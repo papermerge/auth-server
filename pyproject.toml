@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "auth-server"
+version = "0.1.0"
+description = ""
+authors = ["Eugen Ciur <eugen@papermerge.com>"]
+readme = "README.md"
+packages = [{include = "auth_server"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+jose = "^1.0.0"
+sqlalchemy = "^2.0.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
