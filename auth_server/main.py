@@ -52,4 +52,4 @@ async def login(
         algorithm=settings.papermerge__security__token_algorithm
     )
 
-    return schemas.Token({"access_token": access_token, "token_type": "bearer"})
+    return schemas.Token(access_token=access_token, token_type="bearer")
