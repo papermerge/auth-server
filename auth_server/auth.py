@@ -5,8 +5,8 @@ from passlib.hash import pbkdf2_sha256
 from .crud import get_user_by_username
 
 
-def verify_password(passowrd: str, hashed_password: str):
-    pbkdf2_sha256.verify(passowrd, hashed_password)
+def verify_password(password: str, hashed_password: str):
+    return pbkdf2_sha256.verify(password, hashed_password)
 
 
 def create_access_token(
@@ -33,6 +33,6 @@ def authenticate_user(db, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user

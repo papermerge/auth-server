@@ -4,7 +4,7 @@ from .database import Base
 
 
 class User(Base):
-    __tablename__ = "auth_users"
+    __tablename__ = "core_user"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)

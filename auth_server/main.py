@@ -6,15 +6,14 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from .auth import authenticate_user, create_access_token
-from . import crud, models, schemas
+from . import models, get_settings, schemas
 from .database import SessionLocal, engine
-from .config import Settings
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-settings = Settings()
+settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
@@ -31,7 +30,12 @@ def get_db():
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)
-):
+) -> schemas.Token:
+    """
+    username/password based authentication.
+
+    Returns JWT access token.
+    """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -48,4 +52,4 @@ async def login(
         algorithm=settings.papermerge__security__token_algorithm
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return schemas.Token({"access_token": access_token, "token_type": "bearer"})
