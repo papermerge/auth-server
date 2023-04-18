@@ -12,6 +12,7 @@ fastapi = "^0.95.1"
 uvicorn = "^0.21.1"
 jose = "^1.0.0"
 sqlalchemy = "^2.0.9"
+passlib = "^1.7.4"
 
 
 [build-system]
