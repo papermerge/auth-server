@@ -6,6 +6,25 @@ import Error from './error';
 import { ClickEvent } from './types';
 
 
+const authenticate = async (username: string, password: string) => {
+  const params = new URLSearchParams();
+  params.append('username', username);
+  params.append('password', password);
+  let data = {username, password};
+
+  return fetch(
+    '/auth',
+    {
+      method: "POST",
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded'
+      },
+      body: JSON.stringify(data)
+    }
+  );
+}
+
+
 function credentials_provided(username: string, password: string): boolean {
   /**
    * Returens true only if both username and password are provided
@@ -44,6 +63,10 @@ export default function Login() {
     event.preventDefault();
     setErrorMessage('');
     setInProgress(true);
+
+    authenticate(username, password).catch((error) => {
+      console.log("ooops!");
+    });
   }
 
   const handleChangeUsername = (value: string) => {

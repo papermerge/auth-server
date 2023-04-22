@@ -1,7 +1,7 @@
 import React from "react";
+import Spinner from 'react-bootstrap/Spinner';
 import { ClickEvent } from "./types";
 
-import Spinner from "../spinner";
 
 type Args = {
   in_progress: boolean;
@@ -11,6 +11,13 @@ type Args = {
 
 
 function Button({in_progress, is_enabled, onClick, ...props}: Args) {
+  let button_text;
+
+  if (in_progress) {
+    button_text = <Spinner as="span" variant="light" size="sm" />;
+  } else {
+    button_text = <span className="sr-only">Sign In</span>;
+  }
   return (
     <>
       <button {...props}
@@ -19,8 +26,7 @@ function Button({in_progress, is_enabled, onClick, ...props}: Args) {
         onClick={onClick}
         className="btn btn-lg btn-primary"
         style={{'width': '100%'}}>
-            {in_progress && <Spinner />}
-            <span className="sr-only">Sign In</span>
+          {button_text}
       </button>
     </>
   );

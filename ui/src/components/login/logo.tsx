@@ -1,9 +1,9 @@
-import styles from "./logo.module.scss";
+import Image from "next/image";
 
 export default function Logo() {
   return (
-    <div className={styles.logo}>
-      <img width="112px" height="108px" src="/images/logo.svg" />
+    <div className="logo">
+      <Image alt="Papermerge logo" width="112" height="108" src="/images/logo.svg" />
     </div>
   );
 }

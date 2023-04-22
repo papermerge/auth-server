@@ -48,3 +48,8 @@ main.login-layout {
   justify-content: center;
   margin: auto;
 }
+
+.logo {
+  display: flex;
+  justify-content: center;
+}
