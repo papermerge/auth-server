@@ -1,5 +1,7 @@
-import Logo from "../components/login/logo";
-import Login from "../components/login/login";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import Logo from "./components/login/logo";
+import Login from "./components/login/login";
 
 
 export default function LoginLayout() {
