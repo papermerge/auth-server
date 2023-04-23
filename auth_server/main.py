@@ -26,7 +26,7 @@ def get_db():
         db.close()
 
 
-@app.post("/token")
+@app.post("/api/token")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db)

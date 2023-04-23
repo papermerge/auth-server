@@ -13,7 +13,7 @@ const authenticate = async (username: string, password: string) => {
   let data = {username, password};
 
   return fetch(
-    '/auth',
+    '/api/token',
     {
       method: "POST",
       headers: {
