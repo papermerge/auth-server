@@ -1,9 +1,9 @@
 FROM node:18.16.0-alpine as build
 
-ENV APP_DIR=/app_ui
-WORKDIR ${APP_DIR}
+ENV UI_DIR=/app_ui
+WORKDIR ${UI_DIR}
 
-ENV PATH ${APP_DIR}/node_modules/.bin:$PATH
+ENV PATH ${UI_DIR}/node_modules/.bin:$PATH
 
 COPY ui/package.json ./
 COPY ui/package-lock.json ./
@@ -13,11 +13,27 @@ RUN npm install -g
 COPY ui/ .
 RUN npm run build
 
-# production environment
-FROM nginx:stable-alpine
-ENV APP_DIR=/app_ui
+FROM python:3.10
 
-COPY --from=build ${APP_DIR}/build /usr/share/nginx/html
+RUN apt-get update && apt-get install -y --no-install-recommends nginx supervisor
+
+ENV APP_DIR=/auth_server_app
+ENV UI_DIR=/app_ui
+
+WORKDIR ${APP_DIR}
+
+RUN pip install --upgrade poetry
+
+RUN python3 -m venv .venv
+
+COPY docker/supervisord.conf /etc/
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY poetry.lock pyproject.toml README.md ${APP_DIR}
+COPY --from=build ${UI_DIR}/build /usr/share/nginx/html
+
+RUN poetry install --no-root --no-dev -vv
+
+COPY ./auth_server ${APP_DIR}/auth_server/
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/bin/supervisord"]
