@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Annotated
 
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from .auth import authenticate_user, create_access_token
@@ -26,9 +26,10 @@ def get_db():
         db.close()
 
 
-@app.post("/api/token")
+@app.post("/token")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    response: Response,
     db: Session = Depends(get_db)
 ) -> schemas.Token:
     """
@@ -51,5 +52,8 @@ async def login(
         secret_key=settings.papermerge__security__secret_key,
         algorithm=settings.papermerge__security__token_algorithm
     )
+
+    response.set_cookie('access_token', access_token)
+    response.headers['Authorization'] = f"Bearer {access_token}"
 
     return schemas.Token(access_token=access_token, token_type="bearer")

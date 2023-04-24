@@ -31,7 +31,7 @@ const authenticate = async (username: string, password: string) => {
     // read redirect from URL params or from header
     // and redirect to new URL
     // e.g.
-    // window.location.href = "/app";
+    window.location.href = "/app";
     return true;
   }
 
