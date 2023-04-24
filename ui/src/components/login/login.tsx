@@ -10,18 +10,30 @@ const authenticate = async (username: string, password: string) => {
   const params = new URLSearchParams();
   params.append('username', username);
   params.append('password', password);
-  let data = {username, password};
+  params.append('grant_type', 'password');
 
-  return fetch(
+  let response = await fetch(
     '/api/token',
     {
       method: "POST",
       headers: {
-        'content-type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: JSON.stringify(data)
+      body: params
     }
   );
+  if (response.status == 200) {
+    for(let [key, value] of response.headers.entries()) {
+      console.log(key, value);
+    }
+    // read redirect from URL params or from header
+    // and redirect to new URL
+    // e.g.
+    // window.location.href = "/app";
+    return true;
+  }
+
+  return false;
 }
 
 
@@ -64,9 +76,11 @@ export default function Login() {
     setErrorMessage('');
     setInProgress(true);
 
-    authenticate(username, password).catch((error) => {
-      console.log("ooops!");
-    });
+    if (await authenticate(username, password)) {
+    } else {
+      setErrorMessage('Invalid username or password');
+      setInProgress(false);
+    }
   }
 
   const handleChangeUsername = (value: string) => {
