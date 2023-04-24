@@ -8,5 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build Prod Docker image
+    - name: Build Prod Docker Image
       run: docker build . --file docker/Dockerfile --tag papermerge/auth:$(date +%s)

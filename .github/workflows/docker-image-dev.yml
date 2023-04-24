@@ -1,4 +1,4 @@
-name: Docker Image Prod
+name: Docker Image Dev
 
 on:
   workflow_dispatch:
@@ -8,5 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build Dev Docker image
+    - name: Build Dev Docker Image
       run: docker build . --file docker/dev/Dockerfile --tag papermerge/auth:$(date +%s).dev
