@@ -24,7 +24,7 @@ const authenticate = async (username: string, password: string) => {
     }
   );
 
-  if (response.status == 200) {
+  if (response.status === 200) {
     for(let [key, value] of response.headers.entries()) {
       console.log(key, value);
     }

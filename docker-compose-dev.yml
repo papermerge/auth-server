@@ -13,3 +13,4 @@ services:
       - ./ui/node_modules:/app_ui/node_modules/
       - ./ui/src/:/app_ui/src/
       - ./ui/public/:/app_ui/public/
+      - ./ui/tsconfig.json:/app_ui/tsconfig.json
