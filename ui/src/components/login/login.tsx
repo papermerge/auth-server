@@ -8,6 +8,7 @@ import { ClickEvent } from './types';
 
 const authenticate = async (username: string, password: string) => {
   const params = new URLSearchParams();
+
   params.append('username', username);
   params.append('password', password);
   params.append('grant_type', 'password');
@@ -22,6 +23,7 @@ const authenticate = async (username: string, password: string) => {
       body: params
     }
   );
+
   if (response.status == 200) {
     for(let [key, value] of response.headers.entries()) {
       console.log(key, value);
