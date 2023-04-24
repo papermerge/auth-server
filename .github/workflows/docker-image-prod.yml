@@ -1,19 +1,12 @@
-name: Docker Image CI
+name: Docker Image Prod
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
+    - name: Build Prod Docker image
       run: docker build . --file docker/Dockerfile --tag papermerge/auth:$(date +%s)

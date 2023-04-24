@@ -1,0 +1,12 @@
+name: Docker Image Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build Dev Docker image
+      run: docker build . --file docker/dev/Dockerfile --tag papermerge/auth:$(date +%s).dev
