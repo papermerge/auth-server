@@ -1,20 +1,37 @@
 # Authentication Server
 
-Authentication server is standalone http microservice which provides user
-authentication with username and password.
+Authentication server is standalone http microservice which provides
+authentication with username and password via HTML form or via REST API.
 
-User provides username and password either via HTML form (in browser) or via
-REST API, if credentials are valid, then authentication
-server provides in response a valid JWT access token (in body and in
-headers).
+If user credentials are valid, authentication
+server responds with a valid photographically signed JWT access token.
 
+JWT token is delivered to the client http body, as cookie as well as
+`Authorization` header.
 
 ## Usage
 
-In order run authentication server you need to provide it with at least two configuration settings:
-1. a secret
+In order run authentication server you need to provide it with at least two
+configuration settings:
+1. a secret (used to sign token)
 2. access to database which contains one single table `core_user`.
 
+
+Minimal docker compose file:
+
+```
+version: "3.9"
+services:
+  web:
+    image: papermerge/auth-server:0.1.0
+    ports:
+     - "7000:80"
+    environment:
+      PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
+      PAPERMERGE__DATABASE__URL: postgresql://user:password@postgresserver/db
+```
+
+## Configurations
 
 | Name | Description | Default |
 | --- | --- | --- |
