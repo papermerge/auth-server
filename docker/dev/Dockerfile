@@ -18,7 +18,7 @@ RUN python3 -m venv .venv
 COPY docker/dev/supervisord.conf /etc/
 COPY docker/dev/nginx.conf /etc/nginx/nginx.conf
 COPY ui/package-lock.json ui/package.json ui/tsconfig.json /app_ui/
-COPY poetry.lock pyproject.toml README.md ${APP_DIR}
+COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
 
 RUN poetry install --no-root --no-dev -vv
 
