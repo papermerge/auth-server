@@ -6,7 +6,7 @@ authentication with username and password via HTML form or via REST API.
 If user credentials are valid, authentication
 server responds with a valid cryptographically signed JWT access token.
 
-JWT token is delivered to the client http body, as cookie as well as
+JWT token is delivered to the client in http body, in cookie header as well as
 `Authorization` header.
 
 ## Usage
