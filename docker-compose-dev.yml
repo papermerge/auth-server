@@ -1,3 +1,9 @@
+#
+# $ cat .env
+#
+#   PAPERMERGE__SECURITY__SECRET_KEY=123
+#   PAPERMERGE__DATABASE__URL=sqlite:////<absolute path to sqlite3 file>
+#
 version: "3.9"
 services:
   web:
@@ -6,7 +12,7 @@ services:
      - "7000:80"
     environment:
       PAPERMERGE__SECURITY__SECRET_KEY: ${PAPERMERGE__SECURITY__SECRET_KEY}
-      PAPERMERGE__DATABASE__URL: sqlite:////db/db.sqlite3
+      PAPERMERGE__DATABASE__URL: ${PAPERMERGE__DATABASE__URL}
     volumes:
       - ./db:/db
       - ./auth_server/:/auth_server_app/auth_server/
