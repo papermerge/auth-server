@@ -5,12 +5,10 @@ WORKDIR ${UI_DIR}
 
 ENV PATH ${UI_DIR}/node_modules/.bin:$PATH
 
-COPY ui/package.json ./
-COPY ui/package-lock.json ./
+COPY ui/ ./
 
-RUN npm install -g
-
-COPY ui/ .
+RUN npm install -g react-scripts
+RUN npm install
 RUN npm run build
 
 FROM python:3.10
