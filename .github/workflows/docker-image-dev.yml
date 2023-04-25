@@ -25,11 +25,3 @@ jobs:
         push: true
         tags: papermerge/auth-server:${{ inputs.TAG }}.dev
         file: docker/dev/Dockerfile
-
-    - name: Add description
-      uses: peter-evans/dockerhub-description@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: papermerge/auth-server
-        readme-filepath: ./docker/dev/README.md
