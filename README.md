@@ -1,5 +1,7 @@
 # Authentication Server
 
+![Authentication Server](./images/screenshot.png)
+
 Authentication server is standalone http microservice which provides
 authentication with username and password via HTML form or via REST API.
 
