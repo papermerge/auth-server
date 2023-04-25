@@ -1,7 +1,5 @@
 # Authentication Server
 
-![Authentication Server](./images/screenshot.png)
-
 Authentication server is standalone http microservice which provides
 authentication with username and password via HTML form or via REST API.
 
@@ -10,6 +8,8 @@ server responds with a valid cryptographically signed JWT access token.
 
 JWT token is delivered to the client in http body, in cookie header as well as
 `Authorization` header.
+
+![Authentication Server](./images/screenshot.png)
 
 ## Usage
 
