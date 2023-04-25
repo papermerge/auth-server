@@ -4,7 +4,7 @@ Authentication server is standalone http microservice which provides
 authentication with username and password via HTML form or via REST API.
 
 If user credentials are valid, authentication
-server responds with a valid photographically signed JWT access token.
+server responds with a valid cryptographically signed JWT access token.
 
 JWT token is delivered to the client http body, as cookie as well as
 `Authorization` header.
