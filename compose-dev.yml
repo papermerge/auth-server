@@ -7,7 +7,9 @@
 version: "3.9"
 services:
   web:
-    image: papermerge/auth-server:0.1.0.dev
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
     ports:
      - "7000:80"
     environment:

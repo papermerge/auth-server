@@ -9,7 +9,7 @@ services:
   web:
     image: papermerge/auth-server:0.1.0
     ports:
-     - "7000:80"
+     - "11000:80"
     environment:
       PAPERMERGE__SECURITY__SECRET_KEY: ${PAPERMERGE__SECURITY__SECRET_KEY}
       PAPERMERGE__DATABASE__URL: ${PAPERMERGE__DATABASE__URL}
