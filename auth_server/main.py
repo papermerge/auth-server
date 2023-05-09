@@ -38,6 +38,7 @@ async def login(
     Returns JWT access token.
     """
     user = authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=400, detail="Incorrect username or password"
@@ -54,6 +55,8 @@ async def login(
     )
 
     response.set_cookie('access_token', access_token)
+    response.set_cookie('remote_user', str(user.id))
     response.headers['Authorization'] = f"Bearer {access_token}"
+    response.headers['REMOTE_USER'] = str(user.id)
 
     return schemas.Token(access_token=access_token, token_type="bearer")
