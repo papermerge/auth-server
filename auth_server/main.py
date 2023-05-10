@@ -48,7 +48,7 @@ async def login(
         minutes=settings.papermerge__security__token_expire_minutes
     )
     access_token = create_access_token(
-        data={"sub": user.username},
+        data={"sub": user.username, "user_id": user.id},
         expires_delta=access_token_expires,
         secret_key=settings.papermerge__security__secret_key,
         algorithm=settings.papermerge__security__token_algorithm
