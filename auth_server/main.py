@@ -38,6 +38,7 @@ async def login(
     Returns JWT access token.
     """
     user = authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=400, detail="Incorrect username or password"
@@ -47,13 +48,15 @@ async def login(
         minutes=settings.papermerge__security__token_expire_minutes
     )
     access_token = create_access_token(
-        data={"sub": user.username},
+        data={"sub": user.username, "user_id": user.id},
         expires_delta=access_token_expires,
         secret_key=settings.papermerge__security__secret_key,
         algorithm=settings.papermerge__security__token_algorithm
     )
 
     response.set_cookie('access_token', access_token)
+    response.set_cookie('remote_user', str(user.id))
     response.headers['Authorization'] = f"Bearer {access_token}"
+    response.headers['REMOTE_USER'] = str(user.id)
 
     return schemas.Token(access_token=access_token, token_type="bearer")
