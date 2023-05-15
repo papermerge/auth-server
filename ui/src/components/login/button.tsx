@@ -21,7 +21,7 @@ function Button({in_progress, is_enabled, onClick, ...props}: Args) {
   return (
     <>
       <button {...props}
-        type="button"
+        type="submit"
         disabled={!is_enabled}
         onClick={onClick}
         className="btn btn-lg btn-primary"

@@ -14,7 +14,7 @@ def create_access_token(
     secret_key: str,
     algorithm: str,
     expires_delta: timedelta | None = None
-):
+) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
