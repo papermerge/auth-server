@@ -69,20 +69,15 @@ function credentials_provided(username: string, password: string): boolean {
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(
+    (new URLSearchParams(document.location.search)).get('msg') || ''
+  );
   const [inProgress, setInProgress] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
 
-  const handleSubmit = async (event: ClickEvent) => {
-    event.preventDefault();
+  const handleSubmit = (event: ClickEvent) => {
     setErrorMessage('');
     setInProgress(true);
-
-    if (await authenticate(username, password)) {
-    } else {
-      setErrorMessage('Invalid username or password');
-      setInProgress(false);
-    }
   }
 
   const handleChangeUsername = (value: string) => {
@@ -108,7 +103,7 @@ export default function Login() {
   }
 
   return (
-    <form>
+    <form action='/api/auth' method="POST">
       <div className="mb-3 form-floating">
         <Input
           onchange={handleChangeUsername}
