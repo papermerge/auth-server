@@ -10,7 +10,6 @@ export default function SocialLogin() {
     scope: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.scope,
     redirectUri: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.redirect_uri,
     responseType: 'code',
-
     exchangeCodeForTokenMethod: 'POST',
     onSuccess: () => console.log('Success'),
     onError: () => console.log('Error'),
