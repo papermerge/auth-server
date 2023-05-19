@@ -4,6 +4,11 @@
 #   PAPERMERGE__SECURITY__SECRET_KEY=123
 #   PAPERMERGE__DATABASE__URL=sqlite:////<absolute path to sqlite3 file>
 #
+#   # For oauth2/oidc based authentication
+#   PAPERMERGE__OAUTH2__GOOGLE_CLIENT_ID=
+#   PAPERMERGE__OAUTH2__GOOGLE_CLIENT_SECRET=
+#   PAPERMERGE__OAUTH2__CALLBACK_URL=http://localhost:7000
+#
 version: "3.9"
 services:
   web:
