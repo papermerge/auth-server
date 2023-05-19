@@ -4,16 +4,17 @@ import { useOAuth2 } from "../../hooks/use_oauth";
 
 export default function SocialLogin() {
   const { loading, error, getAuth} = useOAuth2({
-		authorizeUrl: 'http://localhost:3001/mock-authorize',
-		clientId: 'SOME_CLIENT_ID',
-		redirectUri: `${document.location.origin}/callback`,
-		scope: 'SOME_SCOPE',
-		responseType: 'code',
-		exchangeCodeForTokenServerURL: 'http://localhost:3001/mock-token',
-		exchangeCodeForTokenMethod: 'POST',
-		onSuccess: () => console.log('Success'),
-		onError: () => console.log('Error'),
-	});
+    authorizeUrl: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.authorize_url,
+    clientId: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.client_id,
+    exchangeCodeForTokenServerURL: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.exchange_code_for_token_url,
+    scope: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.scope,
+    redirectUri: window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.redirect_uri,
+    responseType: 'code',
+
+    exchangeCodeForTokenMethod: 'POST',
+    onSuccess: () => console.log('Success'),
+    onError: () => console.log('Error'),
+  });
 
   return <div className="d-flex flex-column align-items-center">
     <Button className="m-2 btn-success" onClick={() => getAuth()}>

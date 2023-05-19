@@ -1,3 +1,6 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { OAuthPopup } from './components/social_login/oauth_popup';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -7,7 +10,7 @@ import SocialLogin from "./components/social_login/social_login";
 import Separator from './components/separator';
 
 
-export default function LoginLayout() {
+const LoginLayout = () => {
   return (
     <main className="login-layout">
       <div>
@@ -32,3 +35,14 @@ export default function LoginLayout() {
     </main>
   );
 }
+
+const App = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route element={<OAuthPopup />} path="/callback" />
+      <Route element={<LoginLayout />} path="/" />
+    </Routes>
+  </BrowserRouter>
+);
+
+export default App;
