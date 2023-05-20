@@ -37,15 +37,25 @@ You can also start the auth server with poetry:
 
     $ poetry run uvicorn auth_server.main:app --host 0.0.0.0 --port 8000
 
-And then get a jwt token with:
+And then get a jwt token either via form based authentication (/auth endpoint):
 
-    $ curl -XPOST http://localhost:8000/token -H 'Content-Type: application/x-www-form-urlencoded' \
+    $ curl -v -XPOST http://localhost:8000/auth -H 'Content-Type: application/x-www-form-urlencoded' \
         -d 'grant_type=&username=username&password=password&scope=&client_id=&client_secret='
 
-And then you can decode the jwt payload with:
+Note that /auth endpoint will return 302 redirect in both cases (successfully login or not).
+On successfull login the access token will be provided as "access_token" cookie
+and "authorization" header (e.g. "Authorization": "Bearer you-token-here").
+
+You can also authenticate via /token endpoint:
+
+    $ curl -v -XPOST http://localhost:8000/token -H 'Content-Type: application/json' \
+        -d '{"username": "username", "password":"password"}'
+
+On successful login "access_token" will be provided in response body.
+
+You can decode JWT payload with:
 
     $ echo -n payload | base64 -d
-
 
 ## Configurations
 
