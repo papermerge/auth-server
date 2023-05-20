@@ -11,8 +11,6 @@ export type TAuthTokenPayload = {
 export type TResponseTypeBasedProps<T> =
   | {
       responseType: 'code';
-      exchangeCodeForTokenServerURL: string;
-      exchangeCodeForTokenMethod?: 'POST' | 'GET';
       onSuccess?: (payload: T) => void;
       // TODO Adjust payload type
     }
@@ -23,6 +21,7 @@ export type TResponseTypeBasedProps<T> =
 
 
 export type TOauth2Props<T = TAuthTokenPayload> = {
+  provider: 'google' | 'github';
   authorizeUrl: string;
   clientId: string;
   redirectUri: string;

@@ -85,3 +85,36 @@ export const formatAuthorizeUrl = (
 
 	return `${authorizeUrl}?${query}`;
 };
+
+
+export const cleanup = (
+	intervalRef: React.MutableRefObject<string | number | NodeJS.Timeout | undefined>,
+	popupRef: React.MutableRefObject<Window | null | undefined>,
+	handleMessageListener: any
+) => {
+	clearInterval(intervalRef.current);
+	if (popupRef.current && typeof popupRef.current.close === 'function') closePopup(popupRef);
+	removeState();
+	window.removeEventListener('message', handleMessageListener);
+};
+
+export const formatExchangeCodeForTokenServerURL = (
+	clientId: string,
+	code: string,
+	redirectUri: string,
+	state: string
+) => {
+
+	const url = `${window.location.href}token`;
+	const anySearchParameters = queryToObject('');
+
+	return `${url}?${objectToQuery({
+		...anySearchParameters,
+		client_id: clientId,
+		grant_type: 'authorization_code',
+		code,
+		redirect_uri: redirectUri,
+		state,
+	})}`;
+
+};

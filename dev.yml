@@ -7,7 +7,7 @@
 #   # For oauth2/oidc based authentication
 #   PAPERMERGE__OAUTH2__GOOGLE_CLIENT_ID=
 #   PAPERMERGE__OAUTH2__GOOGLE_CLIENT_SECRET=
-#   PAPERMERGE__OAUTH2__CALLBACK_URL=http://localhost:7000
+#   PAPERMERGE__OAUTH2__CALLBACK_URL=http://localhost:7000/callback
 #
 version: "3.9"
 services:
