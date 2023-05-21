@@ -18,3 +18,4 @@ class Token(BaseModel):
 class UserCredentials(BaseModel):
     username: str
     password: str
+

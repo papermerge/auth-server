@@ -1,3 +1,4 @@
+import httpx
 from datetime import timedelta
 from typing import Annotated
 from starlette.datastructures import URL
@@ -11,6 +12,7 @@ from .auth import authenticate_user, create_access_token
 from . import models, get_settings, schemas
 from .database import SessionLocal, engine
 from .models import User
+from .backends.google import GoogleAuth
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -95,3 +97,26 @@ async def form_login(
     response.headers['REMOTE_USER'] = str(user.id)
 
     return response
+
+
+@app.post("/social/token")
+async def social_token(
+    client_id: str,
+    code: str,
+    redirect_uri: str
+):
+    if settings.papermerge__auth__google_client_secret is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Google client secret is empty"
+        )
+
+    client = GoogleAuth(
+        client_secret=settings.papermerge__auth__google_client_secret,
+        client_id=client_id,
+        code=code,
+        redirect_uri=redirect_uri
+    )
+    await client.signin()
+    email = await client.user_email()
+    print(f"====email={email}===")

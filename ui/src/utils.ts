@@ -105,7 +105,7 @@ export const formatExchangeCodeForTokenServerURL = (
 	state: string
 ) => {
 
-	const url = `${window.location.href}token`;
+	const url = `${window.location.href}api/social/token`;
 	const anySearchParameters = queryToObject('');
 
 	return `${url}?${objectToQuery({

@@ -22,3 +22,4 @@ class Settings(BaseSettings):
     # database where to read user table from
     papermerge__database__url: str
     papermerge__auth__redirect_url: str = '/app'
+    papermerge__auth__google_client_secret: str | None
