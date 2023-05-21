@@ -3,6 +3,7 @@ from jose import jwt
 from passlib.hash import pbkdf2_sha256
 
 from .crud import get_user_by_username
+from .models import User
 
 
 def verify_password(password: str, hashed_password: str):
@@ -29,10 +30,12 @@ def create_access_token(
     return encoded_jwt
 
 
-def authenticate_user(db, username: str, password: str):
+def authenticate_user(db, username: str, password: str) -> User | None:
     user = get_user_by_username(db, username)
+
     if not user:
-        return False
+        return None
     if not verify_password(password, user.password):
-        return False
+        return None
+
     return user

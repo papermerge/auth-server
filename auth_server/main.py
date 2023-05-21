@@ -13,6 +13,7 @@ from . import models, get_settings, schemas
 from .database import SessionLocal, engine
 from .models import User
 from .backends.google import GoogleAuth
+from .crud import create_user_from_email
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -54,7 +55,7 @@ async def token_login(
     """username/password based authentication"""
     user = authenticate_user(db, creds.username, creds.password)
 
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=400,
             detail="Incorrect username or password"
@@ -78,7 +79,7 @@ async def form_login(
     """username/password based authentication"""
     user = authenticate_user(db, form_data.username, form_data.password)
 
-    if not user:
+    if user is None:
         redirect_url = URL("/").include_query_params(msg="Invalid credentials")
         return RedirectResponse(
             url=redirect_url,
@@ -103,8 +104,10 @@ async def form_login(
 async def social_token(
     client_id: str,
     code: str,
-    redirect_uri: str
-):
+    redirect_uri: str,
+    response: Response,
+    db: Session = Depends(get_db)
+) -> schemas.Token:
     if settings.papermerge__auth__google_client_secret is None:
         raise HTTPException(
             status_code=400,
@@ -119,4 +122,18 @@ async def social_token(
     )
     await client.signin()
     email = await client.user_email()
-    print(f"====email={email}===")
+
+    user = create_user_from_email(db, email)
+    if user is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Error while creating user in DB"
+        )
+    access_token = create_token(user)
+
+    response.set_cookie('access_token', access_token)
+    response.set_cookie('remote_user', str(user.id))
+    response.headers['Authorization'] = f"Bearer {access_token}"
+    response.headers['REMOTE_USER'] = str(user.id)
+
+    return schemas.Token(access_token=access_token)
