@@ -3,11 +3,11 @@ import uuid
 from auth_server.models import User
 
 
-def test_create_user(session):
+def test_create_user(db_session):
     user = User(
-        id=str(uuid.uuid4()),
+        id=uuid.uuid4().hex,
         username="one",
         email="one@mail.com",
     )
-    session.add(user)
-    session.commit()
+    db_session.add(user)
+    db_session.commit()
