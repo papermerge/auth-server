@@ -28,5 +28,4 @@ def db_session(db_engine):
     yield session
 
     transaction.rollback()
-    session.rollback()
     session.close()

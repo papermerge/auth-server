@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy import select
 
 from auth_server.models import User
 
@@ -11,3 +12,9 @@ def test_create_user(db_session):
     )
     db_session.add(user)
     db_session.commit()
+
+    rows = db_session.execute(
+        select(User).where(User.username == "one")
+    ).all()
+
+    assert len(rows) == 1
