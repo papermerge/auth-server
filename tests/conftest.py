@@ -10,19 +10,23 @@ def db_engine():
     """yields a SQLAlchemy engine which is suppressed after the test session"""
     settings = get_settings()
     db_url = settings.papermerge__database__url
-    _engine = create_engine(db_url, echo=True)
+    engine = create_engine(db_url, echo=True)
 
-    yield _engine
+    yield engine
 
-    _engine.dispose()
+    engine.dispose()
 
 
 @pytest.fixture()
 def db_session(db_engine):
     """yields a SQLAlchemy connection which is rollbacked after the test"""
-    _session = scoped_session(sessionmaker(bind=db_engine))
+    connection = db_engine.connect()
+    # begin the nested transaction
+    transaction = connection.begin()
+    session = scoped_session(sessionmaker(bind=connection))
 
-    yield _session
+    yield session
 
-    _session.rollback()
-    _session.close()
+    transaction.rollback()
+    session.rollback()
+    session.close()
