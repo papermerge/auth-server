@@ -1,6 +1,6 @@
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session, Session
 
 from auth_server import get_settings
 
@@ -20,12 +20,9 @@ def db_engine():
 @pytest.fixture()
 def db_session(db_engine):
     """yields a SQLAlchemy connection which is rollbacked after the test"""
-    connection = db_engine.connect()
-    # begin the nested transaction
-    transaction = connection.begin()
-    session = scoped_session(sessionmaker(bind=connection))
-
-    yield session
-
-    transaction.rollback()
-    session.close()
+    with db_engine.connect() as conn:
+        with conn.begin() as transaction:
+            session = scoped_session(sessionmaker(bind=conn))
+            yield session
+            session.close()
+            transaction.rollback()

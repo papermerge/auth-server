@@ -39,6 +39,14 @@ class Node(Base):
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(200), primary_key=True, index=True)
+    lang: Mapped[str] = mapped_column(String(8), default='deu')
+    ctype: Mapped[str] = mapped_column(String(16), default='folder')
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        default=datetime.datetime.utcnow
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        default=datetime.datetime.utcnow
+    )
     user_id: Mapped["User"] = mapped_column(
         String(32),
         ForeignKey("core_user.id")
