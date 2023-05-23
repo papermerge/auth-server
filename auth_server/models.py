@@ -34,6 +34,7 @@ class User(Base):
         default=datetime.datetime.utcnow
     )
 
+
 class Node(Base):
     __tablename__ = "core_basetreenode"
 
@@ -54,7 +55,6 @@ class Node(Base):
     user = relationship("User", foreign_keys=[user_id])
 
 
-
 class Folder(Base):
     __tablename__ = "core_folder"
 
@@ -64,4 +64,3 @@ class Folder(Base):
         ForeignKey("core_basetreenode.id")
     )
     basetreenode_ptr = relationship("Node", foreign_keys=[basetreenode_ptr_id])
-
