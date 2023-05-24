@@ -24,6 +24,20 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=False)
     first_name: Mapped[str] = mapped_column(String(150), default='')
     last_name: Mapped[str] = mapped_column(String(150), default='')
+    home_folder = relationship(
+        "Node",
+        primaryjoin="and_(User.id==Node.user_id, "
+        " Node.title=='.home')",
+        uselist=False,
+        viewonly = True,
+    )
+    inbox_folder = relationship(
+        "Node",
+        primaryjoin="and_(User.id==Node.user_id, "
+        " Node.title=='.inbox')",
+        viewonly=True,
+        uselist=False
+    )
     date_joined: Mapped[datetime.datetime] = mapped_column(
         default=datetime.datetime.utcnow
     )
@@ -53,6 +67,11 @@ class Node(Base):
         ForeignKey("core_user.id")
     )
     user = relationship("User", foreign_keys=[user_id])
+    parent_id = mapped_column(
+        "parent_id",
+        String(32),
+        ForeignKey("core_basetreenode.id")
+    )
 
 
 class Folder(Base):
