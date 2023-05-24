@@ -6,7 +6,7 @@ from auth_server.crud import create_user_from_email
 
 def test_create_user_from_email(db_session):
 
-    create_user_from_email(db_session, 'one@mail.com')
+    created_user = create_user_from_email(db_session, 'one@mail.com')
 
     statement = select(User).where(User.username == "one")
     rows = db_session.execute(statement).all()
@@ -16,3 +16,4 @@ def test_create_user_from_email(db_session):
     assert user.username == 'one'
     assert user.inbox_folder.title == '.inbox'
     assert user.home_folder.title == '.home'
+    assert created_user.id == user.id

@@ -60,3 +60,5 @@ def create_user_from_email(db_session: Session, email: str):
     db_session.add(inbox)
     db_session.add(inbox_folder)
     db_session.commit()
+
+    return user
