@@ -14,6 +14,12 @@ def get_user_by_username(db: Session, username: str) -> models.User | None:
     ).filter(models.User.username == username).first()
 
 
+def get_user_by_email(db: Session, email: str) -> models.User | None:
+    return db.query(
+        models.User
+    ).filter(models.User.email == email).first()
+
+
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
@@ -62,3 +68,11 @@ def create_user_from_email(db_session: Session, email: str):
     db_session.commit()
 
     return user
+
+
+def get_or_create_user_by_email(
+    db_session: Session, email: str
+):
+    user = get_user_by_email(db_session, email)
+    if user is None:
+        return create_user_from_email(db_session, email)

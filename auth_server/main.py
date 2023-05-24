@@ -1,4 +1,4 @@
-import httpx
+import logging
 from datetime import timedelta
 from typing import Annotated
 from starlette.datastructures import URL
@@ -13,7 +13,7 @@ from . import models, get_settings, schemas
 from .database import SessionLocal, engine
 from .models import User
 from .backends.google import GoogleAuth
-from .crud import create_user_from_email
+from .crud import get_or_create_user_by_email
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,7 +21,7 @@ app = FastAPI()
 
 settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+logger = logging.getLogger(__name__)
 
 # Dependency
 def get_db():
@@ -108,6 +108,7 @@ async def social_token(
     response: Response,
     db: Session = Depends(get_db)
 ) -> schemas.Token:
+    logger.info("Auth with google provider")
     if settings.papermerge__auth__google_client_secret is None:
         raise HTTPException(
             status_code=400,
@@ -120,14 +121,24 @@ async def social_token(
         code=code,
         redirect_uri=redirect_uri
     )
-    await client.signin()
+    logger.info("Auth:goolgle: sign in")
+    try:
+        await client.signin()
+    except Exception as ex:
+        logger.warning(f"Auth:google: sign in failed with {ex}")
+        raise HTTPException(
+            status_code=401,
+            detail=f"401 Unauthorized. Auth provider error: {ex}."
+        )
+
     email = await client.user_email()
 
-    user = create_user_from_email(db, email)
+    user = get_or_create_user_by_email(db, email)
+
     if user is None:
         raise HTTPException(
-            status_code=400,
-            detail="Error while creating user in DB"
+            status_code=401,
+            detail=f"401 Unauthorized. Failed to fetch user model."
         )
     access_token = create_token(user)
 

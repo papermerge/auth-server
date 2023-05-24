@@ -17,3 +17,4 @@ def test_create_user_from_email(db_session):
     assert user.inbox_folder.title == '.inbox'
     assert user.home_folder.title == '.home'
     assert created_user.id == user.id
+

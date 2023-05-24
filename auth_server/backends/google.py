@@ -1,5 +1,6 @@
 import logging
 import httpx
+from httpx import HTTPStatusError
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,13 @@ class GoogleAuth:
             logger.info(f"google signin response_code = {response.status_code}")
             logger.info(f"google signin response_text = {response.text}")
 
-            response.raise_for_status()
+            if not response.is_success:
+                message = " ".join([
+                    f"response.status_code = {response.status_code}",
+                    f"response.text = {response.text}"
+                ])
+                raise ValueError(message)
+
             self.access_token = response.json()['access_token']
 
     async def user_email(self):
@@ -58,5 +65,11 @@ class GoogleAuth:
             logger.info(f"google userinfo response_code = {response.status_code}")
             logger.info(f"google userinfo response_text = {response.text}")
 
-            response.raise_for_status()
+            if not response.is_success:
+                message = " ".join([
+                    f"response.status_code = {response.status_code}",
+                    f"response.text = {response.text}"
+                ])
+                raise ValueError(message)
+
             return response.json()['email']
