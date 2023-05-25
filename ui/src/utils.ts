@@ -65,17 +65,17 @@ export const isWindowOpener = (opener: Window | null): opener is Window =>
 export const openerPostMessage = (opener: Window, message: TMessageData) =>
 	opener.postMessage(message);
 
-export const formatAuthorizeUrl = (
+
+export const auth_provider_url = (
 	authorizeUrl: string,
 	clientId: string,
 	redirectUri: string,
 	scope: string,
 	state: string,
-	responseType: TOauth2Props['responseType'],
 	extraQueryParameters: TOauth2Props['extraQueryParameters'] = {}
 ) => {
 	const query = objectToQuery({
-		response_type: responseType,
+		response_type: 'code',
 		client_id: clientId,
 		redirect_uri: redirectUri,
 		scope,
@@ -93,12 +93,14 @@ export const cleanup = (
 	handleMessageListener: any
 ) => {
 	clearInterval(intervalRef.current);
-	if (popupRef.current && typeof popupRef.current.close === 'function') closePopup(popupRef);
+	if (popupRef.current && typeof popupRef.current.close === 'function') {
+		// closePopup(popupRef);
+	};
 	removeState();
 	window.removeEventListener('message', handleMessageListener);
 };
 
-export const formatExchangeCodeForTokenServerURL = (
+export const auth_server_url = (
 	clientId: string,
 	code: string,
 	redirectUri: string,
@@ -107,6 +109,12 @@ export const formatExchangeCodeForTokenServerURL = (
 
 	const url = `${window.location.href}api/social/token`;
 	const anySearchParameters = queryToObject('');
+	const some_url = 'http://some:7000/url'
+
+	console.log(`client_id=${clientId}`);
+	console.log(`code=${code}`);
+	console.log(`redirect_uri=${redirectUri}`);
+	console.log(`just a test=${some_url}`);
 
 	return `${url}?${objectToQuery({
 		...anySearchParameters,

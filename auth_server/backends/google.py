@@ -33,6 +33,7 @@ class GoogleAuth:
                 'code': self.code
             }
             logger.info(f"google signin params: {params}")
+
             response = await client.post(
                 self.provider_url,
                 params=params
