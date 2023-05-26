@@ -12,6 +12,7 @@ from .auth import authenticate_user, create_access_token
 from . import models, get_settings, schemas
 from .database import SessionLocal, engine
 from .models import User
+from .schemas import User as PyUser
 from .backends.google import GoogleAuth
 from .crud import get_or_create_user_by_email
 

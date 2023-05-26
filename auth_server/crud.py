@@ -76,3 +76,5 @@ def get_or_create_user_by_email(
     user = get_user_by_email(db_session, email)
     if user is None:
         return create_user_from_email(db_session, email)
+
+    return user
