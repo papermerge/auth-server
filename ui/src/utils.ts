@@ -107,7 +107,7 @@ export const auth_server_url = (
 	state: string
 ) => {
 
-	const url = `${window.location.href}api/social/token`;
+	const url = window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.internal_token_url;
 	const anySearchParameters = queryToObject('');
 	const some_url = 'http://some:7000/url'
 

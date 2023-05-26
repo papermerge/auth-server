@@ -55,6 +55,7 @@ declare global {
   interface Window {
     __PAPERMERGE_RUNTIME_CONFIG__: {
       oauth2: {
+        internal_token_url: string;
         google: OAuth2ProviderType,
         github: OAuth2ProviderType
       }

@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { OAuthPopup } from './components/social_login/oauth_popup';
+import { Callback } from './components/social_login/callback';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -39,7 +39,7 @@ const LoginLayout = () => {
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route element={<OAuthPopup />} path="/callback" />
+      <Route element={<Callback />} path="/callback" />
       <Route element={<LoginLayout />} path="/" />
     </Routes>
   </BrowserRouter>

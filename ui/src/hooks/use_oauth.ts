@@ -33,12 +33,10 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
       saveState(state);
 
       console.log("open popup");
-      // 3. Open popup
-      popupRef.current = openPopup(
-        auth_provider_url(authorizeUrl, clientId, redirectUri, scope, state)
-      );
 
-      // 4. Register message listener
+      window.location.href = auth_provider_url(authorizeUrl, clientId, redirectUri, scope, state);
+
+      /*
       async function handleMessageListener(message: MessageEvent<TMessageData>) {
         try {
           if (!('error' in message.data)) {
@@ -66,11 +64,7 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
       }
 
       console.log("Adding handleMessageListenser");
-      window.addEventListener('message', handleMessageListener);
-
-      return () => {
-        window.removeEventListener('message', handleMessageListener);
-      };
+      */
 
   }, []);
 
