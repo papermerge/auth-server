@@ -24,6 +24,7 @@ settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 logger = logging.getLogger(__name__)
 
+
 # Dependency
 def get_db():
     db = SessionLocal()

@@ -8,6 +8,10 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+HOME_TITLE = ".home"
+INBOX_TITLE = ".inbox"
+
+
 class User(Base):
     __tablename__ = "core_user"
 
@@ -24,20 +28,9 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=False)
     first_name: Mapped[str] = mapped_column(String(150), default='')
     last_name: Mapped[str] = mapped_column(String(150), default='')
-    home_folder = relationship(
-        "Node",
-        primaryjoin="and_(User.id==Node.user_id, "
-        " Node.title=='.home')",
-        uselist=False,
-        viewonly = True,
-    )
-    inbox_folder = relationship(
-        "Node",
-        primaryjoin="and_(User.id==Node.user_id, "
-        " Node.title=='.inbox')",
-        viewonly=True,
-        uselist=False
-    )
+    home_folder_id = mapped_column(ForeignKey("core_basetreenode.id"))
+    inbox_folder_id = mapped_column(ForeignKey("core_basetreenode.id"))
+
     date_joined: Mapped[datetime.datetime] = mapped_column(
         default=datetime.datetime.utcnow
     )

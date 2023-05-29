@@ -1,28 +1,27 @@
+import logging
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session, Session
 
-from auth_server import get_settings
+from sqlalchemy.orm import Session
+
+from auth_server.database import Base, engine
+
+logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope='session')
-def db_engine():
-    """yields a SQLAlchemy engine which is suppressed after the test session"""
-    settings = get_settings()
-    db_url = settings.papermerge__database__url
-    engine = create_engine(db_url, echo=True)
-
-    yield engine
-
-    engine.dispose()
+@pytest.fixture(autouse=True)
+def setup_db_schema():
+    Base.metadata.create_all(engine)
+    yield
+    Base.metadata.drop_all(engine)
 
 
 @pytest.fixture()
-def db_session(db_engine):
-    """yields a SQLAlchemy connection which is rollbacked after the test"""
-    with db_engine.connect() as conn:
-        with conn.begin() as transaction:
-            session = scoped_session(sessionmaker(bind=conn))
-            yield session
-            session.close()
-            transaction.rollback()
+def db_connection():
+    with engine.begin() as conn:
+        yield conn
+
+
+@pytest.fixture()
+def db_session():
+    with Session(engine) as session:
+        yield session

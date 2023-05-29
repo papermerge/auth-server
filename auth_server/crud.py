@@ -1,4 +1,5 @@
 import uuid
+from sqlalchemy import Connection, insert, update, select
 from sqlalchemy.orm import Session
 
 from . import models
@@ -24,7 +25,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
-def create_user_from_email(db_session: Session, email: str):
+def create_user_from_email(db_connection: Connection, email: str) -> None:
     """
     Creates user with its home and inbox folders
 
@@ -38,36 +39,58 @@ def create_user_from_email(db_session: Session, email: str):
     will be performed via oauth2 provider.
     """
     username = email.split('@')[0]
-    user = models.User(
-        id=uuid.uuid4().hex,
-        username=username,
-        password=uuid.uuid4().hex,
-        email=email,
+    user_id = uuid.uuid4().hex
+    home_id = uuid.uuid4().hex
+    inbox_id = uuid.uuid4().hex
+
+    # insert user model (without home_folder_id and inbox_folder_id)
+    db_connection.execute(
+        insert(models.User),
+        {
+            "id": user_id,
+            "username": username,
+            "password": uuid.uuid4().hex,
+            "email": email
+        }
     )
-    home = models.Node(
-        id=uuid.uuid4().hex,
-        title=".home",
-        user=user
+
+    # create .home and .inbox nodes
+    db_connection.execute(
+        insert(models.Node),
+        [
+            {
+                "id": home_id,
+                "title": models.HOME_TITLE,
+                "password": uuid.uuid4().hex,
+                "user_id": user_id
+            },
+            {
+                "id": inbox_id,
+                "title": models.INBOX_TITLE,
+                "password": uuid.uuid4().hex,
+                "user_id": user_id
+            }
+        ]
     )
-    home_folder = models.Folder(basetreenode_ptr=home)
 
-    inbox = models.Node(
-        id=uuid.uuid4().hex,
-        title=".inbox",
-        user=user
+    # .home and .inbox nodes are folder instances
+    db_connection.execute(
+        insert(models.Folder),
+        [
+            {
+                "basetreenode_ptr_id": home_id,
+            },
+            {
+                "basetreenode_ptr_id": inbox_id,
+            }
+        ]
     )
-    inbox_folder = models.Folder(basetreenode_ptr=inbox)
-
-    db_session.add(user)
-    db_session.add(home)
-    db_session.add(home_folder)
-    db_session.commit()
-
-    db_session.add(inbox)
-    db_session.add(inbox_folder)
-    db_session.commit()
-
-    return user
+    # update user's home_folder_id and inbox_folder_id
+    db_connection.execute(
+        update(models.User)
+        .where(models.User.username == username)
+        .values(home_folder_id=home_id, inbox_folder_id=inbox_id)
+    )
 
 
 def get_or_create_user_by_email(
@@ -75,6 +98,10 @@ def get_or_create_user_by_email(
 ):
     user = get_user_by_email(db_session, email)
     if user is None:
-        return create_user_from_email(db_session, email)
+        create_user_from_email(db_session.connection(), email)
+        return db_session.scalar(
+            select(models.User)
+            .where(models.User.email == email)
+        )
 
     return user
