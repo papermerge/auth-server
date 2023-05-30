@@ -32,14 +32,16 @@ class GoogleAuth:
                 'redirect_uri': self.redirect_uri,
                 'code': self.code
             }
-            logger.info(f"google signin params: {params}")
+            logger.debug(f"google signin params: {params}")
 
             response = await client.post(
                 self.provider_url,
                 params=params
             )
-            logger.info(f"google signin response_code = {response.status_code}")
-            logger.info(f"google signin response_text = {response.text}")
+            logger.debug(
+                f"google signin response_code = {response.status_code}"
+            )
+            logger.debug(f"google signin response_text = {response.text}")
 
             if not response.is_success:
                 message = " ".join([

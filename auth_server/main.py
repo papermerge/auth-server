@@ -12,13 +12,13 @@ from .auth import authenticate_user, create_access_token
 from . import models, get_settings, schemas
 from .database import SessionLocal, engine
 from .models import User
-from .schemas import User as PyUser
 from .backends.google import GoogleAuth
 from .crud import get_or_create_user_by_email
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
 
 settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -110,7 +110,8 @@ async def social_token(
     response: Response,
     db: Session = Depends(get_db)
 ) -> schemas.Token:
-    logger.info("Auth with google provider")
+    logger.debug("Auth with google provider")
+
     if settings.papermerge__auth__google_client_secret is None:
         raise HTTPException(
             status_code=400,
@@ -123,7 +124,8 @@ async def social_token(
         code=code,
         redirect_uri=redirect_uri
     )
-    logger.info("Auth:goolgle: sign in")
+    logger.debug("Auth:google: sign in")
+
     try:
         await client.signin()
     except Exception as ex:

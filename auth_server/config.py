@@ -20,6 +20,6 @@ class Settings(BaseSettings):
     papermerge__security__token_expire_minutes: int = 360
 
     # database where to read user table from
-    papermerge__database__url: str
+    papermerge__database__url: str = "sqlite+pysqlite:///:memory:"
     papermerge__auth__redirect_url: str = '/app'
     papermerge__auth__google_client_secret: str | None

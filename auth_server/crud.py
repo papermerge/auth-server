@@ -1,8 +1,13 @@
+import logging
 import uuid
+
 from sqlalchemy import Connection, insert, update, select
 from sqlalchemy.orm import Session
 
 from . import models
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_user(db: Session, user_id: int):
@@ -38,6 +43,7 @@ def create_user_from_email(db_connection: Connection, email: str) -> None:
     is created via oauth2 provider and thus, authentication
     will be performed via oauth2 provider.
     """
+    logger.debug(f"Inserting user with email {email}...")
     username = email.split('@')[0]
     user_id = uuid.uuid4().hex
     home_id = uuid.uuid4().hex
@@ -91,17 +97,22 @@ def create_user_from_email(db_connection: Connection, email: str) -> None:
         .where(models.User.username == username)
         .values(home_folder_id=home_id, inbox_folder_id=inbox_id)
     )
+    db_connection.commit()
 
 
 def get_or_create_user_by_email(
     db_session: Session, email: str
 ):
+    logger.debug(f"get or create user with email: {email}")
+
     user = get_user_by_email(db_session, email)
     if user is None:
+        logger.info(f"User with email {email} is None")
         create_user_from_email(db_session.connection(), email)
         return db_session.scalar(
             select(models.User)
             .where(models.User.email == email)
         )
 
+    logger.debug(f"User with email {email} was found in database")
     return user
