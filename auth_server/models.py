@@ -1,11 +1,11 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, ForeignKey, func
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from auth_server.database.base import Base
 
 
 HOME_TITLE = ".home"

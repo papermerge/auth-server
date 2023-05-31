@@ -21,9 +21,9 @@ def get_user_by_username(db: Session, username: str) -> models.User | None:
 
 
 def get_user_by_email(db: Session, email: str) -> models.User | None:
-    return db.query(
-        models.User
-    ).filter(models.User.email == email).first()
+    return db.scalar(
+        select(models.User).where(models.User.email == email)
+    )
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):

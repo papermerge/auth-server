@@ -1,5 +1,3 @@
-import os
-from unittest import mock
 import logging
 
 import httpx
@@ -8,8 +6,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from auth_server.database import Base, engine
+from auth_server.database.base import Base
 from auth_server.main import app
+from auth_server.database.engine import engine
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +23,8 @@ def db_connection():
 @pytest.fixture(scope="module", autouse=True)
 def db_schema():
     Base.metadata.create_all(engine)
-    logger.debug("===DB SCHEMA BEFORE===")
     yield
-    logger.debug("===DB SCHEMA AFTER===")
+    Base.metadata.drop_all(engine)
 
 
 @pytest.fixture()
@@ -37,4 +36,3 @@ def db_session():
 @pytest.fixture()
 def client() -> httpx.Client:
     return TestClient(app)
-

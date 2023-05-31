@@ -9,13 +9,12 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from .auth import authenticate_user, create_access_token
-from . import models, get_settings, schemas
-from .database import SessionLocal, engine
+from . import get_settings, schemas
+from auth_server.database.session import SessionLocal
 from .models import User
 from .backends.google import GoogleAuth
 from .crud import get_or_create_user_by_email
 
-models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
