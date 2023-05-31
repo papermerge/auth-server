@@ -6,6 +6,7 @@ from auth_server.main import settings
 
 logger = logging.getLogger(__name__)
 
+
 class MockedGoogleAuth:
     def __init__(self, *args, **kwargs):
         pass
@@ -35,3 +36,54 @@ def test_retrieve_token_endpoint(client: httpx.Client):
         )
 
         assert response.status_code == 200, response.text
+
+
+def test_invalid_post_request(client: httpx.Client):
+    """
+    POST request to /token must have either non-empty request body
+    containing user credentials or provide following request parameters
+    for oauth2:
+    - provider
+    - code
+    - client_id
+    - redirect_uri
+    """
+    # both params and body are empty
+    response = client.post("/token", params={})
+    # should return 400 Bad request as both body and params
+    # are empty
+    assert response.status_code == 400, response.text
+
+    response = client.post("/token", params={
+        "code": "123",
+        "redirect_uri": "http://some/callback",
+        "provider": "google"
+    })
+    # should return 400 Bad request as "client_id" parameter is missing
+    assert response.status_code == 400, response.text
+
+    response = client.post("/token", params={
+        "client_id": "cl123",
+        "redirect_uri": "http://some/callback",
+        "provider": "google"
+    })
+    # should return 400 Bad request as "code" parameter is missing
+    assert response.status_code == 400, response.text
+
+    response = client.post("/token", params={
+        "client_id": "cl123",
+        "redirect_uri": "http://some/callback",
+        "code": "abc"
+    })
+    # should return 400 Bad request as "provider" parameter is missing
+    assert response.status_code == 400, response.text
+
+    response = client.post("/token", params={
+        "client_id": "cl123",
+        "provider": "google",
+        "code": "abc"
+    })
+    # should return 400 Bad request as "redirect_uri" parameter is missing
+    assert response.status_code == 400, response.text
+
+

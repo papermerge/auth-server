@@ -11,11 +11,19 @@ from fastapi import HTTPException
 from .crud import get_user_by_username, get_or_create_user_by_email
 from .models import User
 from .config import Settings
-from .backends import GoogleAuth
+from .backends import GoogleAuth, OAuth2Provider
 
 
 logger = logging.getLogger(__name__)
 settings = Settings()
+
+
+def raise_on_empty(**kwargs):
+    for key, value in kwargs.items():
+        if value is None:
+            raise ValueError(
+                 f"{key} is expected to be non-empty"
+            )
 
 
 async def authenticate(
@@ -23,16 +31,24 @@ async def authenticate(
     *,
     username: str | None = None,
     password: str | None = None,
-    provider: str | None = None,
+    provider: OAuth2Provider | None = None,
     client_id: str | None = None,
     code: str | None = None,
     redirect_uri: str | None = None
 ) -> User | None:
+
     if username and password:
         # password based authentication against database
         return db_auth(db, username, password)
 
-    if provider == "google":
+    raise_on_empty(
+        code=code,
+        client_id=client_id,
+        provider=provider,
+        redirect_uri=redirect_uri
+    )
+
+    if provider == OAuth2Provider.GOOGLE:
         # oauth 2.0, google provider
         return await google_auth(
             db,
@@ -40,8 +56,15 @@ async def authenticate(
             code=code,
             redirect_uri=redirect_uri
         )
-
-    return None
+    elif provider == OAuth2Provider.GITHUB:
+        return await github_auth(
+            db,
+            client_id=client_id,
+            code=code,
+            redirect_uri=redirect_uri
+        )
+    else:
+        raise ValueError("Unknown or empty oauth2 provider")
 
 
 def verify_password(password: str, hashed_password: str):
@@ -113,6 +136,15 @@ async def google_auth(
     email = await client.user_email()
 
     return get_or_create_user_by_email(db, email)
+
+
+async def github_auth(
+    db: Session,
+    client_id: str,
+    code: str,
+    redirect_uri: str
+) -> User:
+    pass
 
 
 def create_token(user: User) -> str:

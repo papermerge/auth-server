@@ -35,21 +35,33 @@ services:
 
 You can also start the auth server with poetry:
 
-    $ poetry run uvicorn auth_server.main:app --host 0.0.0.0 --port 8000
+    $ poetry run uvicorn auth_server.main:app \
+        --host 0.0.0.0 \
+        --port 8000 \
+        --reload \
+        --log-config etc/logging.yml
+        --log-level info
 
-And then get a jwt token either via form based authentication (/auth endpoint):
+Application providers one single endpoint `POST /token` which return jwt access
+token. There two valid options for using `POST /token` endpoint:
 
-    $ curl -v -XPOST http://localhost:8000/auth -H 'Content-Type: application/x-www-form-urlencoded' \
-        -d 'grant_type=&username=username&password=password&scope=&client_id=&client_secret='
+1. non-empty request body with user credentials (application/json)
+2. empty request body, but non-empty valid request params
 
-Note that /auth endpoint will return 302 redirect in both cases (successfully login or not).
-On successfull login the access token will be provided as "access_token" cookie
-and "authorization" header (e.g. "Authorization": "Bearer you-token-here").
-
-You can also authenticate via /token endpoint:
+In case 1. application will authenticate again user credentials in database
+(TBD: or againt LDAP credentials, if LDAP configurations are present).
+Here is an example of POST request with user credentials: 
 
     $ curl -v -XPOST http://localhost:8000/token -H 'Content-Type: application/json' \
         -d '{"username": "username", "password":"password"}'
+
+In case 2. i.e. when POST body is empty, then application using information from
+request parameters will authenticate against one of the available OAuth 2.0 
+providers:
+
+    $ curl -v -XPOST "http://localhost:8000/token?provider=google&code=123 ..."
+
+For documentation on request parameters see http://localhost:8000/docs
 
 On successful login "access_token" will be provided in response body.
 

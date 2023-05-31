@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from .auth import authenticate, create_token
 from . import schemas
+from .backends import OAuth2Provider
 from .config import get_settings
 from auth_server.database import get_db
 
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 @app.post("/token")
 async def retrieve_token(
     response: Response,
-    provider: str | None = None,
+    provider: OAuth2Provider | None = None,
     client_id: str | None = None,
     code: str | None = None,
     redirect_uri: str | None = None,
@@ -29,14 +30,6 @@ async def retrieve_token(
 ) -> schemas.Token:
     """
     Retrieve JWT access token
-
-    :param provider:
-    :param client_id:
-    :param code:
-    :param redirect_uri:
-    :param creds:
-    :param db:
-    :return:
     """
     kwargs = dict(
         code=code,
@@ -48,11 +41,17 @@ async def retrieve_token(
         kwargs['username'] = creds.username
         kwargs['password'] = creds.password
 
-    user = await authenticate(db, **kwargs)
+    try:
+        user = await authenticate(db, **kwargs)
+    except ValueError as ex:
+        raise HTTPException(
+            status_code=400,
+            detail=str(ex)
+        ) from ex
 
     if user is None:
         raise HTTPException(
-            status_code=400,
+            status_code=401,
             detail="Unauthorized"
         )
 
