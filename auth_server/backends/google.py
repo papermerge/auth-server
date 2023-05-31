@@ -1,8 +1,9 @@
 import logging
 import httpx
-from httpx import HTTPStatusError
+
 
 logger = logging.getLogger(__name__)
+
 
 class GoogleAuth:
     name: str = 'google'

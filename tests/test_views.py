@@ -17,16 +17,17 @@ class MockedGoogleAuth:
         return "momo@mail.com"
 
 
-def test_social_token(client: httpx.Client):
+def test_retrieve_token_endpoint(client: httpx.Client):
     """
     Basic test using Google Auth
     """
     settings.papermerge__auth__google_client_secret = "123"
     logger.debug("===TEST SOCIAL TOKEN===")
-    with mock.patch("auth_server.main.GoogleAuth", MockedGoogleAuth):
+    with mock.patch("auth_server.auth.GoogleAuth", MockedGoogleAuth):
         response = client.post(
-            "/social/token",
+            "/token",
             params={
+                "provider": "google",
                 "client_id": "123",
                 "code": "abc",
                 "redirect_uri": "http://site.com/callback"

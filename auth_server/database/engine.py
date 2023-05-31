@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 
-from auth_server import get_settings
+from auth_server.config import get_settings
 
 settings = get_settings()
 
