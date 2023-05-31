@@ -14,7 +14,13 @@ sqlalchemy = "^2.0.9"
 passlib = "^1.7.4"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
+httpx = "^0.24.1"
+rich = "^13.3.5"
 
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
+pytest-env = "^0.8.1"
 
 [build-system]
 requires = ["poetry-core"]

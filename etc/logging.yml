@@ -1,0 +1,19 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  simple:
+    format: "[%(name)s:%(funcName)s]: %(message)s"
+
+handlers:
+  console:
+    class: rich.logging.RichHandler
+    formatter: simple
+
+root:
+  handlers: [console]
+
+loggers:
+  auth_server:
+    propagate: true
+    level: DEBUG

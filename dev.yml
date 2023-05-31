@@ -4,6 +4,11 @@
 #   PAPERMERGE__SECURITY__SECRET_KEY=123
 #   PAPERMERGE__DATABASE__URL=sqlite:////<absolute path to sqlite3 file>
 #
+#   # For oauth2 based authentication
+#   PAPERMERGE__AUTH__GOOGLE_CLIENT_ID=
+#   PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET=
+
+#
 version: "3.9"
 services:
   web:
@@ -15,6 +20,7 @@ services:
     environment:
       PAPERMERGE__SECURITY__SECRET_KEY: ${PAPERMERGE__SECURITY__SECRET_KEY}
       PAPERMERGE__DATABASE__URL: ${PAPERMERGE__DATABASE__URL}
+      PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET: ${PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET}
     volumes:
       - ./db:/db
       - ./auth_server/:/auth_server_app/auth_server/
