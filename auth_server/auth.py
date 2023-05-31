@@ -12,18 +12,11 @@ from .crud import get_user_by_username, get_or_create_user_by_email
 from .models import User
 from .config import Settings
 from .backends import GoogleAuth, OAuth2Provider
+from .utils import raise_on_empty
 
 
 logger = logging.getLogger(__name__)
 settings = Settings()
-
-
-def raise_on_empty(**kwargs):
-    for key, value in kwargs.items():
-        if value is None:
-            raise ValueError(
-                 f"{key} is expected to be non-empty"
-            )
 
 
 async def authenticate(
@@ -67,7 +60,8 @@ async def authenticate(
         raise ValueError("Unknown or empty oauth2 provider")
 
 
-def verify_password(password: str, hashed_password: str):
+def verify_password(password: str, hashed_password: str) -> bool:
+    logger.debug("checking credentials...")
     return pbkdf2_sha256.verify(password, hashed_password)
 
 
@@ -92,13 +86,18 @@ def create_access_token(
 
 
 def db_auth(db, username: str, password: str) -> User | None:
+    logger.info(f"Database based authentication for '{username}'")
     user = get_user_by_username(db, username)
 
     if not user:
-        return None
-    if not verify_password(password, user.password):
+        logger.warning(f"User {username} not found in database")
         return None
 
+    if not verify_password(password, user.password):
+        logger.warning(f"Authentication failed for '{username}'")
+        return None
+
+    logger.info(f"Authentication succeded for '{username}'")
     return user
 
 

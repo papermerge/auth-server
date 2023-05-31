@@ -8,6 +8,5 @@ SQLALCHEMY_DATABASE_URL = settings.papermerge__database__url
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    echo=True
+    connect_args={"check_same_thread": False}
 )
