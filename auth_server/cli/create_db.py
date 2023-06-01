@@ -7,9 +7,10 @@ from auth_server.models import User  # noqa
 
 
 @click.command()
-def create_db():
+def cli():
     Base.metadata.create_all(engine)
 
 
 if __name__ == '__main__':
-    create_db()
+    click.echo("Creating database...")
+    cli()
