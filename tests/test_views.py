@@ -2,7 +2,10 @@ import logging
 from unittest import mock
 import httpx
 
+from sqlalchemy import Connection
+
 from auth_server.main import settings
+from auth_server.crud import create_user
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +39,7 @@ def test_retrieve_token_endpoint(client: httpx.Client):
         )
 
         assert response.status_code == 200, response.text
+        assert response.json()['access_token'] is not None
 
 
 def test_invalid_post_request(client: httpx.Client):
@@ -87,3 +91,49 @@ def test_invalid_post_request(client: httpx.Client):
     assert response.status_code == 400, response.text
 
 
+def test_db_based_authentication_for_existing_user(
+    client: httpx.Client,
+    db_connection: Connection
+):
+    """
+    Validate that DB based authentication can be performed
+    """
+    # create user "socrates"
+    create_user(
+        db_connection,
+        username="socrates",
+        email="socrates@mail.com",
+        password="secret"
+    )
+
+    # socrates enters wrong password
+    response = client.post("/token", json={
+        "username": "socrates",
+        "password": "wrongsecret"  # this is wrong password!
+    })
+
+    assert response.status_code == 401
+
+    # socrates enters correct credentials
+    response = client.post("/token", json={
+        "username": "socrates",
+        "password": "secret"
+    })
+
+    assert response.status_code == 200, response.text
+    # now socrates has its access token
+    assert response.json()['access_token'] is not None
+
+
+def test_db_based_authentication_for_non_existing_user(
+    client: httpx.Client,
+    db_connection: Connection
+):
+    # There is no user "kant" in DB
+    response = client.post("/token", json={
+        "username": "kant",
+        "password": "secret"
+    })
+
+    assert response.status_code == 401, response.text
+    assert response.json()['detail'] == "Unauthorized"
