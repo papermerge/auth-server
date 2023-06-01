@@ -1,6 +1,7 @@
 import logging
 import uuid
 
+from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Connection, insert, update, select
 from sqlalchemy.orm import Session
 
@@ -45,20 +46,48 @@ def create_user_from_email(db_connection: Connection, email: str) -> None:
     """
     logger.debug(f"Inserting user with email {email}...")
     username = email.split('@')[0]
+
+    create_user(
+        db_connection,
+        username=username,
+        email=email,
+        password=uuid.uuid4().hex,
+        is_superuser=False,
+        is_active=True
+    )
+
+
+def create_user(
+    db_connection: Connection,
+    username: str,
+    email: str,
+    password: str,
+    first_name: str | None = None,
+    last_name: str | None = None,
+    is_superuser: bool = False,
+    is_active: bool = False
+):
+    """Creates a user"""
+    kwargs = {
+        "username": username,
+        "email": email,
+        "password": pbkdf2_sha256.hash(password),
+        "is_superuser": is_superuser,
+        "is_active": is_active
+    }
+    if first_name:
+        kwargs[first_name] = first_name
+
+    if last_name:
+        kwargs[last_name] = last_name
+
     user_id = uuid.uuid4().hex
     home_id = uuid.uuid4().hex
     inbox_id = uuid.uuid4().hex
+    kwargs["id"] = user_id
 
     # insert user model (without home_folder_id and inbox_folder_id)
-    db_connection.execute(
-        insert(models.User),
-        {
-            "id": user_id,
-            "username": username,
-            "password": uuid.uuid4().hex,
-            "email": email
-        }
-    )
+    db_connection.execute(insert(models.User), kwargs)
 
     # create .home and .inbox nodes
     db_connection.execute(
@@ -67,13 +96,11 @@ def create_user_from_email(db_connection: Connection, email: str) -> None:
             {
                 "id": home_id,
                 "title": models.HOME_TITLE,
-                "password": uuid.uuid4().hex,
                 "user_id": user_id
             },
             {
                 "id": inbox_id,
                 "title": models.INBOX_TITLE,
-                "password": uuid.uuid4().hex,
                 "user_id": user_id
             }
         ]

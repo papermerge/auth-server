@@ -1,5 +1,12 @@
+import logging
+
+from functools import lru_cache
 from enum import Enum
+
 from pydantic import BaseSettings
+
+
+logger = logging.getLogger(__name__)
 
 
 class Algs(str, Enum):
@@ -23,3 +30,9 @@ class Settings(BaseSettings):
     papermerge__database__url: str
     papermerge__auth__redirect_url: str = '/app'
     papermerge__auth__google_client_secret: str | None
+
+
+@lru_cache()
+def get_settings():
+    logger.info("=========================Getting settings instance===")
+    return Settings()
