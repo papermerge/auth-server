@@ -24,7 +24,7 @@ export const GoogleCallback = () => {
         data => {
           console.log(data);
           console.log(`Redirecting to the origin ${window.location.origin}`);
-          window.location.href = window.location.origin;
+          window.location.href = `${window.location.origin}/app`;
         }
       ).catch(error => {
         console.log(`There was an error ==='${error}'===`);
