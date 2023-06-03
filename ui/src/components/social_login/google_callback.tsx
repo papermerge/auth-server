@@ -23,6 +23,8 @@ export const GoogleCallback = () => {
       .then(
         data => {
           console.log(data);
+          console.log(`Redirecting to the origin ${window.location.origin}`);
+          window.location.href = window.location.origin;
         }
       ).catch(error => {
         console.log(`There was an error ==='${error}'===`);
