@@ -20,7 +20,7 @@ ENV UI_DIR=/app_ui
 
 WORKDIR ${APP_DIR}
 
-RUN pip install --upgrade poetry
+RUN pip install --upgrade poetry roco
 
 RUN python3 -m venv .venv
 
@@ -28,10 +28,13 @@ COPY docker/supervisord.conf /etc/
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
 COPY --from=build ${UI_DIR}/build /usr/share/nginx/html
-
 RUN poetry install --no-root --no-dev -vv
 
 COPY ./auth_server ${APP_DIR}/auth_server/
 
+COPY docker/run.bash /run.bash
+RUN chmod +x /run.bash
+
 EXPOSE 80
-CMD ["/usr/bin/supervisord"]
+
+ENTRYPOINT ["/run.bash"]

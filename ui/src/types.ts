@@ -20,8 +20,11 @@ export type TResponseTypeBasedProps<T> =
     };
 
 
+export type ProviderType = 'google' | 'github';
+
+
 export type TOauth2Props<T = TAuthTokenPayload> = {
-  provider: 'google' | 'github';
+  provider: ProviderType;
   authorizeUrl: string;
   clientId: string;
   redirectUri: string;
@@ -44,7 +47,6 @@ export type TMessageData =
 declare global {
 
   type OAuth2ProviderType = {
-    redirect_uri: string,
     callback: string,
     authorize_url: string,
     client_id: string,
@@ -56,6 +58,7 @@ declare global {
     __PAPERMERGE_RUNTIME_CONFIG__: {
       oauth2: {
         internal_token_url: string;
+        redirect_uri: string;
         google: OAuth2ProviderType,
         github: OAuth2ProviderType
       }

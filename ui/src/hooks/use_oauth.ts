@@ -22,7 +22,7 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
       authorizeUrl,
       clientId,
       redirectUri,
-      scope = '',
+      scope = ''
     } = props;
   const popupRef = useRef<Window | null>();
   const intervalRef = useRef<string | number | NodeJS.Timeout | undefined>();
@@ -34,7 +34,13 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
 
       console.log("open popup");
 
-      window.location.href = auth_provider_url(authorizeUrl, clientId, redirectUri, scope, state);
+      window.location.href = auth_provider_url(
+        authorizeUrl,
+        clientId,
+        redirectUri,
+        scope,
+        state
+      );
 
       /*
       async function handleMessageListener(message: MessageEvent<TMessageData>) {
