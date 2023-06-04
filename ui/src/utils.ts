@@ -1,5 +1,5 @@
 import { OAUTH_STATE_KEY, POPUP_HEIGHT, POPUP_WIDTH } from "./constants";
-import { TAuthTokenPayload, TOauth2Props, TMessageData } from './types';
+import { TAuthTokenPayload, TOauth2Props, TMessageData, ProviderType } from './types';
 
 
 export const openPopup = (url: string) => {
@@ -104,21 +104,21 @@ export const auth_server_url = (
 	clientId: string,
 	code: string,
 	redirectUri: string,
-	state: string
+	state: string,
+	provider: ProviderType
 ) => {
 
-	const url = window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.internal_token_url;
+	const url = '/api/token';
 	const anySearchParameters = queryToObject('');
-	const some_url = 'http://some:7000/url'
 
 	console.log(`client_id=${clientId}`);
 	console.log(`code=${code}`);
 	console.log(`redirect_uri=${redirectUri}`);
-	console.log(`just a test=${some_url}`);
 
 	return `${url}?${objectToQuery({
 		...anySearchParameters,
 		client_id: clientId,
+		provider: provider,
 		grant_type: 'authorization_code',
 		code,
 		redirect_uri: redirectUri,

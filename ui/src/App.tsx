@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Callback } from './components/social_login/callback';
+import { GoogleCallback } from './components/social_login/google_callback';
+import { GitHubCallback } from './components/social_login/github_callback';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -39,7 +40,8 @@ const LoginLayout = () => {
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route element={<Callback />} path="/callback" />
+      <Route element={<GoogleCallback />} path="/google/callback" />
+      <Route element={<GitHubCallback />} path="/github/callback" />
       <Route element={<LoginLayout />} path="/" />
     </Routes>
   </BrowserRouter>
