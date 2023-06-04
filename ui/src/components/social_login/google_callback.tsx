@@ -13,7 +13,7 @@ export const GoogleCallback = () => {
       const url = auth_server_url(
         window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.client_id,
         payload?.code,
-        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.redirect_uri,
+        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.google.redirect_uri,
         payload?.state,
         'google'
       );
@@ -23,7 +23,7 @@ export const GoogleCallback = () => {
       .then(
         data => {
           console.log(data);
-          console.log(`Redirecting to the origin ${window.location.origin}`);
+          console.log(`Redirecting to the origin ${window.location.origin}/app`);
           window.location.href = `${window.location.origin}/app`;
         }
       ).catch(error => {

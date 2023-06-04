@@ -24,15 +24,12 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
       redirectUri,
       scope = ''
     } = props;
-  const popupRef = useRef<Window | null>();
-  const intervalRef = useRef<string | number | NodeJS.Timeout | undefined>();
+
   const [{ loading, error }, setUI] = useState<StateType>({ loading: false, error: null });
 
   const getAuth = useCallback(() => {
       const state = generateState();
       saveState(state);
-
-      console.log("open popup");
 
       window.location.href = auth_provider_url(
         authorizeUrl,
@@ -41,36 +38,6 @@ export const useOAuth2 = <T = TAuthTokenPayload>(props: TOauth2Props<T>) => {
         scope,
         state
       );
-
-      /*
-      async function handleMessageListener(message: MessageEvent<TMessageData>) {
-        try {
-          if (!('error' in message.data)) {
-            let payload = message?.data?.payload;
-            console.log(`PAYLOAD code received: ${payload?.code}`);
-
-            const response = await fetch(
-              auth_server_url(
-                clientId,
-                payload?.code,
-                redirectUri,
-                state
-              ),
-              {
-                method:'POST',
-              }
-            );
-            payload = await response.json();
-          }
-        } catch (genericError: any) {
-          console.error(genericError);
-        } finally {
-          cleanup(intervalRef, popupRef, handleMessageListener);
-        }
-      }
-
-      console.log("Adding handleMessageListenser");
-      */
 
   }, []);
 

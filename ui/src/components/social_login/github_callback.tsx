@@ -13,7 +13,7 @@ export const GitHubCallback = () => {
       const url = auth_server_url(
         window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.github.client_id,
         payload?.code,
-        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.redirect_uri,
+        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.github.redirect_uri,
         payload?.state,
         'github'
       );
@@ -23,6 +23,8 @@ export const GitHubCallback = () => {
       .then(
         data => {
           console.log(data);
+          console.log(`Redirecting to the origin ${window.location.origin}/app`);
+          window.location.href = `${window.location.origin}/app`;
         }
       ).catch(error => {
         console.log(`There was an error ==='${error}'===`);

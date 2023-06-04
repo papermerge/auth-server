@@ -47,18 +47,15 @@ export type TMessageData =
 declare global {
 
   type OAuth2ProviderType = {
-    callback: string,
+    redirect_uri: string,
     authorize_url: string,
     client_id: string,
-    exchange_code_for_token_url: string,
     scope: string
   }
 
   interface Window {
     __PAPERMERGE_RUNTIME_CONFIG__: {
       oauth2: {
-        internal_token_url: string;
-        redirect_uri: string;
         google: OAuth2ProviderType,
         github: OAuth2ProviderType
       }
