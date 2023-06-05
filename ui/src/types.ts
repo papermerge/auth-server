@@ -1,4 +1,3 @@
-import { OAUTH_RESPONSE } from "./constants";
 
 export type TAuthTokenPayload = {
   token_type: string;
@@ -33,35 +32,24 @@ export type TOauth2Props<T = TAuthTokenPayload> = {
   onError?: (error: string) => void;
 } & TResponseTypeBasedProps<T>;
 
-export type TMessageData =
-  | {
-      type: typeof OAUTH_RESPONSE;
-      error: string;
-    }
-  | {
-      type: typeof OAUTH_RESPONSE;
-      payload: any;
-    };
 
+export type RuntimeConfig = {
+  oauth2: {
+    google: OAuth2ProviderType,
+    github: OAuth2ProviderType
+  }
+}
 
 declare global {
 
   type OAuth2ProviderType = {
-    callback: string,
+    redirect_uri: string,
     authorize_url: string,
     client_id: string,
-    exchange_code_for_token_url: string,
     scope: string
   }
 
   interface Window {
-    __PAPERMERGE_RUNTIME_CONFIG__: {
-      oauth2: {
-        internal_token_url: string;
-        redirect_uri: string;
-        google: OAuth2ProviderType,
-        github: OAuth2ProviderType
-      }
-    }
+    __PAPERMERGE_RUNTIME_CONFIG__: RuntimeConfig;
   }
 }

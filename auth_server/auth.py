@@ -11,7 +11,7 @@ from fastapi import HTTPException
 from .crud import get_user_by_username, get_or_create_user_by_email
 from .models import User
 from .config import Settings
-from .backends import GoogleAuth, OAuth2Provider
+from .backends import GoogleAuth, GithubAuth, OAuth2Provider
 from .utils import raise_on_empty
 
 
@@ -143,7 +143,36 @@ async def github_auth(
     code: str,
     redirect_uri: str
 ) -> User:
-    pass
+
+    logger.info("Auth:Github: sign in")
+    if settings.papermerge__auth__github_client_secret is None:
+        raise HTTPException(
+            status_code=400,
+            detail = "Github client secret is empty"
+        )
+
+    client = GithubAuth(
+        client_secret = settings.papermerge__auth__github_client_secret,
+        client_id=client_id,
+        code=code,
+        redirect_uri = redirect_uri
+    )
+
+    logger.debug("Auth:Github: sign in")
+
+    try:
+        await client.signin()
+    except Exception as ex:
+        logger.warning(f"Auth:Github: sign in failed with {ex}")
+
+        raise HTTPException(
+            status_code=401,
+            detail = f"401 Unauthorized. Auth provider error: {ex}."
+        )
+
+    email = await client.user_email()
+
+    return get_or_create_user_by_email(db, email)
 
 
 def create_token(user: User) -> str:
