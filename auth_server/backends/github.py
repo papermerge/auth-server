@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class GithubAuth:
     name: str = 'github'
-    provider_url: str = 'https://github.com/login/oauth/authorize'
+    provider_url: str = 'https://github.com/login/oauth/access_token'
     userinfo_url: str = 'https://api.github.com/user'
     access_token: str | None = None
 
@@ -26,7 +26,6 @@ class GithubAuth:
     async def signin(self):
         async with httpx.AsyncClient() as client:
             params = {
-                'grant_type': 'authorization_code',
                 'client_id': self.client_id,
                 'client_secret': self.client_secret,
                 # do we need this param?
@@ -37,7 +36,10 @@ class GithubAuth:
 
             response = await client.post(
                 self.provider_url,
-                params=params
+                params=params,
+                headers={
+                    'Accept': 'application/json'
+                }
             )
             logger.debug(
                 f"github signin response_code = {response.status_code}"
@@ -58,7 +60,8 @@ class GithubAuth:
             raise ValueError("Github access token is missing")
 
         headers = {
-            'Authorization': f"Bearer {self.access_token}"
+            'Authorization': f"Bearer {self.access_token}",
+            'Accept': 'application/json'
         }
 
         async with httpx.AsyncClient() as client:
