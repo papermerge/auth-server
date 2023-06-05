@@ -10,8 +10,30 @@ import Login from "./components/login/login";
 import SocialLogin from "./components/social_login/social_login";
 import Separator from './components/separator';
 
+import { is_github_auth_enabled, is_google_auth_enabled } from './runtime_config';
 
-const LoginLayout = () => {
+
+const SimpleLoginLayout = () => {
+  return (
+    <main className="login-layout">
+      <div>
+        <Logo />
+        <div className="d-flex card flex-row">
+          <div className="px-2 py-3">
+            <div className="card-body">
+              <p className="card-title text-secondary">
+                Sign in with your credentials
+              </p>
+              <Login />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+const SocialLoginLayout = () => {
   return (
     <main className="login-layout">
       <div>
@@ -35,6 +57,15 @@ const LoginLayout = () => {
       </div>
     </main>
   );
+}
+
+
+const LoginLayout = () => {
+  if (is_github_auth_enabled() || is_google_auth_enabled()) {
+    return <SocialLoginLayout />;
+  }
+
+  return <SimpleLoginLayout />;
 }
 
 const App = () => (

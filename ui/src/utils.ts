@@ -1,22 +1,11 @@
-import { OAUTH_STATE_KEY, POPUP_HEIGHT, POPUP_WIDTH } from "./constants";
-import { TAuthTokenPayload, TOauth2Props, TMessageData, ProviderType } from './types';
+import { TOauth2Props, ProviderType } from './types';
 
-
-export const openPopup = (url: string) => {
-	// To fix issues with window.screen in multi-monitor setups, the easier option is to
-	// center the pop-up over the parent window.
-	const top = window.outerHeight / 2 + window.screenY - POPUP_HEIGHT / 2;
-	const left = window.outerWidth / 2 + window.screenX - POPUP_WIDTH / 2;
-	return window.open(
-		url,
-		'OAuth2 Popup',
-		`height=${POPUP_HEIGHT},width=${POPUP_WIDTH},top=${top},left=${left}`
-	);
-};
 
 export const closePopup = (popupRef: React.MutableRefObject<Window | null | undefined>) => {
 	popupRef.current?.close();
 };
+
+const OAUTH_STATE_KEY = "oauth_state_key";
 
 
 export const generateState = () => {
@@ -61,10 +50,6 @@ export const checkState = (receivedState: string) => {
 
 export const isWindowOpener = (opener: Window | null): opener is Window =>
 	opener !== null && opener !== undefined;
-
-export const openerPostMessage = (opener: Window, message: TMessageData) =>
-	opener.postMessage(message);
-
 
 export const auth_provider_url = (
 	authorizeUrl: string,
