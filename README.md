@@ -1,8 +1,8 @@
 # Authentication Server
 
-Auth server is standalone microservice which provides
+Auth server is standalone microservice that provides
 authentication capabilities, and it is used as default authentication service
-in Papermerge DMS.
+for Papermerge DMS.
 
 Following authentication methods are supported:
 
@@ -21,7 +21,7 @@ and as cookie.
 
 ## Usage
 
-In order run authentication server you need to provide it with at least two
+In order use authentication server you need to provide it with at least two
 configuration settings:
 1. a secret (used to sign token)
 2. access to database which contains one single table `core_user`.
@@ -40,6 +40,23 @@ services:
       PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
       PAPERMERGE__DATABASE__URL: postgresql://user:password@postgresserver/db
 ```
+
+In order to enable authentication via Google accounts you need to 
+provide following environment variables:
+
+*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
+*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
+*  `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
+*  `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
+
+To enable authentication via Github accounts you need to provider following env
+variables:
+
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
+* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
+
 
 You can also start the auth server with poetry:
 
@@ -79,9 +96,29 @@ You can decode JWT payload with:
 
 ## Configurations
 
-| Name | Description | Default |
-| --- | --- | --- |
-| `PAPERMERGE__SECURITY__SECRET` | (**required**) The secret string | |
-| `PAPERMERGE__DATABASE__URL` | (**required**) Database connection URL e.g.  "postgresql://user:password@postgresserver/db" or for sqlite "sqlite:///./sql_app.db"| |
-| `PAPERMERGE__SECURITY__TOKEN_ALGORITHM` | Algorithm used to sign the token | HS256 |
-| `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES` | Number of minutes the token is valid | 360 |
+This section lists all configuration environment variables.
+
+### Security
+
+* `PAPERMERGE__SECURITY__SECRET`
+* `PAPERMERGE__SECURITY__TOKEN_ALGORITHM`
+* `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES`
+
+
+### Database
+
+* `PAPERMERGE__DATABASE__URL`
+
+### Google Auth 
+
+* `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
+* `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
+
+### Github Auth
+
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
+* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
