@@ -1,13 +1,21 @@
 # Authentication Server
 
-Authentication server is standalone http microservice which provides
-authentication with username and password via HTML form or via REST API.
+Auth server is standalone microservice which provides
+authentication capabilities, and it is used as default authentication service
+in Papermerge DMS.
 
-If user credentials are valid, authentication
-server responds with a valid cryptographically signed JWT access token.
+Following authentication methods are supported:
 
-JWT token is delivered to the client in http body, in cookie header as well as
-`Authorization` header.
+* database - authenticate against user credentials from the database's 
+  core_user table
+* google auth - authenticate against Google's user account credentials
+* github auth - authenticate against Github's user account credentials
+
+When authentication succeeds, auth server responds with a valid 
+cryptographically signed JWT access token.
+
+JWT token is delivered to the client as http response payload (json format) 
+and as cookie.
 
 ![Authentication Server](./images/screenshot.png)
 
