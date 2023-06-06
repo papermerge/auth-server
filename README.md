@@ -49,6 +49,24 @@ provide following environment variables:
 *  `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
 *  `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
 
+You need to provider all four values. First two, client_id and client_secret,
+you obtain when registering oauth2 client with Google.
+
+`PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL` is the URL of the Google authorization
+server. As of writing this documentation, its value is: 
+  
+    https://accounts.google.com/o/oauth2/auth
+
+just keep in mind that it may change thus you need to check Google's oauth2
+documentation for its current value.
+
+`PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI` should be:
+    
+    <http|https>://<your domain>/google/callback
+
+Above value should be same as in field "Authorized redirect URI" when 
+registering oauth2 client.
+
 To enable authentication via Github accounts you need to provider following env
 variables:
 
@@ -56,6 +74,23 @@ variables:
 * `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
 * `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
 * `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
+
+Similarely with Google's oauth2 case, you need to provide all four values.
+Client secret and client id you get when registering oauth2 client.
+
+Current value for `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`, is  
+
+  https://github.com/login/oauth/authorize
+
+Keep in mind to double check GitHub's documentation for up-to-date GitHub 
+oauth2 authentication server URL.
+
+Value for `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI` should be:
+
+    <http|https>://<your domain>/github/callback
+
+Above value should be same as in field "Authorized callback URI" when 
+registering Github oauth2 client.
 
 
 You can also start the auth server with poetry:
@@ -100,16 +135,31 @@ This section lists all configuration environment variables.
 
 ### Security
 
-* `PAPERMERGE__SECURITY__SECRET`
-* `PAPERMERGE__SECURITY__TOKEN_ALGORITHM`
-* `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES`
+* `PAPERMERGE__SECURITY__SECRET` (**required**)
+* `PAPERMERGE__SECURITY__TOKEN_ALGORITHM` default value "HS256"
+* `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES` default value is 60
 
+Possible values for token algorithm are:
+
+* HS256
+* HS384
+* HS512
+* RS256
+* RS384
+* RS512
+* ES256
+* ES384
+* ES512
 
 ### Database
 
-* `PAPERMERGE__DATABASE__URL`
+* `PAPERMERGE__DATABASE__URL` (**required**)
+
+Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
 
 ### Google Auth 
+
+Either all four values should be provided or none.
 
 * `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
 * `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
@@ -117,6 +167,8 @@ This section lists all configuration environment variables.
 * `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
 
 ### Github Auth
+
+Either all four values should be provided or none.
 
 * `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
 * `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
