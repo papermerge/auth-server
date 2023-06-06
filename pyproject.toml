@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "auth-server"
-version = "0.1.0"
+version = "0.4.0"
 description = ""
 authors = ["Eugen Ciur <eugen@papermerge.com>"]
 readme = "README.md"
@@ -8,7 +8,7 @@ packages = [{include = "auth_server"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.95.1"
+fastapi = "^0.96.0"
 uvicorn = "^0.22.0"
 sqlalchemy = "^2.0.9"
 passlib = "^1.7.4"

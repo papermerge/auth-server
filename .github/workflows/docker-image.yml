@@ -32,4 +32,4 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: papermerge/auth-server
-        readme-filepath: ./docker/README.md
+        readme-filepath: README.md
