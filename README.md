@@ -1,19 +1,27 @@
 # Authentication Server
 
-Authentication server is standalone http microservice which provides
-authentication with username and password via HTML form or via REST API.
+Auth server is standalone microservice that provides
+authentication capabilities, and it is used as default authentication service
+for Papermerge DMS.
 
-If user credentials are valid, authentication
-server responds with a valid cryptographically signed JWT access token.
+Following authentication methods are supported:
 
-JWT token is delivered to the client in http body, in cookie header as well as
-`Authorization` header.
+* database - authenticate against user credentials from the database's 
+  core_user table
+* google auth - authenticate against Google's user account credentials
+* github auth - authenticate against Github's user account credentials
+
+When authentication succeeds, auth server responds with a valid 
+cryptographically signed JWT access token.
+
+JWT token is delivered to the client as http response payload (json format) 
+and as cookie.
 
 ![Authentication Server](./images/screenshot.png)
 
 ## Usage
 
-In order run authentication server you need to provide it with at least two
+In order use authentication server you need to provide it with at least two
 configuration settings:
 1. a secret (used to sign token)
 2. access to database which contains one single table `core_user`.
@@ -32,6 +40,58 @@ services:
       PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
       PAPERMERGE__DATABASE__URL: postgresql://user:password@postgresserver/db
 ```
+
+In order to enable authentication via Google accounts you need to 
+provide following environment variables:
+
+*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
+*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
+*  `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
+*  `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
+
+You need to provider all four values. First two, client_id and client_secret,
+you obtain when registering oauth2 client with Google.
+
+`PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL` is the URL of the Google authorization
+server. As of writing this documentation, its value is: 
+  
+    https://accounts.google.com/o/oauth2/auth
+
+just keep in mind that it may change thus you need to check Google's oauth2
+documentation for its current value.
+
+`PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI` should be:
+    
+    <http|https>://<your domain>/google/callback
+
+Above value should be same as in field "Authorized redirect URI" when 
+registering oauth2 client.
+
+To enable authentication via Github accounts you need to provider following env
+variables:
+
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
+* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
+
+Similarely with Google's oauth2 case, you need to provide all four values.
+Client secret and client id you get when registering oauth2 client.
+
+Current value for `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`, is  
+
+  https://github.com/login/oauth/authorize
+
+Keep in mind to double check GitHub's documentation for up-to-date GitHub 
+oauth2 authentication server URL.
+
+Value for `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI` should be:
+
+    <http|https>://<your domain>/github/callback
+
+Above value should be same as in field "Authorized callback URI" when 
+registering Github oauth2 client.
+
 
 You can also start the auth server with poetry:
 
@@ -71,9 +131,46 @@ You can decode JWT payload with:
 
 ## Configurations
 
-| Name | Description | Default |
-| --- | --- | --- |
-| `PAPERMERGE__SECURITY__SECRET` | (**required**) The secret string | |
-| `PAPERMERGE__DATABASE__URL` | (**required**) Database connection URL e.g.  "postgresql://user:password@postgresserver/db" or for sqlite "sqlite:///./sql_app.db"| |
-| `PAPERMERGE__SECURITY__TOKEN_ALGORITHM` | Algorithm used to sign the token | HS256 |
-| `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES` | Number of minutes the token is valid | 360 |
+This section lists all configuration environment variables.
+
+### Security
+
+* `PAPERMERGE__SECURITY__SECRET` (**required**)
+* `PAPERMERGE__SECURITY__TOKEN_ALGORITHM` default value "HS256"
+* `PAPERMERGE__SECURITY__TOKEN_EXPIRE_MINUTES` default value is 60
+
+Possible values for token algorithm are:
+
+* HS256
+* HS384
+* HS512
+* RS256
+* RS384
+* RS512
+* ES256
+* ES384
+* ES512
+
+### Database
+
+* `PAPERMERGE__DATABASE__URL` (**required**)
+
+Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
+
+### Google Auth 
+
+Either all four values should be provided or none.
+
+* `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
+* `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
+
+### Github Auth
+
+Either all four values should be provided or none.
+
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
+* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
