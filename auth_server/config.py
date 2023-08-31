@@ -27,12 +27,11 @@ class Settings(BaseSettings):
     papermerge__security__token_expire_minutes: int = 360
 
     # database where to read user table from
-    papermerge__database__url: str
+    papermerge__database__url: str = "sqlite:////db/db.sqlite3"
     papermerge__auth__google_client_secret: str | None
     papermerge__auth__github_client_secret: str | None
 
 
 @lru_cache()
 def get_settings():
-    logger.info("=========================Getting settings instance===")
     return Settings()

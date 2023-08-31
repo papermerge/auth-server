@@ -19,8 +19,6 @@ services:
      - "7000:80"
     environment:
       PAPERMERGE__SECURITY__SECRET_KEY: ${PAPERMERGE__SECURITY__SECRET_KEY}
-      PAPERMERGE__DATABASE__URL: ${PAPERMERGE__DATABASE__URL}
-      PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET: ${PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET}
     volumes:
       - ./db:/db
       - ./auth_server/:/auth_server_app/auth_server/

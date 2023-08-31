@@ -76,8 +76,34 @@ export default function Login() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleSubmit = (event: ClickEvent) => {
+    event.preventDefault()
     setErrorMessage('');
     setInProgress(true);
+
+    let body = JSON.stringify({username, password});
+
+    fetch(
+      '/api/token',
+      {
+        method:'POST',
+        body: body,
+        headers: {
+          "Content-Type": "application/json",
+        }
+      },
+    )
+    .then(response => {
+        if (response.status != 200) {
+          setErrorMessage(response.statusText);
+          response.json().then(result => console.log(result));
+          setInProgress(false);
+        } else {
+          window.location.href = `${window.location.origin}/app`;
+        }
+      }
+    ).catch(error => {
+      console.log(`There was an error ==='${error}'===`);
+    });
   }
 
   const handleChangeUsername = (value: string) => {
@@ -103,7 +129,7 @@ export default function Login() {
   }
 
   return (
-    <form action='/api/auth' method="POST">
+    <form>
       <div className="mb-3 form-floating">
         <Input
           onchange={handleChangeUsername}
