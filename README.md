@@ -21,15 +21,14 @@ and as cookie.
 
 ## Usage
 
-In order use authentication server you need to provide it secret key (used to sign tokens)
-
-Minimal docker compose file:
+Auth-server is configured only via environment variables.
+The only required parameter you need to provide it secret key (used to sign tokens):
 
 ```
 version: "3.9"
 services:
   web:
-    image: papermerge/auth-server:0.1.0
+    image: papermerge/auth-server
     ports:
      - "7000:80"
     environment:
@@ -44,7 +43,7 @@ Optionally you can choose to store credentials in PostgreSQL database:
 version: "3.9"
 services:
   web:
-    image: papermerge/auth-server:0.1.0
+    image: papermerge/auth-server
     ports:
      - "7000:80"
     environment:
@@ -164,7 +163,9 @@ Possible values for token algorithm are:
 
 ### Database
 
-* `PAPERMERGE__DATABASE__URL` (**required**)
+* `PAPERMERGE__DATABASE__URL` (optional)
+
+Default value is "sqlite:////db/db.sqlite3".
 
 Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
 
