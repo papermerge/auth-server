@@ -121,13 +121,13 @@ token. There two valid options for using `POST /token` endpoint:
 
 In case 1. application will authenticate again user credentials in database
 (TBD: or againt LDAP credentials, if LDAP configurations are present).
-Here is an example of POST request with user credentials: 
+Here is an example of POST request with user credentials:
 
     $ curl -v -XPOST http://localhost:8000/token -H 'Content-Type: application/json' \
         -d '{"username": "username", "password":"password"}'
 
 In case 2. i.e. when POST body is empty, then application using information from
-request parameters will authenticate against one of the available OAuth 2.0 
+request parameters will authenticate against one of the available OAuth 2.0
 providers:
 
     $ curl -v -XPOST "http://localhost:8000/token?provider=google&code=123 ..."
@@ -168,7 +168,7 @@ Possible values for token algorithm are:
 
 Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
 
-### Google Auth 
+### Google Auth
 
 Either all four values should be provided or none.
 
