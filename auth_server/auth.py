@@ -86,6 +86,10 @@ def create_access_token(
 
 
 def db_auth(db, username: str, password: str) -> User | None:
+    """Authenticates user based on username and password
+
+    User data is read from database.
+    """
     logger.info(f"Database based authentication for '{username}'")
     user = get_user_by_username(db, username)
 

@@ -1,5 +1,6 @@
 import click
 
+from sqlalchemy.orm import sessionmaker
 from auth_server.database.engine import engine
 from auth_server.crud import create_user
 
@@ -20,13 +21,15 @@ from auth_server.crud import create_user
     confirmation_prompt=True
 )
 def cli(username: str, email: str, password: str):
-    with engine.connect() as conn:
-        create_user(
-            conn,
-            username=username,
-            password=password,
-            email=email
-        )
+    SessionLocal = sessionmaker(engine)
+    db = SessionLocal()
+    create_user(
+        db,
+        username=username,
+        password=password,
+        email=email
+    )
+    db.close()
 
 
 if __name__ == '__main__':
