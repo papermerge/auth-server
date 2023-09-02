@@ -19,6 +19,12 @@ rich = "^13.3.5"
 click = "^8.1.3"
 pyyaml = "^6.0.1"
 
+[tool.poetry.scripts]
+create_user='auth_server.cli.create_user:cli'
+auth_user='auth_server.cli.auth_user:cli'
+list_users='auth_server.cli.list_users:cli'
+create_db='auth_server.cli.create_db:cli'
+set_password='auth_server.cli.set_password:cli'
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
