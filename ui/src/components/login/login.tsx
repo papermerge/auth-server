@@ -98,7 +98,7 @@ export default function Login() {
           response.json().then(result => console.log(result));
           setInProgress(false);
         } else {
-          window.location.href = `${window.location.origin}/app`;
+          window.location.reload();
         }
       }
     ).catch(error => {
