@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { GoogleCallback } from './components/social_login/google_callback';
 import { GitHubCallback } from './components/social_login/github_callback';
 
@@ -74,6 +74,7 @@ const App = () => (
       <Route element={<GoogleCallback />} path="/google/callback" />
       <Route element={<GitHubCallback />} path="/github/callback" />
       <Route element={<LoginLayout />} path="/" />
+      <Route element={<Navigate to="/" />} path="*" />
     </Routes>
   </BrowserRouter>
 );
