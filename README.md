@@ -48,7 +48,17 @@ services:
      - "7000:80"
     environment:
       PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
-      PAPERMERGE__DATABASE__USE: postgresql://user:password@postgresserver/db
+      PAPERMERGE__DATABASE__URL: postgresql://postgres:123@db:5432/postgres
+    depends_on:
+      - db
+  db:
+    image: bitnami/postgresql:14.4.0
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=123
+volumes:
+  postgres_data:
 ```
 
 In order to enable authentication via Google accounts you need to
