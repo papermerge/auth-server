@@ -61,6 +61,39 @@ volumes:
   postgres_data:
 ```
 
+For MySql/MariaDB use `mysql` scheme. For example:
+
+  PAPERMERGE__DATABASE__URL: mysql://user:password@127.0.0.1:3306/mydatabase
+
+And docker compose file would look like:
+
+```
+version: "3.9"
+services:
+  web:
+    image: papermerge/auth-server
+    ports:
+     - "7000:80"
+    environment:
+      PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
+      PAPERMERGE__DATABASE__URL: mysql://user:password@127.0.0.1:3306/mydatabase
+    depends_on:
+      - db
+  db:
+    image: mariadb:11.2
+    volumes:
+      - maria:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+volumes:
+  maria:
+```
+
 In order to enable authentication via Google accounts you need to
 provide following environment variables:
 
@@ -175,9 +208,15 @@ Possible values for token algorithm are:
 
 * `PAPERMERGE__DATABASE__URL` (optional)
 
-Default value is "sqlite:////db/db.sqlite3".
+Default value is "sqlite:////db/db.sqlite3". PostgreSql and MySql/MariaDB are
+supported as well.  For PostgreSql scheme is `postgresql` and for MySql/MariaDB
+scheme is `mysql`.
 
 Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
+Keep in mind that papermerge-core uses [dj-database-url](https://pypi.org/project/dj-database-url/),
+which means that many scheme described in sqlalchemy docs will not
+work for papermerge-core.
+
 
 ### Google Auth
 
