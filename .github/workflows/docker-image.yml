@@ -1,11 +1,9 @@
 name: Docker Image
 
 on:
-  workflow_dispatch:
-    inputs:
-      TAG:
-        required: true
-        type: string
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: papermerge/auth-server:${{ inputs.TAG }}
+        tags: papermerge/auth-server:${{ github.ref_name }}
         file: docker/Dockerfile
 
     - name: Add description
