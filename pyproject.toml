@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "auth-server"
-version = "0.4.9"
+version = "0.5.0"
 description = "Papermerge auth server"
 authors = ["Eugen Ciur <eugen@papermerge.com>"]
 readme = "README.md"
