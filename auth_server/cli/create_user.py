@@ -4,6 +4,7 @@ import logging
 from sqlalchemy.orm import sessionmaker
 from auth_server.database.engine import engine
 from auth_server.crud import create_user, get_user_by_username
+from passlib.hash import pbkdf2_sha256
 
 
 logger = logging.getLogger(__name__)

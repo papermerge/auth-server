@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "auth-server"
-version = "0.5.0"
+version = "0.6.0"
 description = "Papermerge auth server"
 authors = ["Eugen Ciur <eugen@papermerge.com>"]
 readme = "README.md"
@@ -27,6 +27,7 @@ auth_user='auth_server.cli.auth_user:cli'
 list_users='auth_server.cli.list_users:cli'
 create_db='auth_server.cli.create_db:cli'
 set_password='auth_server.cli.set_password:cli'
+create_token='auth_server.cli.create_token:cli'
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
