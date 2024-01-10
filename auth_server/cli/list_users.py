@@ -17,7 +17,7 @@ def cli():
     users = get_users(db)
 
     for user in users:
-        print(f"username={user.username} email={user.email}")
+        print(f"id={user.id} username={user.username} email={user.email}")
 
     db.close()
 
