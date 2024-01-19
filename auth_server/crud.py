@@ -2,10 +2,14 @@ import logging
 import uuid
 
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import Connection, insert, update, select
+from sqlalchemy import Connection, select, Engine
 from sqlalchemy.orm import Session
 
-from . import models
+
+from auth_server.database import models as db_models2
+from auth_server import constants
+from auth_server import schemas
+from . import models  # TODO: consolidate with db_models2
 
 
 logger = logging.getLogger(__name__)
@@ -15,10 +19,15 @@ def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 
-def get_user_by_username(db: Session, username: str) -> models.User | None:
-    return db.query(
-        models.User
-    ).filter(models.User.username == username).first()
+def get_user_by_username(engine: Engine, username: str) -> schemas.User | None:
+    with Session(engine) as session:
+        stmt = select(db_models2.User).where(
+            db_models2.User.username == username
+        )
+        db_user = session.scalars(stmt).one()
+        model_user = models.User.model_validate(db_user)
+
+    return model_user
 
 
 def get_user_by_email(db: Session, email: str) -> models.User | None:
@@ -58,73 +67,53 @@ def create_user_from_email(db_connection: Connection, email: str) -> None:
 
 
 def create_user(
-    db_connection: Connection,
+    engine: Engine,
     username: str,
     email: str,
     password: str,
     first_name: str | None = None,
     last_name: str | None = None,
-    is_superuser: bool = False,
-    is_active: bool = False
+    is_superuser: bool = True,
+    is_active: bool = True
 ):
     """Creates a user"""
-    kwargs = {
-        "username": username,
-        "email": email,
-        "password": pbkdf2_sha256.hash(password),
-        "is_superuser": is_superuser,
-        "is_active": is_active
-    }
-    if first_name:
-        kwargs[first_name] = first_name
 
-    if last_name:
-        kwargs[last_name] = last_name
+    user_id = uuid.uuid4()
+    home_id = uuid.uuid4()
+    inbox_id = uuid.uuid4()
 
-    user_id = uuid.uuid4().hex
-    home_id = uuid.uuid4().hex
-    inbox_id = uuid.uuid4().hex
-    kwargs["id"] = user_id
+    with Session(engine) as session:
+        db_user = db_models2.User(
+            id=user_id,
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            is_superuser=is_superuser,
+            is_active=is_active,
+            password=pbkdf2_sha256.hash(password),
+            home_folder_id=home_id,
+            inbox_folder_id=inbox_id
+        )
+        db_inbox = db_models2.Folder(
+            id=inbox_id,
+            title=constants.INBOX_TITLE,
+            ctype=constants.CTYPE_FOLDER,
+            user_id=user_id,
+            lang='xxx'  # not used
+        )
+        db_home = db_models2.Folder(
+            id=home_id,
+            title=constants.HOME_TITLE,
+            ctype=constants.CTYPE_FOLDER,
+            user_id=user_id,
+            lang='xxx'  # not used
+        )
 
-    # insert user model (without home_folder_id and inbox_folder_id)
-    db_connection.execute(insert(models.User), kwargs)
-
-    # create .home and .inbox nodes
-    db_connection.execute(
-        insert(models.Node),
-        [
-            {
-                "id": home_id,
-                "title": models.HOME_TITLE,
-                "user_id": user_id
-            },
-            {
-                "id": inbox_id,
-                "title": models.INBOX_TITLE,
-                "user_id": user_id
-            }
-        ]
-    )
-
-    # .home and .inbox nodes are folder instances
-    db_connection.execute(
-        insert(models.Folder),
-        [
-            {
-                "basetreenode_ptr_id": home_id,
-            },
-            {
-                "basetreenode_ptr_id": inbox_id,
-            }
-        ]
-    )
-    # update user's home_folder_id and inbox_folder_id
-    db_connection.execute(
-        update(models.User)
-        .where(models.User.username == username)
-        .values(home_folder_id=home_id, inbox_folder_id=inbox_id)
-    )
-    db_connection.commit()
+        session.add(db_user)
+        session.add(db_inbox)
+        session.add(db_home)
+        session.commit()
 
 
 def get_or_create_user_by_email(
