@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import Connection, select, Engine
+from sqlalchemy import Connection, select, Engine, text
 from sqlalchemy.orm import Session
 
 
@@ -92,8 +92,6 @@ def create_user(
             is_superuser=is_superuser,
             is_active=is_active,
             password=pbkdf2_sha256.hash(password),
-            home_folder_id=home_id,
-            inbox_folder_id=inbox_id
         )
         db_inbox = db_models2.Folder(
             id=inbox_id,
@@ -109,10 +107,12 @@ def create_user(
             user_id=user_id,
             lang='xxx'  # not used
         )
-
-        session.add(db_user)
         session.add(db_inbox)
         session.add(db_home)
+        session.add(db_user)
+        session.commit()
+        db_user.home_folder_id = db_home.id
+        db_user.inbox_folder_id = db_inbox.id
         session.commit()
 
 
