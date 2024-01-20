@@ -3,7 +3,7 @@ import logging
 from functools import lru_cache
 from enum import Enum
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 logger = logging.getLogger(__name__)
@@ -28,8 +28,8 @@ class Settings(BaseSettings):
 
     # database where to read user table from
     papermerge__database__url: str = "sqlite:////db/db.sqlite3"
-    papermerge__auth__google_client_secret: str | None
-    papermerge__auth__github_client_secret: str | None
+    papermerge__auth__google_client_secret: str | None = None
+    papermerge__auth__github_client_secret: str | None = None
 
 
 @lru_cache()
