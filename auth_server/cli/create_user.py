@@ -1,10 +1,9 @@
 import click
 import logging
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import NoResultFound
 from auth_server.database.engine import engine
 from auth_server.crud import create_user, get_user_by_username
-from passlib.hash import pbkdf2_sha256
 
 
 logger = logging.getLogger(__name__)
@@ -16,25 +15,28 @@ logger = logging.getLogger(__name__)
 @click.option('--email', envvar='PAPERMERGE__AUTH__EMAIL')
 @click.option('--password', envvar='PAPERMERGE__AUTH__PASSWORD')
 def cli(username: str, email: str | None, password: str):
-    SessionLocal = sessionmaker(engine)
-    db = SessionLocal()
-
     if not email:
         email = f'{username}@example.com'
 
-    user = get_user_by_username(db, username)
-    if user:
+    user = None
+    try:
+        user = get_user_by_username(engine, username)
         logger.warning(f"User '{username}' already exists.")
-    else:
+    except NoResultFound:
+        pass
+
+    if user is None:
         create_user(
-            db,
+            engine,
             username=username,
             password=password,
             email=email
         )
         logger.info(f"User '{username}' created.")
 
-    db.close()
+
+
+
 
 
 if __name__ == '__main__':
