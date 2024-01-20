@@ -1,6 +1,7 @@
 import logging
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import NoResultFound
 
 from datetime import datetime, timedelta
 from jose import jwt
@@ -101,7 +102,10 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     """
     logger.info(f"Database based authentication for '{username}'")
 
-    user = get_user_by_username(db.get_bind(), username)
+    try:
+        user = get_user_by_username(db.get_bind(), username)
+    except NoResultFound:
+        user = None
 
     if not user:
         logger.warning(f"User {username} not found in database")

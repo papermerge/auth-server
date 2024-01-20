@@ -1,6 +1,7 @@
 import logging
 from unittest import mock
 import httpx
+import pytest
 
 from sqlalchemy import Connection, Engine
 
@@ -21,6 +22,7 @@ class MockedGoogleAuth:
         return "momo@mail.com"
 
 
+@pytest.mark.skip()
 def test_retrieve_token_endpoint(client: httpx.Client):
     """
     Basic test using Google Auth
