@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 0.6.3 - 2024-01-20
+## 0.6.3 - 2024-01-xx
 
 - Fix create_user to work with MySql/MariaDB/sqlite [Issue#579](https://github.com/ciur/papermerge/issues/579)
 
