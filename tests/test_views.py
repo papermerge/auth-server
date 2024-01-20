@@ -2,7 +2,7 @@ import logging
 from unittest import mock
 import httpx
 
-from sqlalchemy import Connection
+from sqlalchemy import Connection, Engine
 
 from auth_server.main import settings
 from auth_server.crud import create_user
@@ -93,14 +93,14 @@ def test_invalid_post_request(client: httpx.Client):
 
 def test_db_based_authentication_for_existing_user(
     client: httpx.Client,
-    db_connection: Connection
+    db_engine: Engine
 ):
     """
     Validate that DB based authentication can be performed
     """
     # create user "socrates"
     create_user(
-        db_connection,
+        db_engine,
         username="socrates",
         email="socrates@mail.com",
         password="secret"
