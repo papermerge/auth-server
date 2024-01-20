@@ -7,6 +7,7 @@ on:
     paths:
       - 'auth_server/**'
       - 'tests/**'
+      - '.github/**'
 
 jobs:
   tests:
@@ -22,3 +23,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install && poetry run pytest
+        with:
+            PAPERMERGE__SECURITY__SECRET_KEY: ${{ secrets.security__secret_key }}
