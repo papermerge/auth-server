@@ -5,6 +5,7 @@ import pytest
 
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
+from sqlalchemy import Engine
 
 from auth_server.database.base import Base
 from auth_server.main import app
@@ -36,3 +37,8 @@ def db_session():
 @pytest.fixture()
 def client() -> httpx.Client:
     return TestClient(app)
+
+
+@pytest.fixture()
+def db_engine() -> Engine:
+    return engine

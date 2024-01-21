@@ -25,7 +25,7 @@ def get_user_by_username(engine: Engine, username: str) -> schemas.User | None:
             db_models2.User.username == username
         )
         db_user = session.scalars(stmt).one()
-        model_user = models.User.model_validate(db_user)
+        model_user = schemas.User.model_validate(db_user)
 
     return model_user
 
