@@ -6,18 +6,17 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 
-from auth_server.database import models as db_models2
+from auth_server.database import models
 from auth_server import constants
 from auth_server import schemas
-from . import models
 
 
 logger = logging.getLogger(__name__)
 
 
 def get_user_by_username(session: Session, username: str) -> schemas.User | None:
-    stmt = select(db_models2.User).where(
-        db_models2.User.username == username
+    stmt = select(models.User).where(
+        models.User.username == username
     )
     db_user = session.scalars(stmt).one()
     model_user = schemas.User.model_validate(db_user)
@@ -27,7 +26,7 @@ def get_user_by_username(session: Session, username: str) -> schemas.User | None
 
 def get_user_by_email(session: Session, email: str) -> schemas.User | None:
 
-    stmt = select(db_models2.User).where(db_models2.User.email == email)
+    stmt = select(models.User).where(models.User.email == email)
     db_user = session.scalar(stmt)
     model_user = schemas.User.model_validate(db_user)
 
@@ -80,7 +79,7 @@ def create_user(
     home_id = uuid.uuid4()
     inbox_id = uuid.uuid4()
 
-    db_user = db_models2.User(
+    db_user = models.User(
         id=user_id,
         username=username,
         email=email,
@@ -90,14 +89,14 @@ def create_user(
         is_active=is_active,
         password=pbkdf2_sha256.hash(password),
     )
-    db_inbox = db_models2.Folder(
+    db_inbox = models.Folder(
         id=inbox_id,
         title=constants.INBOX_TITLE,
         ctype=constants.CTYPE_FOLDER,
         user_id=user_id,
         lang='xxx'  # not used
     )
-    db_home = db_models2.Folder(
+    db_home = models.Folder(
         id=home_id,
         title=constants.HOME_TITLE,
         ctype=constants.CTYPE_FOLDER,
@@ -126,7 +125,7 @@ def get_or_create_user_by_email(
         stmt = select(models.User).where(
             models.User.email == email
         )
-        user = session.scalar(stmt).one
+        user = session.scalar(stmt)
 
     logger.debug(f"User with email {email} was found in database")
     return user

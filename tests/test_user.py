@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 
-from auth_server.models import User, Node, Folder, HOME_TITLE, INBOX_TITLE
+from auth_server.database.models import User, Node, Folder, HOME_TITLE, INBOX_TITLE
 from auth_server.crud import (
     create_user,
     create_user_from_email,

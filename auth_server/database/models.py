@@ -4,11 +4,11 @@ from typing import List, Literal
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from .base import Base
 
-
-class Base(DeclarativeBase):
-    pass
+HOME_TITLE = ".home"
+INBOX_TITLE = ".inbox"
 
 
 class User(Base):

@@ -10,7 +10,7 @@ from passlib.hash import pbkdf2_sha256
 from fastapi import HTTPException
 
 from .crud import get_user_by_username, get_or_create_user_by_email
-from .models import User
+from .database.models import User
 from . import schemas
 from .config import Settings
 from .backends import GoogleAuth, GithubAuth, OAuth2Provider
