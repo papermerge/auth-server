@@ -2,6 +2,7 @@ import click
 import logging
 
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import sessionmaker
 from auth_server.database.engine import engine
 from auth_server.auth import create_token, get_user_by_username
 
@@ -13,9 +14,11 @@ logger = logging.getLogger(__name__)
 @click.argument('username')
 def cli(username: str):
     """Creates token for given user"""
+    SessionLocal = sessionmaker(engine)
+    db = SessionLocal()
     user = None
     try:
-        user = get_user_by_username(engine, username)
+        user = get_user_by_username(db, username)
     except NoResultFound:
         pass
 
