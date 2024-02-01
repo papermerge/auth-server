@@ -28,6 +28,10 @@ def get_user_by_email(session: Session, email: str) -> schemas.User | None:
 
     stmt = select(models.User).where(models.User.email == email)
     db_user = session.scalar(stmt)
+
+    if db_user is None:
+        return db_user
+
     model_user = schemas.User.model_validate(db_user)
 
     return model_user
@@ -37,7 +41,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
-def create_user_from_email(session: Session, email: str) -> None:
+def create_user_from_email(
+    session: Session,
+    email: str
+) -> schemas.User:
     """
     Creates user with its home and inbox folders
 
@@ -53,7 +60,7 @@ def create_user_from_email(session: Session, email: str) -> None:
     logger.debug(f"Inserting user with email {email}...")
     username = email.split('@')[0]
 
-    create_user(
+    return create_user(
         session,
         username=username,
         email=email,
@@ -72,7 +79,7 @@ def create_user(
     last_name: str | None = None,
     is_superuser: bool = True,
     is_active: bool = True
-):
+) -> schemas.User:
     """Creates a user"""
 
     user_id = uuid.uuid4()
@@ -87,6 +94,8 @@ def create_user(
         last_name=last_name,
         is_superuser=is_superuser,
         is_active=is_active,
+        home_folder_id=home_id,
+        inbox_folder_id=inbox_id,
         password=pbkdf2_sha256.hash(password),
     )
     db_inbox = models.Folder(
@@ -111,6 +120,7 @@ def create_user(
     db_user.inbox_folder_id = db_inbox.id
     session.commit()
 
+    return schemas.User.model_validate(db_user)
 
 def get_or_create_user_by_email(
     session: Session, email: str

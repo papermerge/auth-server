@@ -18,12 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 def test_create_user_from_email(db_session):
-    create_user_from_email(db_session, "john@mail.com")
+    user = create_user_from_email(db_session, "john@mail.com")
 
     stmt_home = select(Folder).join(
-        Node,
-        Node.id == Folder.basetreenode_ptr_id
-    ).join(
         User,
         User.id == Node.user_id
     ).where(
@@ -33,9 +30,6 @@ def test_create_user_from_email(db_session):
     )
 
     stmt_inbox = select(Folder).join(
-        Node,
-        Node.id == Folder.basetreenode_ptr_id
-    ).join(
         User,
         User.id == Node.user_id
     ).where(
@@ -44,21 +38,14 @@ def test_create_user_from_email(db_session):
         User.username == "john"
     )
 
-    home_id = db_session.execute(stmt_home).all()[0][1]
-    inbox_id = db_session.execute(stmt_inbox).all()[0][1]
-
-    user = db_session.execute(
-        select(
-            User.id,
-            User.username,
-            User.home_folder_id,
-            User.inbox_folder_id
-        ).where(User.username == "john")
-    ).all()[0]
+    home = db_session.execute(stmt_home).one()[0]
+    inbox = db_session.execute(stmt_inbox).one()[0]
 
     # make sure that user's home_folder_id and inbox_folder_id are correct
-    assert user.home_folder_id == home_id
-    assert user.inbox_folder_id == inbox_id
+    assert user.id == home.user.id
+    assert user.id == inbox.user.id
+    assert user.home_folder_id == home.id
+    assert user.inbox_folder_id == inbox.id
 
 
 def test_get_or_create_user_by_email(db_session):

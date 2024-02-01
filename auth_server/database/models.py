@@ -31,7 +31,11 @@ class User(Base):
         primaryjoin="User.id == Node.user_id"
     )
     home_folder_id: Mapped[UUID] = mapped_column(
-        ForeignKey("core_folder.basetreenode_ptr_id", deferrable=True)
+        ForeignKey(
+            "core_folder.basetreenode_ptr_id",
+            deferrable=True,
+            use_alter=True
+        )
     )
     home_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
@@ -39,7 +43,11 @@ class User(Base):
         viewonly=True
     )
     inbox_folder_id: Mapped[UUID] = mapped_column(
-        ForeignKey("core_folder.basetreenode_ptr_id", deferrable=True)
+        ForeignKey(
+            "core_folder.basetreenode_ptr_id",
+            deferrable=True,
+            use_alter=True
+        )
     )
     inbox_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
@@ -75,8 +83,12 @@ class Node(Base):
         back_populates="nodes",
         primaryjoin="User.id == Node.user_id"
     )
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("core_user.id"))
-    parent_id: Mapped[UUID] = mapped_column(ForeignKey("core_basetreenode.id"))
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("core_user.id", use_alter=True)
+    )
+    parent_id: Mapped[UUID] = mapped_column(
+        ForeignKey("core_basetreenode.id"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         insert_default=func.now()
     )
