@@ -8,6 +8,7 @@ from auth_server.models import User, Node, Folder, HOME_TITLE, INBOX_TITLE
 from auth_server.crud import (
     create_user,
     create_user_from_email,
+    get_user_by_email,
     get_or_create_user_by_email,
     get_user_by_username
 )
@@ -16,8 +17,8 @@ from auth_server.crud import (
 logger = logging.getLogger(__name__)
 
 
-def test_create_user_from_email(db_connection):
-    create_user_from_email(db_connection, "john@mail.com")
+def test_create_user_from_email(db_session):
+    create_user_from_email(db_session, "john@mail.com")
 
     stmt_home = select(Folder).join(
         Node,
@@ -43,10 +44,10 @@ def test_create_user_from_email(db_connection):
         User.username == "john"
     )
 
-    home_id = db_connection.execute(stmt_home).all()[0][1]
-    inbox_id = db_connection.execute(stmt_inbox).all()[0][1]
+    home_id = db_session.execute(stmt_home).all()[0][1]
+    inbox_id = db_session.execute(stmt_inbox).all()[0][1]
 
-    user = db_connection.execute(
+    user = db_session.execute(
         select(
             User.id,
             User.username,
@@ -68,19 +69,26 @@ def test_get_or_create_user_by_email(db_session):
     assert user.inbox_folder_id
 
 
-def test_get_user_by_username(db_engine):
+def test_get_user_by_username(db_session):
     create_user(
-        db_engine,
+        db_session,
         username='eugen',
         password='1234',
         email='eugen@mail.com'
     )
 
-    user = get_user_by_username(db_engine, 'eugen')
+    user = get_user_by_username(db_session, 'eugen')
 
     assert user.username == 'eugen'
 
 
-def test_get_user_by_username(db_engine):
+def test_get_user_by_username_raises_correct_exception(db_session):
     with pytest.raises(NoResultFound):
-        get_user_by_username(db_engine, 'no_such_user')
+        get_user_by_username(db_session, 'no_such_user')
+
+
+def test_get_user_by_email(db_session):
+    create_user_from_email(db_session, "john2@mail.com")
+    user = get_user_by_email(db_session, "john2@mail.com")
+
+    assert user.username == "john2"
