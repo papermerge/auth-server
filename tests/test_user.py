@@ -76,7 +76,7 @@ def test_get_user_by_username_raises_correct_exception(db_session):
 
 
 def test_get_user_by_email(db_session):
-    create_user_from_email(db_session, "john2@mail.com")
-    user = get_user_by_email(db_session, "john2@mail.com")
+    create_user_from_email(db_session, "john@mail.com")
+    user = get_user_by_email(db_session, "john@mail.com")
 
-    assert user.username == "john2"
+    assert user.username == "john"
