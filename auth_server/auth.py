@@ -103,7 +103,7 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     logger.info(f"Database based authentication for '{username}'")
 
     try:
-        user = get_user_by_username(db.get_bind(), username)
+        user = get_user_by_username(db, username)
     except NoResultFound:
         user = None
 
