@@ -14,7 +14,10 @@ from auth_server import schemas
 logger = logging.getLogger(__name__)
 
 
-def get_user_by_username(session: Session, username: str) -> schemas.User | None:
+def get_user_by_username(
+    session: Session,
+    username: str
+) -> schemas.User | None:
     stmt = select(models.User).where(
         models.User.username == username
     )
@@ -122,9 +125,10 @@ def create_user(
 
     return schemas.User.model_validate(db_user)
 
+
 def get_or_create_user_by_email(
     session: Session, email: str
-):
+) -> schemas.User:
     logger.debug(f"get or create user with email: {email}")
 
     user = get_user_by_email(session, email)
@@ -138,4 +142,5 @@ def get_or_create_user_by_email(
         user = session.scalar(stmt)
 
     logger.debug(f"User with email {email} was found in database")
+
     return user
