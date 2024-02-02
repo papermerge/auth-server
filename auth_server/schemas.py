@@ -7,9 +7,10 @@ class User(BaseModel):
     username: str
     password: str
     email: str
+    home_folder_id: UUID
+    inbox_folder_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
-
 
 
 class Token(BaseModel):

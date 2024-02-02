@@ -2,6 +2,7 @@ import click
 import logging
 
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import sessionmaker
 from auth_server.database.engine import engine
 from auth_server.crud import create_user, get_user_by_username
 
@@ -19,15 +20,17 @@ def cli(username: str, email: str | None, password: str):
         email = f'{username}@example.com'
 
     user = None
+    SessionLocal = sessionmaker(engine)
+    db = SessionLocal()
     try:
-        user = get_user_by_username(engine, username)
+        user = get_user_by_username(db, username)
         logger.warning(f"User '{username}' already exists.")
     except NoResultFound:
         pass
 
     if user is None:
         create_user(
-            engine,
+            db,
             username=username,
             password=password,
             email=email

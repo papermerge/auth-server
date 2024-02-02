@@ -10,7 +10,7 @@ from passlib.hash import pbkdf2_sha256
 from fastapi import HTTPException
 
 from .crud import get_user_by_username, get_or_create_user_by_email
-from .models import User
+from .database.models import User
 from . import schemas
 from .config import Settings
 from .backends import GoogleAuth, GithubAuth, OAuth2Provider
@@ -103,7 +103,7 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     logger.info(f"Database based authentication for '{username}'")
 
     try:
-        user = get_user_by_username(db.get_bind(), username)
+        user = get_user_by_username(db, username)
     except NoResultFound:
         user = None
 
