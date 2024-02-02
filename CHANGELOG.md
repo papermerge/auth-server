@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0 - xxx
+
+- Refactoring - all sql functions to have session as first arg
+
 
 ## 0.6.4 - 2024-01-29
 
