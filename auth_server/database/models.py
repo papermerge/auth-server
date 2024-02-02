@@ -35,7 +35,8 @@ class User(Base):
             "core_folder.basetreenode_ptr_id",
             deferrable=True,
             use_alter=True
-        )
+        ),
+        nullable=True
     )
     home_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
@@ -47,7 +48,8 @@ class User(Base):
             "core_folder.basetreenode_ptr_id",
             deferrable=True,
             use_alter=True
-        )
+        ),
+        nullable = True,
     )
     inbox_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",

@@ -97,8 +97,6 @@ def create_user(
         last_name=last_name,
         is_superuser=is_superuser,
         is_active=is_active,
-        home_folder_id=home_id,
-        inbox_folder_id=inbox_id,
         password=pbkdf2_sha256.hash(password),
     )
     db_inbox = models.Folder(
