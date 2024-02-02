@@ -134,7 +134,12 @@ def get_or_create_user_by_email(
     user = get_user_by_email(session, email)
     if user is None:
         logger.info(f"User with email {email} is None")
-        create_user_from_email(session, email)
+        try:
+            create_user_from_email(session, email)
+        except Exception:
+            logger.exception(
+                f"Exception while creating user from email={email}"
+            )
 
         stmt = select(models.User).where(
             models.User.email == email
