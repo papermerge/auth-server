@@ -25,17 +25,17 @@ export const useGoogleAuth = () => {
     saveState(state);
 
     window.location.href = auth_provider_url(
-      config?.oauth2.google.authorize_url || '',
-      config?.oauth2.google.client_id || '',
-      config?.oauth2.google.redirect_uri || '',
-      config?.oauth2.google.scope || '',
+      config?.oauth2?.google?.authorize_url || '',
+      config?.oauth2?.google?.client_id || '',
+      config?.oauth2?.google?.redirect_uri || '',
+      config?.oauth2?.google?.scope || '',
       state
     );
   }, [
-    config?.oauth2.google.authorize_url,
-    config?.oauth2.google.client_id,
-    config?.oauth2.google.redirect_uri,
-    config?.oauth2.google.scope
+    config?.oauth2?.google?.authorize_url,
+    config?.oauth2?.google?.client_id,
+    config?.oauth2?.google?.redirect_uri,
+    config?.oauth2?.google?.scope
   ]);
 
 
@@ -53,17 +53,17 @@ export const useGithubAuth = () => {
     saveState(state);
 
     window.location.href = auth_provider_url(
-      config?.oauth2.github.authorize_url || '',
-      config?.oauth2.github.client_id || '',
-      config?.oauth2.github.redirect_uri || '',
-      config?.oauth2.github.scope || '',
+      config?.oauth2?.github?.authorize_url || '',
+      config?.oauth2?.github?.client_id || '',
+      config?.oauth2?.github?.redirect_uri || '',
+      config?.oauth2?.github?.scope || '',
       state
     );
   }, [
-    config?.oauth2.google.authorize_url,
-    config?.oauth2.google.client_id,
-    config?.oauth2.google.redirect_uri,
-    config?.oauth2.google.scope
+    config?.oauth2?.github?.authorize_url,
+    config?.oauth2?.github?.client_id,
+    config?.oauth2?.github?.redirect_uri,
+    config?.oauth2?.github?.scope
   ]);
 
   return { loading, error, githubAuth};

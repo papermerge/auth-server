@@ -3,6 +3,7 @@
 ## 0.7.0 - xxx
 
 - Refactoring - all sql functions to have session as first arg
+- Adjust oauth2 so that github or google providers can use used separately
 
 
 ## 0.6.4 - 2024-01-29
