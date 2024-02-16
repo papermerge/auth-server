@@ -269,6 +269,20 @@ files = [
 ]
 
 [[package]]
+name = "ldap3"
+version = "2.9.1"
+description = "A strictly RFC 4510 conforming LDAP V3 pure Python client library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ldap3-2.9.1-py2.py3-none-any.whl", hash = "sha256:5869596fc4948797020d3f03b7939da938778a0f9e2009f7a072ccf92b8e8d70"},
+    {file = "ldap3-2.9.1.tar.gz", hash = "sha256:f3e7fc4718e3f09dda568b57100095e0ce58633bcabbed8667ce3f8fbaa4229f"},
+]
+
+[package.dependencies]
+pyasn1 = ">=0.4.6"
+
+[[package]]
 name = "markdown-it-py"
 version = "3.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
@@ -901,4 +915,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "780f92db4a2c441959f8f305b1ed74d520179d345deab9310794d016018d017d"
+content-hash = "f504624a3c484f2c76b9b31657245c514984baadd2b9c222dc6efd94e7939de9"

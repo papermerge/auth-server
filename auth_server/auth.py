@@ -13,7 +13,7 @@ from .crud import get_user_by_username, get_or_create_user_by_email
 from .database.models import User
 from . import schemas
 from .config import Settings
-from .backends import GoogleAuth, GithubAuth, OAuth2Provider
+from .backends import GoogleAuth, GithubAuth, AuthProvider
 from .utils import raise_on_empty
 
 
@@ -26,7 +26,7 @@ async def authenticate(
     *,
     username: str | None = None,
     password: str | None = None,
-    provider: OAuth2Provider | None = None,
+    provider: AuthProvider | None = None,
     client_id: str | None = None,
     code: str | None = None,
     redirect_uri: str | None = None
@@ -43,7 +43,7 @@ async def authenticate(
         redirect_uri=redirect_uri
     )
 
-    if provider == OAuth2Provider.GOOGLE:
+    if provider == AuthProvider.GOOGLE:
         # oauth 2.0, google provider
         return await google_auth(
             db,
@@ -51,15 +51,17 @@ async def authenticate(
             code=code,
             redirect_uri=redirect_uri
         )
-    elif provider == OAuth2Provider.GITHUB:
+    elif provider == AuthProvider.GITHUB:
         return await github_auth(
             db,
             client_id=client_id,
             code=code,
             redirect_uri=redirect_uri
         )
+    elif provider == AuthProvider.LDAP:
+        return await ldap_auth(username, password)
     else:
-        raise ValueError("Unknown or empty oauth2 provider")
+        raise ValueError("Unknown or empty auth provider")
 
 
 def verify_password(password: str, hashed_password: str) -> bool:
@@ -117,6 +119,10 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
 
     logger.info(f"Authentication succeded for '{username}'")
     return user
+
+
+async def ldap_auth(username: str, password: str) -> schemas.User | None:
+    pass
 
 
 async def google_auth(

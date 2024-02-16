@@ -4,6 +4,7 @@
 
 - Refactoring - all sql functions to have session as first arg
 - Adjust oauth2 so that github or google providers can use used separately
+- Support for OpenLDAP (RFC 4510) authentication
 
 
 ## 0.6.4 - 2024-01-29

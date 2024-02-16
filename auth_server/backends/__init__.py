@@ -2,8 +2,10 @@ from enum import Enum
 
 from .google import GoogleAuth
 from .github import GithubAuth
+from .ldap import LDAPAuth
 
 
-class OAuth2Provider(str, Enum):
+class AuthProvider(str, Enum):
     GOOGLE = "google"
     GITHUB = "github"
+    LDAP = "ldap"
