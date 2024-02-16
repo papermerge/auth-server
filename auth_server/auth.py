@@ -126,7 +126,13 @@ async def ldap_auth(
     username: str,
     password: str
 ) -> schemas.User | None:
-    client = LDAPAuth(username, password)
+    client = LDAPAuth(
+        url=settings.papermerge__auth__ldap_url,
+        username=username,
+        password=password,
+        user_dn_format=settings.papermerge__auth__ldap_user_dn_format,
+        use_ssl=settings.papermerge__auth__ldap_use_ssl
+    )
 
     try:
         await client.signin()

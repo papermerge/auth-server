@@ -9,7 +9,7 @@ class LDAPAuth:
     name: str = 'ldap'
 
     def __init__(self,
-        uri: str,
+        url: str,
         username: str,
         password: str,
         user_dn_format: str,
@@ -17,7 +17,7 @@ class LDAPAuth:
     ):
         self._username = username
         self._password = password
-        self._uri = uri
+        self._url = url
         self._user_dn_format = user_dn_format
         self._use_ssl = use_ssl
 
