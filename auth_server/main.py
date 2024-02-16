@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from .auth import authenticate, create_token
 from . import schemas
-from .backends import OAuth2Provider
+from .backends import AuthProvider
 from .config import get_settings
 from auth_server.database import get_db
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @app.post("/token")
 async def retrieve_token(
     response: Response,
-    provider: OAuth2Provider | None = None,
+    provider: AuthProvider | None = None,
     client_id: str | None = None,
     code: str | None = None,
     redirect_uri: str | None = None,
