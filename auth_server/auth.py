@@ -13,7 +13,7 @@ from .crud import get_user_by_username, get_or_create_user_by_email
 from .database.models import User
 from . import schemas
 from .config import Settings
-from .backends import GoogleAuth, GithubAuth, AuthProvider
+from .backends import GoogleAuth, GithubAuth, AuthProvider, LDAPAuth
 from .utils import raise_on_empty
 
 
@@ -59,7 +59,7 @@ async def authenticate(
             redirect_uri=redirect_uri
         )
     elif provider == AuthProvider.LDAP:
-        return await ldap_auth(username, password)
+        return await ldap_auth(db, username, password)
     else:
         raise ValueError("Unknown or empty auth provider")
 
@@ -121,8 +121,34 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     return user
 
 
-async def ldap_auth(username: str, password: str) -> schemas.User | None:
-    pass
+async def ldap_auth(
+    db: Session,
+    username: str,
+    password: str
+) -> schemas.User | None:
+    client = LDAPAuth(username, password)
+
+    try:
+        await client.signin()
+    except Exception as ex:
+        logger.warning(f"Auth:LDAP: sign in failed with {ex}")
+
+        raise HTTPException(
+            status_code=401,
+            detail=f"401 Unauthorized. LDAP Auth error: {ex}."
+        )
+
+    try:
+        email = await client.user_email()
+    except Exception as ex:
+        logger.warning(f"Auth:LDAP: cannot retrieve user email {ex}")
+        logger.warning(
+            f"Auth:LDAP: user email fallback to {email}"
+        )
+        domain = settings.papermerge__auth__ldap_user_email_domain_fallback
+        email = f"{username}@{domain}"
+
+    return get_or_create_user_by_email(db, email)
 
 
 async def google_auth(
