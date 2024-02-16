@@ -31,11 +31,11 @@ class Settings(BaseSettings):
     papermerge__auth__google_client_secret: str | None = None
     papermerge__auth__github_client_secret: str | None = None
 
-    papermerge__auth__ldap_uri: str | None  # e.g. ldap.trusel.net
+    papermerge__auth__ldap_uri: str | None = None  # e.g. ldap.trusel.net
     papermerge__auth__ldap_use_ssl: bool = True
     # e.g. uid={username},ou=People,dc=ldap,dc=trusel,dc=net
-    papermerge__auth__ldap_user_dn_format: str | None
-    papermerge__auth__ldap_email_attr: str | None  # e.g. email
+    papermerge__auth__ldap_user_dn_format: str | None = None
+    papermerge__auth__ldap_email_attr: str | None = None  # e.g. email
     # if there is an error retrieving ldap_email_attr, the
     # fallback user email will be set to username@<email-domain-fallback>
     papermerge__auth__ldap_user_email_domain_fallback: str = 'example.com'
