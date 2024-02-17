@@ -13,7 +13,12 @@ from .crud import get_user_by_username, get_or_create_user_by_email
 from .database.models import User
 from . import schemas
 from .config import Settings
-from .backends import GoogleAuth, GithubAuth, AuthProvider, LDAPAuth
+from .backends import (
+    GoogleAuth,
+    GithubAuth,
+    AuthProvider,
+)
+from .backends import ldap
 from .utils import raise_on_empty
 
 
@@ -126,13 +131,7 @@ async def ldap_auth(
     username: str,
     password: str
 ) -> schemas.User | None:
-    client = LDAPAuth(
-        url=settings.papermerge__auth__ldap_url,
-        username=username,
-        password=password,
-        user_dn_format=settings.papermerge__auth__ldap_user_dn_format,
-        use_ssl=settings.papermerge__auth__ldap_use_ssl
-    )
+    client = ldap.get_client(username, password)
 
     try:
         await client.signin()
@@ -144,6 +143,7 @@ async def ldap_auth(
             detail=f"401 Unauthorized. LDAP Auth error: {ex}."
         )
 
+    email = ldap.get_default_email(username)
     try:
         email = await client.user_email()
     except Exception as ex:
@@ -151,8 +151,6 @@ async def ldap_auth(
         logger.warning(
             f"Auth:LDAP: user email fallback to {email}"
         )
-        domain = settings.papermerge__auth__ldap_user_email_domain_fallback
-        email = f"{username}@{domain}"
 
     return get_or_create_user_by_email(db, email)
 
