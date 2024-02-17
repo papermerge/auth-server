@@ -4,14 +4,23 @@ import Button from "./button";
 import Input from "./input";
 import Error from './error';
 import { ClickEvent } from './types';
+import { get_runtime_config  } from "../../runtime_config";
+import { RuntimeConfig } from '../../types';
 
 
 const authenticate = async (username: string, password: string) => {
   const params = new URLSearchParams();
+  let config: RuntimeConfig | undefined = get_runtime_config();
 
   params.append('username', username);
   params.append('password', password);
   params.append('grant_type', 'password');
+
+  if (config) {
+    params.append('provider', config.login_provider);
+  } else {
+    console.log('RuntimeConfig is undefined')
+  }
 
   let response = await fetch(
     '/api/token',
