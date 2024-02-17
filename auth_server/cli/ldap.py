@@ -39,6 +39,5 @@ def user_email(username: str, password: Password):
         console.print("Authentication error", style="red")
 
 
-
 if __name__ == '__main__':
     app()
