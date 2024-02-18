@@ -32,6 +32,6 @@ class AuthProvider(str, Enum):
 class UserCredentials(BaseModel):
     username: str
     password: str
-    provider: AuthProvider = 'db'
+    provider: AuthProvider = AuthProvider.DB
 
     model_config = ConfigDict(from_attributes=True)
