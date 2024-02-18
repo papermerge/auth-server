@@ -1,4 +1,6 @@
 from uuid import UUID
+from enum import Enum
+from typing_extensions import Literal
 from pydantic import BaseModel, ConfigDict
 
 
@@ -20,8 +22,16 @@ class Token(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AuthProvider(str, Enum):
+    GOOGLE = "google"
+    GITHUB = "github"
+    LDAP = "ldap"
+    DB = "db"
+
+
 class UserCredentials(BaseModel):
     username: str
     password: str
+    provider: AuthProvider = AuthProvider.DB
 
     model_config = ConfigDict(from_attributes=True)

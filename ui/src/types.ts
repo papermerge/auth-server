@@ -20,7 +20,7 @@ export type TResponseTypeBasedProps<T> =
 
 
 export type ProviderType = 'google' | 'github';
-
+export type LoginProvider = 'db' | 'ldap'
 
 export type TOauth2Props<T = TAuthTokenPayload> = {
   provider: ProviderType;
@@ -38,6 +38,16 @@ export type RuntimeConfig = {
     google: OAuth2ProviderType,
     github: OAuth2ProviderType
   }
+  /*
+  There are two types of buttons to sign in:
+  1. social - or OIDC/OAuth2
+  2. default login button
+  When signing in via Social/OIDC/OAuth2 provider attributes is set the OIDC provider
+  When signing in via default login button - backend can authenticate via
+  DB or via LDAP. `login_provider` attribute is there to distinguish between
+  DB or LDAP authentication.
+  */
+  login_provider: LoginProvider
 }
 
 declare global {
