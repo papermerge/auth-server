@@ -85,11 +85,18 @@ export default function Login() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleSubmit = (event: ClickEvent) => {
-    event.preventDefault()
+    let config: RuntimeConfig | undefined = get_runtime_config();
+    let provider = 'db';
+
+    event.preventDefault();
     setErrorMessage('');
     setInProgress(true);
 
-    let body = JSON.stringify({username, password});
+    if (config) {
+      provider = config.login_provider;
+    }
+
+    let body = JSON.stringify({username, password, provider});
 
     fetch(
       '/api/token',

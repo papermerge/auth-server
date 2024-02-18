@@ -84,7 +84,7 @@ class LDAPAuth:
                 logger.info(msg)
                 return None
 
-            return result[self._email_attr]
+            return result[self._email_attr].value
         else:
             logger.info("conn.search returned falsy value")
             logger.info(msg)

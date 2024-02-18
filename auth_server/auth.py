@@ -16,7 +16,6 @@ from .config import Settings
 from .backends import (
     GoogleAuth,
     GithubAuth,
-    AuthProvider,
 )
 from .backends import ldap
 from .utils import raise_on_empty
@@ -31,24 +30,25 @@ async def authenticate(
     *,
     username: str | None = None,
     password: str | None = None,
-    provider: AuthProvider | None = None,
+    provider: schemas.AuthProvider = schemas.AuthProvider.DB,
     client_id: str | None = None,
     code: str | None = None,
     redirect_uri: str | None = None
 ) -> schemas.User | None:
 
-    if username and password:
+    # provider = DB
+    if username and password and provider == schemas.AuthProvider.DB:
         # password based authentication against database
         return db_auth(db, username, password)
 
-    raise_on_empty(
-        code=code,
-        client_id=client_id,
-        provider=provider,
-        redirect_uri=redirect_uri
-    )
-
-    if provider == AuthProvider.GOOGLE:
+    if provider == schemas.AuthProvider.GOOGLE:
+        # provider = GOOGLE (oauth2/google)
+        raise_on_empty(
+            code=code,
+            client_id=client_id,
+            provider=provider,
+            redirect_uri=redirect_uri
+        )
         # oauth 2.0, google provider
         return await google_auth(
             db,
@@ -56,14 +56,22 @@ async def authenticate(
             code=code,
             redirect_uri=redirect_uri
         )
-    elif provider == AuthProvider.GITHUB:
+    elif provider == schemas.AuthProvider.GITHUB:
+        # provider = GitHub (oauth2/github)
+        raise_on_empty(
+            code=code,
+            client_id=client_id,
+            provider=provider,
+            redirect_uri=redirect_uri
+        )
         return await github_auth(
             db,
             client_id=client_id,
             code=code,
             redirect_uri=redirect_uri
         )
-    elif provider == AuthProvider.LDAP:
+    elif provider == schemas.AuthProvider.LDAP:
+        # provider = ldap
         return await ldap_auth(db, username, password)
     else:
         raise ValueError("Unknown or empty auth provider")
