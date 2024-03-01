@@ -27,14 +27,14 @@ export const useOIDC = () => {
     window.location.href = auth_provider_url(
       config?.oidc?.authorize_url || '',
       config?.oidc?.client_id || '',
-      config?.oidc?.redirect_uri || '',
+      config?.oidc?.redirect_url || '',
       config?.oidc?.scope || '',
       state
     );
   }, [
     config?.oidc?.authorize_url,
     config?.oidc?.client_id,
-    config?.oidc?.redirect_uri,
+    config?.oidc?.redirect_url,
     config?.oidc?.scope
   ]);
 

@@ -23,7 +23,7 @@ async def retrieve_token(
     provider: schemas.AuthProvider | None = None,
     client_id: str | None = None,
     code: str | None = None,
-    redirect_uri: str | None = None,
+    redirect_url: str | None = None,
     creds: schemas.UserCredentials | None = None,
     db: Session = Depends(get_db)
 ) -> schemas.Token:
@@ -32,7 +32,7 @@ async def retrieve_token(
     """
     kwargs = dict(
         code=code,
-        redirect_uri=redirect_uri,
+        redirect_url=redirect_url,
         client_id=client_id,
         provider=provider
     )

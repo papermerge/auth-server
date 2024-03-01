@@ -47,7 +47,7 @@ export type RuntimeConfig = {
 declare global {
 
   type OIDCProviderType = {
-    redirect_uri: string,
+    redirect_url: string,
     authorize_url: string,
     client_id: string,
     scope: string

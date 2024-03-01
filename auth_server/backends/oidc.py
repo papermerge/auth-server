@@ -18,14 +18,14 @@ class OIDCAuth:
         client_secret: str,
         client_id: str,
         code: str,
-        redirect_uri: str
+        redirect_url: str
     ):
         self.access_token_url = access_token_url
         self.user_info_url = user_info_url
         self.client_secret = client_secret
         self.client_id = client_id
         self.code = code
-        self.redirect_uri = redirect_uri
+        self.redirect_url = redirect_url
 
     async def signin(self):
         async with httpx.AsyncClient() as client:
@@ -34,7 +34,7 @@ class OIDCAuth:
                 'client_id': self.client_id,
                 'client_secret': self.client_secret,
                 # do we need this param?
-                'redirect_uri': self.redirect_uri,
+                'redirect_uri': self.redirect_url,
                 'code': self.code
             }
             logger.debug(f"oidc signin params: {params}")

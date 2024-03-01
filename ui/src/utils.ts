@@ -54,7 +54,7 @@ export const isWindowOpener = (opener: Window | null): opener is Window =>
 export const auth_provider_url = (
   authorizeUrl: string,
   clientId: string,
-  redirectUri: string,
+  redirectUrl: string,
   scope: string,
   state: string,
   extraQueryParameters: TOauth2Props['extraQueryParameters'] = {}
@@ -62,7 +62,7 @@ export const auth_provider_url = (
   const query = objectToQuery({
     response_type: 'code',
     client_id: clientId,
-    redirect_uri: redirectUri,
+    redirect_url: redirectUrl,
     scope,
     state,
     ...extraQueryParameters,
@@ -88,7 +88,7 @@ export const cleanup = (
 export const auth_server_url = (
   clientId: string,
   code: string,
-  redirectUri: string,
+  redirectUrl: string,
   state: string
 ) => {
 
@@ -97,7 +97,7 @@ export const auth_server_url = (
 
   console.log(`client_id=${clientId}`);
   console.log(`code=${code}`);
-  console.log(`redirect_uri=${redirectUri}`);
+  console.log(`redirect_url=${redirectUrl}`);
 
   return `${url}?${objectToQuery({
     ...anySearchParameters,
@@ -105,7 +105,7 @@ export const auth_server_url = (
     provider: 'oidc',
     grant_type: 'authorization_code',
     code,
-    redirect_uri: redirectUri,
+    redirect_url: redirectUrl,
     state,
   })}`;
 

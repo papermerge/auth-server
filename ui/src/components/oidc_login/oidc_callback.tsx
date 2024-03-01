@@ -13,7 +13,7 @@ export const OIDCCallback = () => {
       const url = auth_server_url(
         window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.client_id,
         payload?.code,
-        window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.redirect_uri,
+        window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.redirect_url,
         payload?.state,
       );
 

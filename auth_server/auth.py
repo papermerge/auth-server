@@ -30,7 +30,7 @@ async def authenticate(
     provider: schemas.AuthProvider = schemas.AuthProvider.DB,
     client_id: str | None = None,
     code: str | None = None,
-    redirect_uri: str | None = None
+    redirect_url: str | None = None
 ) -> schemas.User | None:
 
     # provider = DB
@@ -43,13 +43,13 @@ async def authenticate(
             code=code,
             client_id=client_id,
             provider=provider,
-            redirect_uri=redirect_uri
+            redirect_url=redirect_url
         )
         return await oidc_auth(
             db,
             client_id=client_id,
             code=code,
-            redirect_uri=redirect_uri
+            redirect_url=redirect_url
         )
     elif provider == schemas.AuthProvider.LDAP:
         # provider = ldap
@@ -148,7 +148,7 @@ async def oidc_auth(
     db: Session,
     client_id: str,
     code: str,
-    redirect_uri: str
+    redirect_url: str
 ) -> User | None:
     if settings.papermerge__auth__oidc_client_secret is None:
         raise HTTPException(
@@ -162,7 +162,7 @@ async def oidc_auth(
         user_info_url=settings.papermerge__auth__oidc_user_info_url,
         client_id=client_id,
         code=code,
-        redirect_uri = redirect_uri
+        redirect_url = redirect_url
     )
 
     logger.debug("Auth:oidc: sign in")
@@ -171,44 +171,6 @@ async def oidc_auth(
         await client.signin()
     except Exception as ex:
         logger.warning(f"Auth:oidc: sign in failed with {ex}")
-
-        raise HTTPException(
-            status_code=401,
-            detail = f"401 Unauthorized. Auth provider error: {ex}."
-        )
-
-    email = await client.user_email()
-
-    return get_or_create_user_by_email(db, email)
-
-
-async def github_auth(
-    db: Session,
-    client_id: str,
-    code: str,
-    redirect_uri: str
-) -> User:
-
-    logger.info("Auth:Github: sign in")
-    if settings.papermerge__auth__github_client_secret is None:
-        raise HTTPException(
-            status_code=400,
-            detail = "Github client secret is empty"
-        )
-
-    client = GithubAuth(
-        client_secret = settings.papermerge__auth__github_client_secret,
-        client_id=client_id,
-        code=code,
-        redirect_uri = redirect_uri
-    )
-
-    logger.debug("Auth:Github: sign in")
-
-    try:
-        await client.signin()
-    except Exception as ex:
-        logger.warning(f"Auth:Github: sign in failed with {ex}")
 
         raise HTTPException(
             status_code=401,
