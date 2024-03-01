@@ -13,10 +13,7 @@ from .crud import get_user_by_username, get_or_create_user_by_email
 from .database.models import User
 from . import schemas
 from .config import Settings
-from .backends import (
-    GoogleAuth,
-    GithubAuth,
-)
+from .backends import OIDCAuth
 from .backends import ldap
 from .utils import raise_on_empty
 
@@ -41,30 +38,14 @@ async def authenticate(
         # password based authentication against database
         return db_auth(db, username, password)
 
-    if provider == schemas.AuthProvider.GOOGLE:
-        # provider = GOOGLE (oauth2/google)
+    if provider == schemas.AuthProvider.OIDC:
         raise_on_empty(
             code=code,
             client_id=client_id,
             provider=provider,
             redirect_uri=redirect_uri
         )
-        # oauth 2.0, google provider
-        return await google_auth(
-            db,
-            client_id=client_id,
-            code=code,
-            redirect_uri=redirect_uri
-        )
-    elif provider == schemas.AuthProvider.GITHUB:
-        # provider = GitHub (oauth2/github)
-        raise_on_empty(
-            code=code,
-            client_id=client_id,
-            provider=provider,
-            redirect_uri=redirect_uri
-        )
-        return await github_auth(
+        return await oidc_auth(
             db,
             client_id=client_id,
             code=code,
@@ -163,31 +144,33 @@ async def ldap_auth(
     return get_or_create_user_by_email(db, email)
 
 
-async def google_auth(
+async def oidc_auth(
     db: Session,
     client_id: str,
     code: str,
     redirect_uri: str
 ) -> User | None:
-    if settings.papermerge__auth__google_client_secret is None:
+    if settings.papermerge__auth__oidc_client_secret is None:
         raise HTTPException(
             status_code=400,
-            detail = "Google client secret is empty"
+            detail = "OIDC client secret is empty"
         )
 
-    client = GoogleAuth(
-        client_secret = settings.papermerge__auth__google_client_secret,
+    client = OIDCAuth(
+        client_secret=settings.papermerge__auth__google_client_secret,
+        access_token_url=settings.papermerge__auth__oidc_access_token_url,
+        user_info_url=settings.papermerge__auth__oidc_user_info_url,
         client_id=client_id,
         code=code,
         redirect_uri = redirect_uri
     )
 
-    logger.debug("Auth:google: sign in")
+    logger.debug("Auth:oidc: sign in")
 
     try:
         await client.signin()
     except Exception as ex:
-        logger.warning(f"Auth:google: sign in failed with {ex}")
+        logger.warning(f"Auth:oidc: sign in failed with {ex}")
 
         raise HTTPException(
             status_code=401,

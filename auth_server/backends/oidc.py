@@ -5,19 +5,23 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
-class GithubAuth:
-    name: str = 'github'
-    provider_url: str = 'https://github.com/login/oauth/access_token'
-    userinfo_url: str = 'https://api.github.com/user'
+class OIDCAuth:
+    name: str = 'oidc'
+    # provider_url: str = 'https://oauth2.googleapis.com/token'
+    # userinfo_url: str = 'https://www.googleapis.com/oauth2/v3/userinfo'
     access_token: str | None = None
 
     def __init__(
         self,
+        access_token_url: str,
+        user_info_url: str,
         client_secret: str,
         client_id: str,
         code: str,
         redirect_uri: str
     ):
+        self.access_token_url = access_token_url
+        self.user_info_url = user_info_url
         self.client_secret = client_secret
         self.client_id = client_id
         self.code = code
@@ -26,25 +30,23 @@ class GithubAuth:
     async def signin(self):
         async with httpx.AsyncClient() as client:
             params = {
+                'grant_type': 'authorization_code',
                 'client_id': self.client_id,
                 'client_secret': self.client_secret,
                 # do we need this param?
                 'redirect_uri': self.redirect_uri,
                 'code': self.code
             }
-            logger.debug(f"github signin params: {params}")
+            logger.debug(f"oidc signin params: {params}")
 
             response = await client.post(
-                self.provider_url,
-                params=params,
-                headers={
-                    'Accept': 'application/json'
-                }
+                self.access_token_url,
+                params=params
             )
             logger.debug(
-                f"github signin response_code = {response.status_code}"
+                f"oidc signin response_code = {response.status_code}"
             )
-            logger.debug(f"github signin response_text = {response.text}")
+            logger.debug(f"oidc signin response_text = {response.text}")
 
             if not response.is_success:
                 message = " ".join([
@@ -57,20 +59,19 @@ class GithubAuth:
 
     async def user_email(self):
         if self.access_token is None:
-            raise ValueError("Github access token is missing")
+            raise ValueError("OIDC access token is missing")
 
         headers = {
-            'Authorization': f"Bearer {self.access_token}",
-            'Accept': 'application/json'
+            'Authorization': f"Bearer {self.access_token}"
         }
 
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                self.userinfo_url,
+                self.user_info_url,
                 headers=headers
             )
-            logger.info(f"github userinfo response_code = {response.status_code}")
-            logger.info(f"github userinfo response_text = {response.text}")
+            logger.info(f"OIDC userinfo response_code = {response.status_code}")
+            logger.info(f"OIDC userinfo response_text = {response.text}")
 
             if not response.is_success:
                 message = " ".join([
