@@ -64,7 +64,7 @@ def test_invalid_post_request(client: httpx.Client):
     response = client.post("/token", params={
         "code": "123",
         "redirect_uri": "http://some/callback",
-        "provider": "google"
+        "provider": "oidc"
     })
     # should return 400 Bad request as "client_id" parameter is missing
     assert response.status_code == 400, response.text
@@ -72,7 +72,7 @@ def test_invalid_post_request(client: httpx.Client):
     response = client.post("/token", params={
         "client_id": "cl123",
         "redirect_uri": "http://some/callback",
-        "provider": "google"
+        "provider": "oidc"
     })
     # should return 400 Bad request as "code" parameter is missing
     assert response.status_code == 400, response.text
@@ -87,7 +87,7 @@ def test_invalid_post_request(client: httpx.Client):
 
     response = client.post("/token", params={
         "client_id": "cl123",
-        "provider": "google",
+        "provider": "oidc",
         "code": "abc"
     })
     # should return 400 Bad request as "redirect_uri" parameter is missing

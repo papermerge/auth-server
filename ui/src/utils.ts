@@ -1,16 +1,16 @@
-import { TOauth2Props, ProviderType } from './types';
+import { TOauth2Props } from './types';
 
 
 export const closePopup = (popupRef: React.MutableRefObject<Window | null | undefined>) => {
-	popupRef.current?.close();
+  popupRef.current?.close();
 };
 
 const OAUTH_STATE_KEY = "oauth_state_key";
 
 
 export const generateState = () => {
-	const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	let array: Uint8Array = new Uint8Array(40);
+  const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let array: Uint8Array = new Uint8Array(40);
   let array2: Uint8Array;
 
   window.crypto.getRandomValues(array);
@@ -20,94 +20,93 @@ export const generateState = () => {
         return validChars.codePointAt(value % validChars.length) || 0;
     }
   );
-	const randomState = String.fromCharCode.apply(null, Array.from(array2));
+  const randomState = String.fromCharCode.apply(null, Array.from(array2));
 
   return randomState;
 };
 
 export const saveState = (state: string) => {
-	sessionStorage.setItem(OAUTH_STATE_KEY, state);
+  sessionStorage.setItem(OAUTH_STATE_KEY, state);
 };
 
 export const removeState = () => {
-	sessionStorage.removeItem(OAUTH_STATE_KEY);
+  sessionStorage.removeItem(OAUTH_STATE_KEY);
 };
 
 export const objectToQuery = (object: Record<string, string>) => {
-	return new URLSearchParams(object).toString();
+  return new URLSearchParams(object).toString();
 };
 
 export const queryToObject = (query: string) => {
-	const parameters = new URLSearchParams(query);
-	return Object.fromEntries(parameters.entries());
+  const parameters = new URLSearchParams(query);
+  return Object.fromEntries(parameters.entries());
 };
 
 export const checkState = (receivedState: string) => {
-	const state = sessionStorage.getItem(OAUTH_STATE_KEY);
-	return state === receivedState;
+  const state = sessionStorage.getItem(OAUTH_STATE_KEY);
+  return state === receivedState;
 };
 
 
 export const isWindowOpener = (opener: Window | null): opener is Window =>
-	opener !== null && opener !== undefined;
+  opener !== null && opener !== undefined;
 
 export const auth_provider_url = (
-	authorizeUrl: string,
-	clientId: string,
-	redirectUri: string,
-	scope: string,
-	state: string,
-	extraQueryParameters: TOauth2Props['extraQueryParameters'] = {}
+  authorizeUrl: string,
+  clientId: string,
+  redirectUri: string,
+  scope: string,
+  state: string,
+  extraQueryParameters: TOauth2Props['extraQueryParameters'] = {}
 ) => {
-	const query = objectToQuery({
-		response_type: 'code',
-		client_id: clientId,
-		redirect_uri: redirectUri,
-		scope,
-		state,
-		...extraQueryParameters,
-	});
+  const query = objectToQuery({
+    response_type: 'code',
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope,
+    state,
+    ...extraQueryParameters,
+  });
 
-	return `${authorizeUrl}?${query}`;
+  return `${authorizeUrl}?${query}`;
 };
 
 
 export const cleanup = (
-	intervalRef: React.MutableRefObject<string | number | NodeJS.Timeout | undefined>,
-	popupRef: React.MutableRefObject<Window | null | undefined>,
-	handleMessageListener: any
+  intervalRef: React.MutableRefObject<string | number | NodeJS.Timeout | undefined>,
+  popupRef: React.MutableRefObject<Window | null | undefined>,
+  handleMessageListener: any
 ) => {
-	clearInterval(intervalRef.current);
-	if (popupRef.current && typeof popupRef.current.close === 'function') {
-		// closePopup(popupRef);
-	};
-	removeState();
-	window.removeEventListener('message', handleMessageListener);
+  clearInterval(intervalRef.current);
+  if (popupRef.current && typeof popupRef.current.close === 'function') {
+    // closePopup(popupRef);
+  };
+  removeState();
+  window.removeEventListener('message', handleMessageListener);
 };
 
 export const auth_server_url = (
-	clientId: string,
-	code: string,
-	redirectUri: string,
-	state: string,
-	provider: ProviderType
+  clientId: string,
+  code: string,
+  redirectUri: string,
+  state: string
 ) => {
 
-	const url = '/api/token';
-	const anySearchParameters = queryToObject('');
+  const url = '/api/token';
+  const anySearchParameters = queryToObject('');
 
-	console.log(`client_id=${clientId}`);
-	console.log(`code=${code}`);
-	console.log(`redirect_uri=${redirectUri}`);
+  console.log(`client_id=${clientId}`);
+  console.log(`code=${code}`);
+  console.log(`redirect_uri=${redirectUri}`);
 
-	return `${url}?${objectToQuery({
-		...anySearchParameters,
-		client_id: clientId,
-		provider: provider,
-		grant_type: 'authorization_code',
-		code,
-		redirect_uri: redirectUri,
-		state,
-	})}`;
+  return `${url}?${objectToQuery({
+    ...anySearchParameters,
+    client_id: clientId,
+    provider: 'oidc',
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: redirectUri,
+    state,
+  })}`;
 
 };

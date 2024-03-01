@@ -19,11 +19,9 @@ export type TResponseTypeBasedProps<T> =
     };
 
 
-export type ProviderType = 'google' | 'github';
 export type LoginProvider = 'db' | 'ldap'
 
 export type TOauth2Props<T = TAuthTokenPayload> = {
-  provider: ProviderType;
   authorizeUrl: string;
   clientId: string;
   redirectUri: string;

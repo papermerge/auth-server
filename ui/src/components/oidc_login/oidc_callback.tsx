@@ -15,7 +15,6 @@ export const OIDCCallback = () => {
         payload?.code,
         window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.redirect_uri,
         payload?.state,
-        'google'
       );
 
       fetch(url, { method:'POST' })
