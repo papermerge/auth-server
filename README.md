@@ -8,8 +8,8 @@ Following authentication methods are supported:
 
 * database - authenticate against user credentials from the database's
   core_user table
-* google auth - authenticate against Google's user account credentials
-* github auth - authenticate against Github's user account credentials
+* oidc - authenticate against OIDC provider
+* ldap - authenticate with LDAP
 
 When authentication succeeds, auth server responds with a valid
 cryptographically signed JWT access token.
@@ -94,57 +94,22 @@ volumes:
   maria:
 ```
 
-In order to enable authentication via Google accounts you need to
+In order to enable authentication via OIDC provider you need to
 provide following environment variables:
 
-*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
-*  `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
-*  `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
-*  `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
+*  `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
+*  `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
+*  `PAPERMERGE__AUTH__OIDC_AUTHORIZE_URL`
+*  `PAPERMERGE__AUTH__OIDC_REDIRECT_URI`
 
-You need to provider all four values. First two, client_id and client_secret,
-you obtain when registering oauth2 client with Google.
+You need to provider all four values.
 
-`PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL` is the URL of the Google authorization
-server. As of writing this documentation, its value is:
+`PAPERMERGE__AUTH__OIDC_REDIRECT_URI` should be:
 
-    https://accounts.google.com/o/oauth2/auth
-
-just keep in mind that it may change thus you need to check Google's oauth2
-documentation for its current value.
-
-`PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI` should be:
-
-    <http|https>://<your domain>/google/callback
+    <http|https>://<your domain>/oidc/callback
 
 Above value should be same as in field "Authorized redirect URI" when
 registering oauth2 client.
-
-To enable authentication via Github accounts you need to provider following env
-variables:
-
-* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
-* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
-* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
-
-Similarely with Google's oauth2 case, you need to provide all four values.
-Client secret and client id you get when registering oauth2 client.
-
-Current value for `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`, is
-
-  https://github.com/login/oauth/authorize
-
-Keep in mind to double check GitHub's documentation for up-to-date GitHub
-oauth2 authentication server URL.
-
-Value for `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI` should be:
-
-    <http|https>://<your domain>/github/callback
-
-Above value should be same as in field "Authorized callback URI" when
-registering Github oauth2 client.
-
 
 You can also start the auth server with poetry:
 
@@ -218,20 +183,11 @@ which means that many scheme described in sqlalchemy docs will not
 work for papermerge-core.
 
 
-### Google Auth
+### OIDC Auth
 
 Either all four values should be provided or none.
 
-* `PAPERMERGE__AUTH__GOOGLE_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__GOOGLE_CLIENT_ID`
-* `PAPERMERGE__AUTH__GOOGLE_AUTHORIZE_URL`
-* `PAPERMERGE__AUTH__GOOGLE_REDIRECT_URI`
-
-### Github Auth
-
-Either all four values should be provided or none.
-
-* `PAPERMERGE__AUTH__GITHUB_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__GITHUB_CLIENT_ID`
-* `PAPERMERGE__AUTH__GITHUB_AUTHORIZE_URL`
-* `PAPERMERGE__AUTH__GITHUB_REDIRECT_URI`
+* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
+* `PAPERMERGE__AUTH__OIDC_AUTHORIZE_URL`
+* `PAPERMERGE__AUTH__OIDC_REDIRECT_URI`

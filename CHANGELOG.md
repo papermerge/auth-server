@@ -1,5 +1,11 @@
 # Changelog
 
+
+
+## 0.8.0 - 2024-xxx
+
+- OIDC support
+
 ## 0.7.0 - 2024-02-18
 
 - Refactoring - all sql functions to have session as first arg
