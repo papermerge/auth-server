@@ -1,7 +1,6 @@
 # Changelog
 
 
-
 ## 0.8.0 - 2024-xxx
 
 - OIDC support
