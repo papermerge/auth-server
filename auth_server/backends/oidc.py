@@ -41,7 +41,8 @@ class OIDCAuth:
 
             response = await client.post(
                 self.access_token_url,
-                params=params
+                params=params,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
             logger.debug(
                 f"oidc signin response_code = {response.status_code}"
