@@ -10,7 +10,7 @@ export default function OIDCLogin() {
 
   if (is_oidc_enabled()) {
     oidc_signin_btn = <Button className="m-2 btn-success" onClick={() => oidcAuth()}>
-      <i className="bi bi-google"></i><span className="m-2">Login with Google</span>
+      <span className="m-2">Login with OIDC</span>
     </Button>
   }
 

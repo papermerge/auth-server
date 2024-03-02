@@ -62,7 +62,7 @@ export const auth_provider_url = (
   const query = objectToQuery({
     response_type: 'code',
     client_id: clientId,
-    redirect_url: redirectUrl,
+    redirect_uri: redirectUrl,
     scope,
     state,
     ...extraQueryParameters,
