@@ -157,12 +157,12 @@ async def oidc_auth(
         )
 
     client = OIDCAuth(
-        client_secret=settings.papermerge__auth__google_client_secret,
+        client_secret=settings.papermerge__auth__oidc_client_secret,
         access_token_url=settings.papermerge__auth__oidc_access_token_url,
         user_info_url=settings.papermerge__auth__oidc_user_info_url,
         client_id=client_id,
         code=code,
-        redirect_url = redirect_url
+        redirect_url=redirect_url
     )
 
     logger.debug("Auth:oidc: sign in")
