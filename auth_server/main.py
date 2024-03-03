@@ -57,8 +57,6 @@ async def retrieve_token(
     access_token = create_token(user)
 
     response.set_cookie('access_token', access_token)
-    response.set_cookie('remote_user', str(user.id))
     response.headers['Authorization'] = f"Bearer {access_token}"
-    response.headers['REMOTE_USER'] = str(user.id)
 
     return schemas.Token(access_token=access_token)
