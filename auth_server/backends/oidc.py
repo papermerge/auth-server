@@ -42,6 +42,7 @@ class OIDCAuth:
             response = await client.post(
                 self.access_token_url,
                 params=params,
+                data=params,
                 headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
             logger.debug(
