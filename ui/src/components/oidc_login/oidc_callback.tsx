@@ -3,7 +3,7 @@ import { queryToObject } from '../../utils';
 import { auth_server_url } from "../../utils"
 
 
-export const GitHubCallback = () => {
+export const OIDCCallback = () => {
 
   useEffect(() => {
       const payload = {
@@ -11,11 +11,10 @@ export const GitHubCallback = () => {
         ...queryToObject(window.location.hash.split('#')[1]),
       };
       const url = auth_server_url(
-        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.github.client_id,
+        window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.client_id,
         payload?.code,
-        window.__PAPERMERGE_RUNTIME_CONFIG__.oauth2.github.redirect_uri,
+        window.__PAPERMERGE_RUNTIME_CONFIG__.oidc.redirect_url,
         payload?.state,
-        'github'
       );
 
       fetch(url, { method:'POST' })

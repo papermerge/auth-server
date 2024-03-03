@@ -1,16 +1,15 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { GoogleCallback } from './components/social_login/google_callback';
-import { GitHubCallback } from './components/social_login/github_callback';
+import { OIDCCallback } from './components/oidc_login/oidc_callback';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Logo from "./components/login/logo";
 import Login from "./components/login/login";
-import SocialLogin from "./components/social_login/social_login";
+import OIDCLogin from "./components/oidc_login/oidc_login";
 import Separator from './components/separator';
 
-import { is_github_auth_enabled, is_google_auth_enabled } from './runtime_config';
+import { is_oidc_enabled } from './runtime_config';
 
 
 const SimpleLoginLayout = () => {
@@ -33,7 +32,7 @@ const SimpleLoginLayout = () => {
   );
 }
 
-const SocialLoginLayout = () => {
+const OIDCLoginLayout = () => {
   return (
     <main className="login-layout">
       <div>
@@ -41,7 +40,7 @@ const SocialLoginLayout = () => {
         <div className="d-flex card flex-row">
           <div className="px-2 py-3">
             <div className="card-body h-100 d-flex align-items-center">
-              <SocialLogin />
+              <OIDCLogin />
             </div>
           </div>
           <Separator />
@@ -61,8 +60,8 @@ const SocialLoginLayout = () => {
 
 
 const LoginLayout = () => {
-  if (is_github_auth_enabled() || is_google_auth_enabled()) {
-    return <SocialLoginLayout />;
+  if (is_oidc_enabled()) {
+    return <OIDCLoginLayout />;
   }
 
   return <SimpleLoginLayout />;
@@ -71,8 +70,7 @@ const LoginLayout = () => {
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route element={<GoogleCallback />} path="/google/callback" />
-      <Route element={<GitHubCallback />} path="/github/callback" />
+      <Route element={<OIDCCallback />} path="/oidc/callback" />
       <Route element={<LoginLayout />} path="/" />
       <Route element={<Navigate to="/" />} path="*" />
     </Routes>

@@ -20,7 +20,7 @@ ENV UI_DIR=/app_ui
 
 WORKDIR ${APP_DIR}
 
-RUN pip install --upgrade poetry roco
+RUN pip install --upgrade poetry roco==0.4.1
 
 RUN python3 -m venv .venv
 

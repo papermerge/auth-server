@@ -23,7 +23,7 @@ async def retrieve_token(
     provider: schemas.AuthProvider | None = None,
     client_id: str | None = None,
     code: str | None = None,
-    redirect_uri: str | None = None,
+    redirect_url: str | None = None,
     creds: schemas.UserCredentials | None = None,
     db: Session = Depends(get_db)
 ) -> schemas.Token:
@@ -32,7 +32,7 @@ async def retrieve_token(
     """
     kwargs = dict(
         code=code,
-        redirect_uri=redirect_uri,
+        redirect_url=redirect_url,
         client_id=client_id,
         provider=provider
     )
@@ -57,8 +57,6 @@ async def retrieve_token(
     access_token = create_token(user)
 
     response.set_cookie('access_token', access_token)
-    response.set_cookie('remote_user', str(user.id))
     response.headers['Authorization'] = f"Bearer {access_token}"
-    response.headers['REMOTE_USER'] = str(user.id)
 
     return schemas.Token(access_token=access_token)

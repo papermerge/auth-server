@@ -23,8 +23,7 @@ class Token(BaseModel):
 
 
 class AuthProvider(str, Enum):
-    GOOGLE = "google"
-    GITHUB = "github"
+    OIDC = "oidc"
     LDAP = "ldap"
     DB = "db"
 

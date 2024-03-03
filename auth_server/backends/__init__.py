@@ -1,3 +1,2 @@
-from .google import GoogleAuth
-from .github import GithubAuth
+from .oidc import OIDCAuth
 from .ldap import LDAPAuth
