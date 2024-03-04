@@ -182,12 +182,17 @@ async def oidc_auth(
     return get_or_create_user_by_email(db, email)
 
 
-def create_token(user: User) -> str:
+def create_token(user: User, token_id: str) -> str:
     access_token_expires = timedelta(
         minutes=settings.papermerge__security__token_expire_minutes
     )
+    payload = schemas.TokenPayload(
+        sub=user.username,
+        user_id=str(user.id),
+        token_id=token_id
+    )
     access_token = create_access_token(
-        data={"sub": user.username, "user_id": str(user.id)},
+        data=payload.model_dump(),
         expires_delta=access_token_expires,
         secret_key=settings.papermerge__security__secret_key,
         algorithm=settings.papermerge__security__token_algorithm

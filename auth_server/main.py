@@ -1,4 +1,5 @@
 import logging
+import uuid
 from uuid import UUID
 
 from sqlalchemy.exc import OperationalError, NoResultFound
@@ -59,10 +60,14 @@ async def retrieve_token(
             detail="Unauthorized"
         )
 
-    access_token = create_token(user)
+    token_id = str(uuid.uuid4())
+    access_token = create_token(user, token_id=token_id)
 
     response.set_cookie('access_token', access_token)
     response.headers['Authorization'] = f"Bearer {access_token}"
+
+    # save token_id in Redis DB
+    # with settings.papermerge__security__token_expire_minutes
 
     return schemas.Token(access_token=access_token)
 

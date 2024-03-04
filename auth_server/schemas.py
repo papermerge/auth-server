@@ -22,6 +22,13 @@ class Token(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class TokenPayload(BaseModel):
+    """JWT token payload"""
+    sub: str  # username
+    user_id: str  # user UUID
+    token_id: str  # token UUID
+
+
 class AuthProvider(str, Enum):
     OIDC = "oidc"
     LDAP = "ldap"
@@ -34,3 +41,4 @@ class UserCredentials(BaseModel):
     provider: AuthProvider = AuthProvider.DB
 
     model_config = ConfigDict(from_attributes=True)
+
