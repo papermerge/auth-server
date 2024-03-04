@@ -1,11 +1,16 @@
 import logging
+from uuid import UUID
 
+from sqlalchemy.exc import OperationalError, NoResultFound
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Response, Request, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 
+from .crud import get_user_by_id
 from .auth import authenticate, create_token
 from . import schemas
+from .utils import get_token
 from .config import get_settings
 from auth_server.database import get_db
 
@@ -60,3 +65,94 @@ async def retrieve_token(
     response.headers['Authorization'] = f"Bearer {access_token}"
 
     return schemas.Token(access_token=access_token)
+
+
+@app.api_route(
+    "/verify",
+    methods=["HEAD", "GET", "POST", "PATCH", "PUT", "OPTIONS", "DELETE"]
+)
+async def root(
+    request: Request,
+    db: Session = Depends(get_db)
+) -> Response:
+    """
+    Returns 200 OK response if and only if JWT token is valid
+
+    JWT token is read either from authorization header or from
+    cookie header. Token is considered valid if and only if both
+    of the following conditions are true:
+    - token was signed with PAPERMERGE__SECURITY__SECRET_KEY
+    - User with user_id from the token is present in database
+    """
+    token = get_token(request)
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+
+    try:
+        decoded_token = jwt.decode(
+            token,
+            settings.papermerge__security__secret_key,
+            algorithms=[settings.papermerge__security__token_algorithm]
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+
+    # token signature is valid: check
+
+    if 'user_id' not in decoded_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"user_id key not present in decoded token",
+        )
+
+    # token signature is valid: check
+    # user_id key present in the token: check
+
+    user_id = decoded_token['user_id']
+
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"user_id value is None",
+        )
+
+    # token signature is valid: check
+    # user_id key present in the token: check
+    # user_id value is not empty: check
+
+    try:
+        user = get_user_by_id(db, user_id=UUID(user_id))
+    except OperationalError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"DB operation error {exc}",
+        )
+    except NoResultFound:
+        user = None
+
+    # token signature is valid: check
+    # user_id key present in the token: check
+    # user_id value is not empty: check
+    # database connection: check
+    # database has core_user table: check
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"User with ID {user_id} not found in DB",
+        )
+
+    # token signature is valid: check
+    # user_id key present in the token: check
+    # user_id value is not empty: check
+    # database connection: check
+    # database has core_user table: check
+    # user with given user_id present in core_user table: check
+    return Response(status_code=status.HTTP_200_OK)

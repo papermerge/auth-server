@@ -27,6 +27,20 @@ def get_user_by_username(
     return model_user
 
 
+def get_user_by_id(
+    session: Session,
+    user_id: uuid.UUID
+) -> schemas.User | None:
+    stmt = select(models.User).where(
+        models.User.id == user_id
+    )
+    db_user = session.scalars(stmt).one()
+    model_user = schemas.User.model_validate(db_user)
+
+    return model_user
+
+
+
 def get_user_by_email(session: Session, email: str) -> schemas.User | None:
 
     stmt = select(models.User).where(models.User.email == email)
