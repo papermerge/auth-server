@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session
 
 
 from auth_server.database import models
-from auth_server import constants
-from auth_server import schemas
+from auth_server import constants, schemas, scopes
 
 
 logger = logging.getLogger(__name__)
@@ -23,6 +22,9 @@ def get_user_by_username(
     )
     db_user = session.scalars(stmt).one()
     model_user = schemas.User.model_validate(db_user)
+    if model_user.is_superuser:
+        # superuser has all permissions (permission = scope)
+        model_user.scopes = scopes.SCOPES.keys()
 
     return model_user
 

@@ -16,6 +16,7 @@ from .config import Settings
 from .backends import OIDCAuth
 from .backends import ldap
 from .utils import raise_on_empty
+from .scopes import SCOPES
 
 
 logger = logging.getLogger(__name__)
@@ -64,14 +65,14 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(
-    data: dict,
+    data: schemas.TokenData,
     secret_key: str,
     algorithm: str,
     expires_delta: timedelta | None = None
 ) -> str:
     logger.debug(f"create access token for data={data}")
 
-    to_encode = data.copy()
+    to_encode = data.model_dump()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -99,7 +100,7 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     logger.info(f"Database based authentication for '{username}'")
 
     try:
-        user = get_user_by_username(db, username)
+        user: schemas.User | None = get_user_by_username(db, username)
     except NoResultFound:
         user = None
 
@@ -182,12 +183,18 @@ async def oidc_auth(
     return get_or_create_user_by_email(db, email)
 
 
-def create_token(user: User) -> str:
+def create_token(user: schemas.User) -> str:
     access_token_expires = timedelta(
         minutes=settings.papermerge__security__token_expire_minutes
     )
+    data = schemas.TokenData(
+        sub=user.username,
+        user_id=str(user.id),
+        scopes=user.scopes
+    )
+
     access_token = create_access_token(
-        data={"sub": user.username, "user_id": str(user.id)},
+        data=data,
         expires_delta=access_token_expires,
         secret_key=settings.papermerge__security__secret_key,
         algorithm=settings.papermerge__security__token_algorithm

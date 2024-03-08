@@ -1,6 +1,5 @@
 from uuid import UUID
 from enum import Enum
-from typing_extensions import Literal
 from pydantic import BaseModel, ConfigDict
 
 
@@ -11,6 +10,8 @@ class User(BaseModel):
     email: str
     home_folder_id: UUID
     inbox_folder_id: UUID
+    is_superuser: bool = False
+    scopes: list[str] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -18,6 +19,14 @@ class User(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = 'bearer'
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TokenData(BaseModel):
+    sub: str   # username
+    user_id: str
+    scopes: list[str] = []
 
     model_config = ConfigDict(from_attributes=True)
 
