@@ -23,7 +23,7 @@ class User(Base):
     password: Mapped[str]
     first_name: Mapped[str] = mapped_column(default=' ')
     last_name: Mapped[str] = mapped_column(default=' ')
-    is_superuser: Mapped[bool] = mapped_column(default=True)
+    is_superuser: Mapped[bool] = mapped_column(default=False)
     is_staff: Mapped[bool] = mapped_column(default=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     nodes: Mapped[List["Node"]] = relationship(

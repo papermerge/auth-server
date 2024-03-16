@@ -41,7 +41,7 @@ async def retrieve_token(
         kwargs['password'] = creds.password
         kwargs['provider'] = creds.provider.value
     try:
-        user = await authenticate(db, **kwargs)
+        user: schemas.User | None = await authenticate(db, **kwargs)
     except ValueError as ex:
         raise HTTPException(
             status_code=400,
