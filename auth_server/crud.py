@@ -98,7 +98,7 @@ def create_user(
     is_superuser: bool = True,
     is_active: bool = True,
     group_names: list[str] = [],
-    scopes: list[str] = []
+    perm_names: list[str] = []
 ) -> schemas.User:
     """Creates a user"""
 
@@ -137,7 +137,7 @@ def create_user(
     db_user.home_folder_id = db_home.id
     db_user.inbox_folder_id = db_inbox.id
     stmt = select(models.Permission).where(
-        models.Permission.codename.in_(scopes)
+        models.Permission.codename.in_(perm_names)
     )
     perms = session.execute(stmt).scalars().all()
 

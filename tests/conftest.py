@@ -21,7 +21,7 @@ def db_connection():
         yield conn
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def db_schema():
     Base.metadata.create_all(engine)
     yield
