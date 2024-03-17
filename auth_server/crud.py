@@ -25,6 +25,19 @@ def get_user_by_username(
     if model_user.is_superuser:
         # superuser has all permissions (permission = scope)
         model_user.scopes = scopes.SCOPES.keys()
+    else:
+        # user inherits his/her scopes
+        # from the direct permissions associated
+        # and from groups he/she belongs to
+        user_scopes = set()
+        user_scopes.update(
+            [p.codename for p in db_user.permissions]
+        )
+        for group in db_user.groups:
+            user_scopes.update(
+                [p.codename for p in group.permissions]
+            )
+        model_user.scopes = list(user_scopes)
 
     return model_user
 
@@ -83,7 +96,9 @@ def create_user(
     first_name: str | None = None,
     last_name: str | None = None,
     is_superuser: bool = True,
-    is_active: bool = True
+    is_active: bool = True,
+    group_names: list[str] = [],
+    scopes: list[str] = []
 ) -> schemas.User:
     """Creates a user"""
 
@@ -121,6 +136,17 @@ def create_user(
     session.commit()
     db_user.home_folder_id = db_home.id
     db_user.inbox_folder_id = db_inbox.id
+    stmt = select(models.Permission).where(
+        models.Permission.codename.in_(scopes)
+    )
+    perms = session.execute(stmt).scalars().all()
+
+    stmt = select(models.Group).where(
+        models.Group.name.in_(group_names)
+    )
+    groups = session.execute(stmt).scalars().all()
+    db_user.groups = groups
+    db_user.permissions = perms
     session.commit()
 
     return schemas.User.model_validate(db_user)
@@ -149,3 +175,24 @@ def get_or_create_user_by_email(
     logger.debug(f"User with email {email} was found in database")
 
     return user
+
+
+def create_group(
+    session: Session,
+    name: str,
+    scopes: list[str],
+) -> schemas.Group:
+
+    stmt = select(models.Permission).where(
+        models.Permission.codename.in_(scopes)
+    )
+    perms = session.execute(stmt).scalars().all()
+    group = models.Group(
+        name=name,
+        permissions=perms
+    )
+    session.add(group)
+    session.commit()
+    result = schemas.Group.model_validate(group)
+
+    return result

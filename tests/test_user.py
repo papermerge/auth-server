@@ -5,7 +5,14 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 
 
-from auth_server.database.models import User, Node, Folder, HOME_TITLE, INBOX_TITLE
+from auth_server.database.models import (
+    User,
+    Node,
+    Folder,
+    HOME_TITLE,
+    INBOX_TITLE
+)
+from auth_server import database as db
 from auth_server.crud import (
     create_user,
     create_user_from_email,
@@ -80,3 +87,39 @@ def test_get_user_by_email(db_session):
     user = get_user_by_email(db_session, "john@mail.com")
 
     assert user.username == "john"
+
+
+def test_get_user_by_username_with_scopes(db_session):
+    """
+    Assert that returned user contains correct scopes
+
+    User inherits his/her scopes from the group he/she belongs
+    """
+    # make sure all scope values are in DB
+    db.sync_perms(db_session)
+
+    db.create_group(
+        db_session,
+        name="g1",
+        scopes=["node.create", "node.view"]
+    )
+    db.create_group(
+        db_session,
+        name="g2",
+        scopes=["tag.create", "tag.view"]
+    )
+    create_user(
+        db_session,
+        username="erasmus",
+        email="erasmus@mail.com",
+        password="freewill41",
+        is_superuser=False,
+        group_names=["g1", "g2"]  # user
+    )
+    user = get_user_by_username(db_session, "erasmus")
+
+    assert user.username == "erasmus"
+    # check that user inherits all permissions from his/her group
+    expected_scopes = {"node.create", "node.view", "tag.create", "tag.view"}
+    actual_scopes = set(user.scopes)
+    assert actual_scopes == expected_scopes
