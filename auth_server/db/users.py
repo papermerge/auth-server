@@ -5,7 +5,6 @@ from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-
 from auth_server.db import models
 from auth_server import constants, schemas, scopes
 
