@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 
-from auth_server.database import models
+from auth_server.db import models
 from auth_server import constants, schemas, scopes
 
 
@@ -97,10 +97,15 @@ def create_user(
     last_name: str | None = None,
     is_superuser: bool = True,
     is_active: bool = True,
-    group_names: list[str] = [],
-    perm_names: list[str] = []
+    group_names: list[str] | None = None,
+    perm_names: list[str] | None = None
 ) -> schemas.User:
     """Creates a user"""
+
+    if group_names is None:
+        group_names = []
+    if perm_names is None:
+        perm_names = []
 
     user_id = uuid.uuid4()
     home_id = uuid.uuid4()
@@ -176,23 +181,3 @@ def get_or_create_user_by_email(
 
     return user
 
-
-def create_group(
-    session: Session,
-    name: str,
-    scopes: list[str],
-) -> schemas.Group:
-
-    stmt = select(models.Permission).where(
-        models.Permission.codename.in_(scopes)
-    )
-    perms = session.execute(stmt).scalars().all()
-    group = models.Group(
-        name=name,
-        permissions=perms
-    )
-    session.add(group)
-    session.commit()
-    result = schemas.Group.model_validate(group)
-
-    return result

@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from sqlalchemy import Engine
 
-from auth_server.database.base import Base
+from auth_server.db.base import Base
 from auth_server.main import app
-from auth_server.database.engine import engine
+from auth_server.db.engine import engine
 
 
 logger = logging.getLogger(__name__)

@@ -9,14 +9,12 @@ from passlib.hash import pbkdf2_sha256
 
 from fastapi import HTTPException
 
-from .crud import get_user_by_username, get_or_create_user_by_email
-from .database.models import User
-from . import schemas
-from .config import Settings
-from .backends import OIDCAuth
-from .backends import ldap
-from .utils import raise_on_empty
-from .scopes import SCOPES
+from auth_server import db
+from auth_server.db.models import User
+from auth_server import schemas
+from auth_server.config import Settings
+from auth_server.backends import OIDCAuth, ldap
+from auth_server.utils import raise_on_empty
 
 
 logger = logging.getLogger(__name__)
@@ -24,7 +22,7 @@ settings = Settings()
 
 
 async def authenticate(
-    db: Session,
+    session: Session,
     *,
     username: str | None = None,
     password: str | None = None,
@@ -37,7 +35,7 @@ async def authenticate(
     # provider = DB
     if username and password and provider == schemas.AuthProvider.DB:
         # password based authentication against database
-        return db_auth(db, username, password)
+        return db_auth(session, username, password)
 
     if provider == schemas.AuthProvider.OIDC:
         raise_on_empty(
@@ -47,14 +45,14 @@ async def authenticate(
             redirect_url=redirect_url
         )
         return await oidc_auth(
-            db,
+            session,
             client_id=client_id,
             code=code,
             redirect_url=redirect_url
         )
     elif provider == schemas.AuthProvider.LDAP:
         # provider = ldap
-        return await ldap_auth(db, username, password)
+        return await ldap_auth(session, username, password)
     else:
         raise ValueError("Unknown or empty auth provider")
 
@@ -92,7 +90,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
+def db_auth(session: Session, username: str, password: str) -> schemas.User | None:
     """Authenticates user based on username and password
 
     User data is read from database.
@@ -100,7 +98,7 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
     logger.info(f"Database based authentication for '{username}'")
 
     try:
-        user: schemas.User | None = get_user_by_username(db, username)
+        user: schemas.User | None = db.get_user_by_username(session, username)
     except NoResultFound:
         user = None
 
@@ -117,7 +115,7 @@ def db_auth(db: Session, username: str, password: str) -> schemas.User | None:
 
 
 async def ldap_auth(
-    db: Session,
+    session: Session,
     username: str,
     password: str
 ) -> schemas.User | None:
@@ -142,11 +140,11 @@ async def ldap_auth(
             f"Auth:LDAP: user email fallback to {email}"
         )
 
-    return get_or_create_user_by_email(db, email)
+    return db.get_or_create_user_by_email(session, email)
 
 
 async def oidc_auth(
-    db: Session,
+    session: Session,
     client_id: str,
     code: str,
     redirect_url: str
@@ -180,7 +178,7 @@ async def oidc_auth(
 
     email = await client.user_email()
 
-    return get_or_create_user_by_email(db, email)
+    return db.get_or_create_user_by_email(session, email)
 
 
 def create_token(user: schemas.User) -> str:

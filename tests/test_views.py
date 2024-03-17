@@ -7,7 +7,7 @@ from sqlalchemy import Connection
 from sqlalchemy.orm import Session
 
 from auth_server.main import settings
-from auth_server.crud import create_user
+from auth_server import db
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ def test_db_based_authentication_for_existing_user(
     Validate that DB based authentication can be performed
     """
     # create user "socrates"
-    create_user(
+    db.create_user(
         db_session,
         username="socrates",
         email="socrates@mail.com",

@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from auth_server import schemas
-from auth_server.database import models
+from auth_server.db import models
 
 
 def create_group(
@@ -24,4 +24,3 @@ def create_group(
     result = schemas.Group.model_validate(group)
 
     return result
-

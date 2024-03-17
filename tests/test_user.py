@@ -5,28 +5,21 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 
 
-from auth_server.database.models import (
+from auth_server.db.models import (
     User,
     Node,
     Folder,
     HOME_TITLE,
     INBOX_TITLE
 )
-from auth_server import database as db
-from auth_server.crud import (
-    create_user,
-    create_user_from_email,
-    get_user_by_email,
-    get_or_create_user_by_email,
-    get_user_by_username
-)
+from auth_server import db
 
 
 logger = logging.getLogger(__name__)
 
 
 def test_create_user_from_email(db_session):
-    user = create_user_from_email(db_session, "john@mail.com")
+    user = db.create_user_from_email(db_session, "john@mail.com")
 
     stmt_home = select(Folder).join(
         User,
@@ -57,7 +50,7 @@ def test_create_user_from_email(db_session):
 
 
 def test_get_or_create_user_by_email(db_session):
-    user = get_or_create_user_by_email(db_session, "mila@lol.com")
+    user = db.get_or_create_user_by_email(db_session, "mila@lol.com")
 
     assert user.username == "mila"
     assert user.home_folder_id
@@ -65,26 +58,26 @@ def test_get_or_create_user_by_email(db_session):
 
 
 def test_get_user_by_username(db_session):
-    create_user(
+    db.create_user(
         db_session,
         username='eugen',
         password='1234',
         email='eugen@mail.com'
     )
 
-    user = get_user_by_username(db_session, 'eugen')
+    user = db.get_user_by_username(db_session, 'eugen')
 
     assert user.username == 'eugen'
 
 
 def test_get_user_by_username_raises_correct_exception(db_session):
     with pytest.raises(NoResultFound):
-        get_user_by_username(db_session, 'no_such_user')
+        db.get_user_by_username(db_session, 'no_such_user')
 
 
 def test_get_user_by_email(db_session):
-    create_user_from_email(db_session, "john@mail.com")
-    user = get_user_by_email(db_session, "john@mail.com")
+    db.create_user_from_email(db_session, "john@mail.com")
+    user = db.get_user_by_email(db_session, "john@mail.com")
 
     assert user.username == "john"
 
@@ -108,7 +101,7 @@ def test_user_inherits_from_groups(db_session):
         name="g2",
         scopes=["tag.create", "tag.view"]
     )
-    create_user(
+    db.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -116,7 +109,7 @@ def test_user_inherits_from_groups(db_session):
         is_superuser=False,
         group_names=["g1", "g2"]  # user inherits scopes from these groups
     )
-    user = get_user_by_username(db_session, "erasmus")
+    user = db.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits all permissions from his/her group
@@ -134,7 +127,7 @@ def test_user_inherits_scopes_from_perms(db_session):
     # make sure all scope values are in DB
     db.sync_perms(db_session)
 
-    create_user(
+    db.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -142,7 +135,7 @@ def test_user_inherits_scopes_from_perms(db_session):
         is_superuser=False,
         perm_names=["page.move", "page.extract"]
     )
-    user = get_user_by_username(db_session, "erasmus")
+    user = db.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits his/her direct permissions
@@ -171,7 +164,7 @@ def test_user_inherits_scopes_from_perms_and_groups(db_session):
         scopes=["tag.create", "tag.view"]
     )
 
-    create_user(
+    db.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -180,7 +173,7 @@ def test_user_inherits_scopes_from_perms_and_groups(db_session):
         perm_names=["page.move", "page.extract"],
         group_names=["g1", "g2"]
     )
-    user = get_user_by_username(db_session, "erasmus")
+    user = db.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits scopes from his/her direct permissions and groups

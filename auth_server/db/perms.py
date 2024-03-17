@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from auth_server import schemas
 from auth_server import scopes
-from auth_server.database import models
+from auth_server.db import models
 
 logger = logging.getLogger(__name__)
 
