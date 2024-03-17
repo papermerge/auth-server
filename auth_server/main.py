@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from .auth import authenticate, create_token
 from . import schemas
 from .config import get_settings
-from auth_server.database import get_db
+from auth_server import db
 
 app = FastAPI()
 
@@ -25,7 +25,7 @@ async def retrieve_token(
     code: str | None = None,
     redirect_url: str | None = None,
     creds: schemas.UserCredentials | None = None,
-    db: Session = Depends(get_db)
+    session: Session = Depends(db.get_db)
 ) -> schemas.Token:
     """
     Retrieve JWT access token
@@ -41,7 +41,7 @@ async def retrieve_token(
         kwargs['password'] = creds.password
         kwargs['provider'] = creds.provider.value
     try:
-        user: schemas.User | None = await authenticate(db, **kwargs)
+        user: schemas.User | None = await authenticate(session, **kwargs)
     except ValueError as ex:
         raise HTTPException(
             status_code=400,

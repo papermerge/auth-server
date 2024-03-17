@@ -3,13 +3,52 @@ from datetime import datetime
 from typing import List, Literal
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, func
+from sqlalchemy import ForeignKey, String, func, Column, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 HOME_TITLE = ".home"
 INBOX_TITLE = ".inbox"
 
+
+group_permissions_association = Table(
+    "auth_group_permissions",
+    Base.metadata,
+    Column(
+        "group_id",
+        ForeignKey("auth_group.id"),
+    ),
+    Column(
+        "permission_id",
+        ForeignKey("auth_permission.id"),
+    ),
+)
+
+user_groups_association = Table(
+    "core_user_groups",
+    Base.metadata,
+    Column(
+        "user_id",
+        ForeignKey("core_user.id"),
+    ),
+    Column(
+        "group_id",
+        ForeignKey("auth_group.id"),
+    ),
+)
+
+user_permissions_association = Table(
+    "core_user_user_permissions",
+    Base.metadata,
+    Column(
+        "user_id",
+        ForeignKey("core_user.id"),
+    ),
+    Column(
+        "permission_id",
+        ForeignKey("auth_permission.id"),
+    ),
+)
 
 class User(Base):
     __tablename__ = "core_user"
@@ -66,6 +105,14 @@ class User(Base):
         insert_default=func.now(),
         onupdate=func.now()
     )
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=user_permissions_association,
+        back_populates="users"
+    )
+    groups: Mapped[list["Group"]] = relationship(
+        secondary=user_groups_association,
+        back_populates="users"
+    )
 
 
 CType = Literal["document", "folder"]
@@ -121,3 +168,48 @@ class Folder(Node):
     __mapper_args__ = {
         "polymorphic_identity": "folder",
     }
+
+
+class Permission(Base):
+    __tablename__ = "auth_permission"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    codename: Mapped[str]
+    content_type_id: Mapped[int] = mapped_column(
+        ForeignKey("django_content_type.id")
+    )
+    content_type: Mapped["ContentType"] = relationship()
+    groups = relationship(
+        "Group",
+        secondary=group_permissions_association,
+        back_populates="permissions"
+    )
+    users = relationship(
+        "User",
+        secondary=user_permissions_association,
+        back_populates="permissions"
+    )
+
+
+class Group(Base):
+    __tablename__ = "auth_group"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=group_permissions_association,
+        back_populates="groups"
+    )
+    users: Mapped[list["User"]] = relationship(
+        secondary=user_groups_association,
+        back_populates="groups"
+    )
+
+
+class ContentType(Base):
+    __tablename__ = "django_content_type"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    app_label: Mapped[str]
+    model: Mapped[str]
