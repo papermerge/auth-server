@@ -39,12 +39,17 @@ class OIDCAuth:
             }
             logger.debug(f"oidc signin params: {params}")
 
-            response = await client.post(
-                self.access_token_url,
-                params=params,
-                data=params,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
-            )
+            try:
+                response = await client.post(
+                    self.access_token_url,
+                    params=params,
+                    data=params,
+                    headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                )
+            except Exception as ex:
+                logger.exception(ex)
+                raise Exception from ex
+
             logger.debug(
                 f"oidc signin response_code = {response.status_code}"
             )
