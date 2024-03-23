@@ -47,9 +47,26 @@ def get_user_by_email(session: Session, email: str) -> schemas.User | None:
     db_user = session.scalar(stmt)
 
     if db_user is None:
-        return db_user
+        return None
 
     model_user = schemas.User.model_validate(db_user)
+
+    if model_user.is_superuser:
+        # superuser has all permissions (permission = scope)
+        model_user.scopes = scopes.SCOPES.keys()
+    else:
+        # user inherits his/her scopes
+        # from the direct permissions associated
+        # and from groups he/she belongs to
+        user_scopes = set()
+        user_scopes.update(
+            [p.codename for p in db_user.permissions]
+        )
+        for group in db_user.groups:
+            user_scopes.update(
+                [p.codename for p in group.permissions]
+            )
+        model_user.scopes = list(user_scopes)
 
     return model_user
 
