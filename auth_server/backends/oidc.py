@@ -88,3 +88,38 @@ class OIDCAuth:
                 raise ValueError(message)
 
             return response.json()['email']
+
+
+async def introspect_token(
+    url: str,
+    client_id: str,
+    client_secret: str
+) -> bool:
+    ret_value = False
+    async with httpx.AsyncClient() as client:
+        params = {
+            'client_id': client_id,
+            'client_secret': client_secret,
+        }
+
+        try:
+            response = await client.post(
+                url,
+                params=params,
+                data=params,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+        except Exception as ex:
+            logger.exception(ex)
+            raise Exception from ex
+
+        if not response.is_success:
+            message = " ".join([
+                f"response.status_code = {response.status_code}",
+                f"response.text = {response.text}"
+            ])
+            raise ValueError(message)
+
+        ret_value = response.json()['active']
+
+    return ret_value

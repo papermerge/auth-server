@@ -8,6 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 from .auth import authenticate, create_token
+from auth_server.backends.oidc import introspect_token
 from . import schemas
 from .config import get_settings
 from auth_server import db, utils
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 @app.post("/token")
-async def retrieve_token(
+async def token_endpoint(
     response: Response,
     provider: schemas.AuthProvider | None = None,
     client_id: str | None = None,
@@ -69,7 +70,7 @@ async def retrieve_token(
     "/verify/{whatever:path}",
     methods=["HEAD", "GET", "POST", "PATCH", "PUT", "OPTIONS", "DELETE"]
 )
-async def root(
+async def verify_endpoint(
     request: Request,
     session: Session = Depends(db.get_db)
 ) -> Response:
@@ -90,6 +91,22 @@ async def root(
             detail="Not authenticated"
         )
 
+    if settings.papermerge__auth__oidc_introspection_url:
+        # OIDC introspection point is provided ->
+        # ask OIDC provider if token is active
+        valid_token = await introspect_token(
+            settings.papermerge__auth__oidc_introspection_url,
+            client_secret=settings.papermerge__auth__oidc_client_secret,
+            client_id=settings.papermerge__auth__oidc_client_id
+        )
+        if valid_token:
+            return Response(status_code=status.HTTP_200_OK)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Introspection says: token is not active",
+            )
+    # non OIDC flow
     try:
         decoded_token = jwt.decode(
             token,
