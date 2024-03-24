@@ -96,13 +96,14 @@ async def verify_endpoint(
             detail="Not authenticated"
         )
 
-    if settings.papermerge__auth__oidc_introspection_url:
+    if settings.papermerge__auth__oidc_introspect_url:
         # OIDC introspection point is provided ->
         # ask OIDC provider if token is active
         # # https://datatracker.ietf.org/doc/html/rfc7662
         # here we verify (=instrospect) token issued by OIDC provider
         valid_token = await introspect_token(
-            settings.papermerge__auth__oidc_introspection_url,
+            settings.papermerge__auth__oidc_introspect_url,
+            token=token,
             client_secret=settings.papermerge__auth__oidc_client_secret,
             client_id=settings.papermerge__auth__oidc_client_id
         )
@@ -138,7 +139,7 @@ async def verify_endpoint(
     # token signature is valid: check
     # user_id key present in the token: check
 
-    user_id = decoded_token['user_id']
+    user_id = decoded_token['sub']
 
     if not user_id:
         raise HTTPException(

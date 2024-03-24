@@ -63,6 +63,7 @@ class OIDCAuth:
                 raise ValueError(message)
 
             self.access_token = response.json()['access_token']
+            return self.access_token
 
     async def user_email(self):
         if self.access_token is None:
@@ -92,12 +93,20 @@ class OIDCAuth:
 
 async def introspect_token(
     url: str,
+    token: str,
     client_id: str,
     client_secret: str
 ) -> bool:
+    """Ask OIDC provider if token is active
+
+    Only confidential clients can ask for such info, thus
+    we need to send `client_id` and `client_secret` as well.
+    For details, see:  # https://datatracker.ietf.org/doc/html/rfc7662
+    """
     ret_value = False
     async with httpx.AsyncClient() as client:
         params = {
+            'token': token,
             'client_id': client_id,
             'client_secret': client_secret,
         }

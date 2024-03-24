@@ -184,8 +184,7 @@ def create_token(user: schemas.User) -> str:
         minutes=settings.papermerge__security__token_expire_minutes
     )
     data = schemas.TokenData(
-        sub=user.username,
-        user_id=str(user.id),
+        sub=str(user.user_id),
         scopes=user.scopes
     )
 
