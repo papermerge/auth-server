@@ -45,20 +45,25 @@ async def token_endpoint(
         kwargs['password'] = creds.password
         kwargs['provider'] = creds.provider.value
     try:
-        user: schemas.User | None = await authenticate(session, **kwargs)
+        user_or_token: None | str | schemas.User = await authenticate(session, **kwargs)
     except ValueError as ex:
         raise HTTPException(
             status_code=400,
             detail=str(ex)
         ) from ex
 
-    if user is None:
+    if user_or_token is None:
         raise HTTPException(
             status_code=401,
             detail="Unauthorized"
         )
 
-    access_token = create_token(user)
+    if isinstance(user_or_token, schemas.User):
+        # user was returned e.g. when using DB auth
+        access_token = create_token(user_or_token)
+    else:
+        # token string was returned e.g. when using OIDC provider
+        access_token = user_or_token
 
     response.set_cookie('access_token', access_token)
     response.headers['Authorization'] = f"Bearer {access_token}"
@@ -94,6 +99,8 @@ async def verify_endpoint(
     if settings.papermerge__auth__oidc_introspection_url:
         # OIDC introspection point is provided ->
         # ask OIDC provider if token is active
+        # # https://datatracker.ietf.org/doc/html/rfc7662
+        # here we verify (=instrospect) token issued by OIDC provider
         valid_token = await introspect_token(
             settings.papermerge__auth__oidc_introspection_url,
             client_secret=settings.papermerge__auth__oidc_client_secret,
@@ -107,6 +114,7 @@ async def verify_endpoint(
                 detail="Introspection says: token is not active",
             )
     # non OIDC flow
+    # here we verify token which was issued by papermerge auth server
     try:
         decoded_token = jwt.decode(
             token,
