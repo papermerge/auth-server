@@ -35,7 +35,7 @@ class OIDCAuth:
                 'client_secret': self.client_secret,
                 # do we need this param?
                 'redirect_uri': self.redirect_url,
-                'code': self.code
+                'code': self.code,
             }
             logger.debug(f"oidc signin params: {params}")
 
