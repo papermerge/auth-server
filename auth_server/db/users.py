@@ -12,6 +12,16 @@ from auth_server import constants, schemas, scopes
 logger = logging.getLogger(__name__)
 
 
+def get_user_uuid(session: Session, user_id: uuid.UUID) -> models.User:
+    stmt = select(models.User).where(
+        models.User.id == user_id
+    )
+
+    db_user = session.scalars(stmt).one()
+
+    return db_user
+
+
 def get_user_by_username(
     session: Session,
     username: str

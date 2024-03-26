@@ -35,7 +35,7 @@ class OIDCAuth:
                 'client_secret': self.client_secret,
                 # do we need this param?
                 'redirect_uri': self.redirect_url,
-                'code': self.code
+                'code': self.code,
             }
             logger.debug(f"oidc signin params: {params}")
 
@@ -63,6 +63,7 @@ class OIDCAuth:
                 raise ValueError(message)
 
             self.access_token = response.json()['access_token']
+            return self.access_token
 
     async def user_email(self):
         if self.access_token is None:
@@ -88,3 +89,46 @@ class OIDCAuth:
                 raise ValueError(message)
 
             return response.json()['email']
+
+
+async def introspect_token(
+    url: str,
+    token: str,
+    client_id: str,
+    client_secret: str
+) -> bool:
+    """Ask OIDC provider if token is active
+
+    Only confidential clients can ask for such info, thus
+    we need to send `client_id` and `client_secret` as well.
+    For details, see:  # https://datatracker.ietf.org/doc/html/rfc7662
+    """
+    ret_value = False
+    async with httpx.AsyncClient() as client:
+        params = {
+            'token': token,
+            'client_id': client_id,
+            'client_secret': client_secret,
+        }
+
+        try:
+            response = await client.post(
+                url,
+                params=params,
+                data=params,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+        except Exception as ex:
+            logger.exception(ex)
+            raise Exception from ex
+
+        if not response.is_success:
+            message = " ".join([
+                f"response.status_code = {response.status_code}",
+                f"response.text = {response.text}"
+            ])
+            raise ValueError(message)
+
+        ret_value = response.json()['active']
+
+    return ret_value

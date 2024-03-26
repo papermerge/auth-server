@@ -25,12 +25,16 @@ class Settings(BaseSettings):
     papermerge__security__secret_key: str
     papermerge__security__token_algorithm: Algs = Algs.HS256
     papermerge__security__token_expire_minutes: int = 360
+    papermerge__security__cookie_name: str = 'access_token'
 
     # database where to read user table from
     papermerge__database__url: str = "sqlite:////db/db.sqlite3"
     papermerge__auth__oidc_client_secret: str | None = None
+    papermerge__auth__oidc_client_id: str | None = None
     papermerge__auth__oidc_access_token_url: str | None = None
     papermerge__auth__oidc_user_info_url: str | None = None
+    # https://datatracker.ietf.org/doc/html/rfc7662
+    papermerge__auth__oidc_introspect_url: str | None = None
 
     papermerge__auth__ldap_url: str | None = None  # e.g. ldap.trusel.net
     papermerge__auth__ldap_use_ssl: bool = True

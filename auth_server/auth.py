@@ -30,7 +30,7 @@ async def authenticate(
     client_id: str | None = None,
     code: str | None = None,
     redirect_url: str | None = None
-) -> schemas.User | None:
+) -> schemas.User | str | None:
 
     # provider = DB
     if username and password and provider == schemas.AuthProvider.DB:
@@ -148,7 +148,7 @@ async def oidc_auth(
     client_id: str,
     code: str,
     redirect_url: str
-) -> User | None:
+) -> str | None:
     if settings.papermerge__auth__oidc_client_secret is None:
         raise HTTPException(
             status_code=400,
@@ -167,7 +167,7 @@ async def oidc_auth(
     logger.debug("Auth:oidc: sign in")
 
     try:
-        await client.signin()
+        result = await client.signin()
     except Exception as ex:
         logger.warning(f"Auth:oidc: sign in failed with {ex}")
 
@@ -176,9 +176,7 @@ async def oidc_auth(
             detail = f"401 Unauthorized. Auth provider error: {ex}."
         )
 
-    email = await client.user_email()
-
-    return db.get_or_create_user_by_email(session, email)
+    return result
 
 
 def create_token(user: schemas.User) -> str:
@@ -186,8 +184,10 @@ def create_token(user: schemas.User) -> str:
         minutes=settings.papermerge__security__token_expire_minutes
     )
     data = schemas.TokenData(
-        sub=user.username,
+        sub=str(user.id),
         user_id=str(user.id),
+        username=user.username,
+        email=user.email,
         scopes=user.scopes
     )
 

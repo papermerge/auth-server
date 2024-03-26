@@ -24,8 +24,10 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    sub: str   # username
+    sub: str   # same as `user_id`
     user_id: str
+    username: str
+    email: str
     scopes: list[str] = []
 
     model_config = ConfigDict(from_attributes=True)

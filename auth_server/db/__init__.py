@@ -7,7 +7,8 @@ from .users import (
     create_user_from_email,
     get_user_by_email,
     get_or_create_user_by_email,
-    get_user_by_username
+    get_user_by_username,
+    get_user_uuid
 )
 
 __all__ = [
@@ -18,6 +19,7 @@ __all__ = [
     'get_users',
     'get_user_by_email',
     'get_or_create_user_by_email',
-    'get_user_by_username'
+    'get_user_by_username',
+    'get_user_uuid',
 ]
 
