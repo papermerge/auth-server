@@ -71,10 +71,7 @@ async def token_endpoint(
     return schemas.Token(access_token=access_token)
 
 
-@app.api_route(
-    "/verify/{whatever:path}",
-    methods=["HEAD", "GET", "POST", "PATCH", "PUT", "OPTIONS", "DELETE"]
-)
+@app.get("/verify")
 async def verify_endpoint(
     request: Request,
     session: Session = Depends(db.get_db)
@@ -88,6 +85,7 @@ async def verify_endpoint(
     - token was signed with PAPERMERGE__SECURITY__SECRET_KEY
     - User with user_id from the token is present in database
     """
+    logger.debug("Verify endpoint")
     token = utils.get_token(request)
 
     if not token:
@@ -97,6 +95,7 @@ async def verify_endpoint(
         )
 
     if settings.papermerge__auth__oidc_introspect_url:
+        logger.debug("Found OIDC introspect endpoint")
         # OIDC introspection point is provided ->
         # ask OIDC provider if token is active
         # # https://datatracker.ietf.org/doc/html/rfc7662
@@ -108,14 +107,17 @@ async def verify_endpoint(
             client_id=settings.papermerge__auth__oidc_client_id
         )
         if valid_token:
+            logger.debug("Introspect: token valid")
             return Response(status_code=status.HTTP_200_OK)
         else:
+            logger.debug("Introspect: token NOT valid!")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Introspection says: token is not active",
             )
     # non OIDC flow
     # here we verify token which was issued by papermerge auth server
+    logger.debug("non OIDC flow")
     try:
         decoded_token = jwt.decode(
             token,
