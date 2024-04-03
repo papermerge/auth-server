@@ -25,8 +25,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     sub: str   # same as `user_id`
-    user_id: str
-    username: str
+    preferred_username: str  # standard claim for `username`
     email: str
     scopes: list[str] = []
 

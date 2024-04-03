@@ -185,8 +185,7 @@ def create_token(user: schemas.User) -> str:
     )
     data = schemas.TokenData(
         sub=str(user.id),
-        user_id=str(user.id),
-        username=user.username,
+        preferred_username=user.username,
         email=user.email,
         scopes=user.scopes
     )
