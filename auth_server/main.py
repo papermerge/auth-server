@@ -130,16 +130,11 @@ async def verify_endpoint(
             detail="Invalid token",
         )
 
-    # token signature is valid: check
-
-    if 'user_id' not in decoded_token:
+    if 'sub' not in decoded_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"user_id key not present in decoded token",
+            detail=f"sub key not present in decoded token",
         )
-
-    # token signature is valid: check
-    # user_id key present in the token: check
 
     user_id = decoded_token['sub']
 
@@ -148,10 +143,6 @@ async def verify_endpoint(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"user_id value is None",
         )
-
-    # token signature is valid: check
-    # user_id key present in the token: check
-    # user_id value is not empty: check
 
     try:
         user = db.get_user_uuid(session, UUID(user_id))
@@ -163,22 +154,10 @@ async def verify_endpoint(
     except NoResultFound:
         user = None
 
-    # token signature is valid: check
-    # user_id key present in the token: check
-    # user_id value is not empty: check
-    # database connection: check
-    # database has core_user table: check
-
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"User with ID {user_id} not found in DB",
         )
 
-    # token signature is valid: check
-    # user_id key present in the token: check
-    # user_id value is not empty: check
-    # database connection: check
-    # database has core_user table: check
-    # user with given user_id present in core_user table: check
     return Response(status_code=status.HTTP_200_OK)
