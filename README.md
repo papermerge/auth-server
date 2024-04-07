@@ -97,12 +97,13 @@ volumes:
 In order to enable authentication via OIDC provider you need to
 provide following environment variables:
 
-*  `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
-*  `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
-*  `PAPERMERGE__AUTH__OIDC_AUTHORIZE_URL`
-*  `PAPERMERGE__AUTH__OIDC_REDIRECT_URI`
+* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
+* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
+* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
+* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`
 
-You need to provider all four values.
+You need to provider all five values.
 
 `PAPERMERGE__AUTH__OIDC_REDIRECT_URI` should be:
 
@@ -185,9 +186,8 @@ work for papermerge-core.
 
 ### OIDC Auth
 
-Either all four values should be provided or none.
-
 * `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
 * `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
-* `PAPERMERGE__AUTH__OIDC_AUTHORIZE_URL`
-* `PAPERMERGE__AUTH__OIDC_REDIRECT_URI`
+* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
+* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
+* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`

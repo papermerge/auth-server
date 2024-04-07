@@ -1,9 +1,8 @@
 # Changelog
 
-## 0.9.0 - 2024-03-xx
+## 0.9.0 - 2024-04-07
 
 - Support for scopes/permissions/groups
-
 
 ## 0.8.0 - 2024-03-03
 
