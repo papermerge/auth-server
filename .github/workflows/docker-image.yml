@@ -23,6 +23,7 @@ jobs:
         push: true
         tags: papermerge/auth-server:${{ github.ref_name }}
         file: docker/Dockerfile
+        platforms: linux/amd64,linux/arm64
 
     - name: Add description
       uses: peter-evans/dockerhub-description@v3
