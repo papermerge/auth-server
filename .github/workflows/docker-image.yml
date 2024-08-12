@@ -26,10 +26,10 @@ jobs:
         file: docker/Dockerfile
         platforms: linux/amd64
 
-    - name: Add description
-      uses: peter-evans/dockerhub-description@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: papermerge/auth-server
-        readme-filepath: README.md
+#    - name: Add description
+#      uses: peter-evans/dockerhub-description@v3
+#      with:
+#        username: ${{ secrets.DOCKERHUB_USERNAME }}
+#        password: ${{ secrets.DOCKERHUB_TOKEN }}
+#        repository: papermerge/auth-server
+#        readme-filepath: README.md
