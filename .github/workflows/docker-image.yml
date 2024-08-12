@@ -21,7 +21,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: papermerge/auth-server:${{ github.ref_name }}
+        tags: urganot/papermerge-raspberry-auth-server:${{ github.ref_name }}
         file: docker/Dockerfile
         platforms: linux/amd64
 
