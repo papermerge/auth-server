@@ -1,4 +1,4 @@
-name: Docker Image AMD
+name: Docker Image
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         push: true
         tags: urganot/papermerge-raspberry-auth-server:${{ github.ref_name }}
         file: docker/Dockerfile
-        platforms: linux/amd64
+        platforms: linux/amd64,linux/arm64
 
 #    - name: Add description
 #      uses: peter-evans/dockerhub-description@v3
