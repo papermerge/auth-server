@@ -21,9 +21,9 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: papermerge/auth-server:${{ github.ref_name }}
+        tags: papermerge/auth-server:${{ github.ref_name }}-arm64
         file: docker/Dockerfile
-        platforms: linux/amd64
+        platforms: linux/arm64
 
     - name: Add description
       uses: peter-evans/dockerhub-description@v3
