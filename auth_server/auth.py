@@ -9,9 +9,9 @@ from passlib.hash import pbkdf2_sha256
 
 from fastapi import HTTPException
 
-from auth_server import db
-from auth_server.db.models import User
-from auth_server import schemas
+from auth_server.db import api as dbapi
+from auth_server.db.orm import User
+from auth_server import schema
 from auth_server.config import Settings
 from auth_server.backends import OIDCAuth, ldap
 from auth_server.utils import raise_on_empty
@@ -26,31 +26,25 @@ async def authenticate(
     *,
     username: str | None = None,
     password: str | None = None,
-    provider: schemas.AuthProvider = schemas.AuthProvider.DB,
+    provider: schema.AuthProvider = schema.AuthProvider.DB,
     client_id: str | None = None,
     code: str | None = None,
-    redirect_url: str | None = None
-) -> schemas.User | str | None:
+    redirect_url: str | None = None,
+) -> schema.User | str | None:
 
     # provider = DB
-    if username and password and provider == schemas.AuthProvider.DB:
+    if username and password and provider == schema.AuthProvider.DB:
         # password based authentication against database
         return db_auth(session, username, password)
 
-    if provider == schemas.AuthProvider.OIDC:
+    if provider == schema.AuthProvider.OIDC:
         raise_on_empty(
-            code=code,
-            client_id=client_id,
-            provider=provider,
-            redirect_url=redirect_url
+            code=code, client_id=client_id, provider=provider, redirect_url=redirect_url
         )
         return await oidc_auth(
-            session,
-            client_id=client_id,
-            code=code,
-            redirect_url=redirect_url
+            session, client_id=client_id, code=code, redirect_url=redirect_url
         )
-    elif provider == schemas.AuthProvider.LDAP:
+    elif provider == schema.AuthProvider.LDAP:
         # provider = ldap
         return await ldap_auth(session, username, password)
     else:
@@ -63,10 +57,10 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(
-    data: schemas.TokenData,
+    data: schema.TokenData,
     secret_key: str,
     algorithm: str,
-    expires_delta: timedelta | None = None
+    expires_delta: timedelta | None = None,
 ) -> str:
     logger.debug(f"create access token for data={data}")
 
@@ -78,11 +72,7 @@ def create_access_token(
     to_encode.update({"exp": expire})
 
     try:
-        encoded_jwt = jwt.encode(
-            to_encode,
-            secret_key,
-            algorithm=algorithm
-        )
+        encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
     except Exception as exc:
         logger.error(exc)
         raise
@@ -90,7 +80,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def db_auth(session: Session, username: str, password: str) -> schemas.User | None:
+def db_auth(session: Session, username: str, password: str) -> schema.User | None:
     """Authenticates user based on username and password
 
     User data is read from database.
@@ -98,7 +88,7 @@ def db_auth(session: Session, username: str, password: str) -> schemas.User | No
     logger.info(f"Database based authentication for '{username}'")
 
     try:
-        user: schemas.User | None = db.get_user_by_username(session, username)
+        user: schema.User | None = dbapi.get_user_by_username(session, username)
     except NoResultFound:
         user = None
 
@@ -115,10 +105,8 @@ def db_auth(session: Session, username: str, password: str) -> schemas.User | No
 
 
 async def ldap_auth(
-    session: Session,
-    username: str,
-    password: str
-) -> schemas.User | None:
+    session: Session, username: str, password: str
+) -> schema.User | None:
     client = ldap.get_client(username, password)
 
     try:
@@ -127,8 +115,7 @@ async def ldap_auth(
         logger.warning(f"Auth:LDAP: sign in failed with {ex}")
 
         raise HTTPException(
-            status_code=401,
-            detail=f"401 Unauthorized. LDAP Auth error: {ex}."
+            status_code=401, detail=f"401 Unauthorized. LDAP Auth error: {ex}."
         )
 
     email = ldap.get_default_email(username)
@@ -136,24 +123,16 @@ async def ldap_auth(
         email = await client.user_email()
     except Exception as ex:
         logger.warning(f"Auth:LDAP: cannot retrieve user email {ex}")
-        logger.warning(
-            f"Auth:LDAP: user email fallback to {email}"
-        )
+        logger.warning(f"Auth:LDAP: user email fallback to {email}")
 
-    return db.get_or_create_user_by_email(session, email)
+    return dbapi.get_or_create_user_by_email(session, email)
 
 
 async def oidc_auth(
-    session: Session,
-    client_id: str,
-    code: str,
-    redirect_url: str
+    session: Session, client_id: str, code: str, redirect_url: str
 ) -> str | None:
     if settings.papermerge__auth__oidc_client_secret is None:
-        raise HTTPException(
-            status_code=400,
-            detail = "OIDC client secret is empty"
-        )
+        raise HTTPException(status_code=400, detail="OIDC client secret is empty")
 
     client = OIDCAuth(
         client_secret=settings.papermerge__auth__oidc_client_secret,
@@ -161,7 +140,7 @@ async def oidc_auth(
         user_info_url=settings.papermerge__auth__oidc_user_info_url,
         client_id=client_id,
         code=code,
-        redirect_url=redirect_url
+        redirect_url=redirect_url,
     )
 
     logger.debug("Auth:oidc: sign in")
@@ -172,29 +151,28 @@ async def oidc_auth(
         logger.warning(f"Auth:oidc: sign in failed with {ex}")
 
         raise HTTPException(
-            status_code=401,
-            detail = f"401 Unauthorized. Auth provider error: {ex}."
+            status_code=401, detail=f"401 Unauthorized. Auth provider error: {ex}."
         )
 
     return result
 
 
-def create_token(user: schemas.User) -> str:
+def create_token(user: schema.User) -> str:
     access_token_expires = timedelta(
         minutes=settings.papermerge__security__token_expire_minutes
     )
-    data = schemas.TokenData(
+    data = schema.TokenData(
         sub=str(user.id),
         preferred_username=user.username,
         email=user.email,
-        scopes=user.scopes
+        scopes=user.scopes,
     )
 
     access_token = create_access_token(
         data=data,
         expires_delta=access_token_expires,
         secret_key=settings.papermerge__security__secret_key,
-        algorithm=settings.papermerge__security__token_algorithm
+        algorithm=settings.papermerge__security__token_algorithm,
     )
 
     return access_token
