@@ -149,7 +149,7 @@ class Folder(Node):
 class Permission(Base):
     __tablename__ = "permissions"
 
-    id: Mapped[int] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str]
     codename: Mapped[str]
     groups = relationship(
@@ -163,7 +163,7 @@ class Permission(Base):
 class Group(Base):
     __tablename__ = "groups"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str]
     permissions: Mapped[list["Permission"]] = relationship(
         secondary=group_permissions_association, back_populates="groups"

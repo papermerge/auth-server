@@ -133,12 +133,12 @@ def test_user_inherits_scopes_from_perms_and_groups(db_session):
     User inherits his/her scopes from his/her direct permissions and groups
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
-    db.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
+    dbapi.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
+    dbapi.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -147,7 +147,7 @@ def test_user_inherits_scopes_from_perms_and_groups(db_session):
         perm_names=["page.move", "page.extract"],
         group_names=["g1", "g2"],
     )
-    user = db.get_user_by_username(db_session, "erasmus")
+    user = dbapi.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits scopes from his/her direct permissions and groups
@@ -170,11 +170,11 @@ def test_get_user_by_email_inherits_scopes_from_groups(db_session):
     User inherits his/her scopes from the group he/she belongs
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
-    db.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
-    db.create_user(
+    dbapi.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
+    dbapi.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -182,7 +182,7 @@ def test_get_user_by_email_inherits_scopes_from_groups(db_session):
         is_superuser=False,
         group_names=["g1", "g2"],  # user inherits scopes from these groups
     )
-    user = db.get_user_by_email(db_session, "erasmus@mail.com")
+    user = dbapi.get_user_by_email(db_session, "erasmus@mail.com")
 
     assert user.username == "erasmus"
     # check that user inherits all permissions from his/her group
@@ -198,9 +198,9 @@ def test_get_user_by_email_scopes_from_perms(db_session):
     User inherits his/her scopes from his/her direct permissions
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -208,7 +208,7 @@ def test_get_user_by_email_scopes_from_perms(db_session):
         is_superuser=False,
         perm_names=["page.move", "page.extract"],
     )
-    user = db.get_user_by_email(db_session, "erasmus@mail.com")
+    user = dbapi.get_user_by_email(db_session, "erasmus@mail.com")
 
     assert user.username == "erasmus"
     # check that user inherits his/her direct permissions
@@ -224,12 +224,12 @@ def test_get_user_by_email_inherits_scopes_from_perms_and_groups(db_session):
     User inherits his/her scopes from his/her direct permissions and groups
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
-    db.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
+    dbapi.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
+    dbapi.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -238,7 +238,7 @@ def test_get_user_by_email_inherits_scopes_from_perms_and_groups(db_session):
         perm_names=["page.move", "page.extract"],
         group_names=["g1", "g2"],
     )
-    user = db.get_user_by_email(db_session, "erasmus@mail.com")
+    user = dbapi.get_user_by_email(db_session, "erasmus@mail.com")
 
     assert user.username == "erasmus"
     # check that user inherits scopes from his/her direct permissions and groups
@@ -261,16 +261,16 @@ def test_get_user_by_email_for_superuser(db_session):
     User inherits all scopes if he/she is superuser
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
         password="freewill41",
         is_superuser=True,
     )
-    user = db.get_user_by_email(db_session, "erasmus@mail.com")
+    user = dbapi.get_user_by_email(db_session, "erasmus@mail.com")
 
     assert user.username == "erasmus"
     assert len(user.scopes) == len(scopes.SCOPES)
@@ -285,16 +285,16 @@ def test_get_user_by_email_for_non_superuser(db_session):
     groups assigned
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
         password="freewill41",
         is_superuser=False,
     )
-    user = db.get_user_by_email(db_session, "erasmus@mail.com")
+    user = dbapi.get_user_by_email(db_session, "erasmus@mail.com")
 
     assert user.username == "erasmus"
     # user is not superuser and does not have any
