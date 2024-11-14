@@ -1,15 +1,15 @@
 import uuid
 import logging
 
-from sqlalchemy import delete
-from auth_server import scopes
-
-logger = logging.getLogger(__name__)
+from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy import delete
 
-from auth_server import schema, constants
+from auth_server import schema, constants, scopes
 from auth_server.db import orm
+
+logger = logging.getLogger(__name__)
 
 
 def create_group(
