@@ -8,3 +8,4 @@ __pycache__
 *.log
 *.sqlite3
 mydev.yml
+*.db

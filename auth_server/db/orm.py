@@ -7,51 +7,51 @@ from sqlalchemy import ForeignKey, String, func, Column, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
-HOME_TITLE = ".home"
-INBOX_TITLE = ".inbox"
+HOME_TITLE = "home"
+INBOX_TITLE = "inbox"
 
 
 group_permissions_association = Table(
-    "auth_group_permissions",
+    "groups_permissions",
     Base.metadata,
     Column(
         "group_id",
-        ForeignKey("auth_group.id"),
+        ForeignKey("groups.id"),
     ),
     Column(
         "permission_id",
-        ForeignKey("auth_permission.id"),
+        ForeignKey("permissions.id"),
     ),
 )
 
 user_groups_association = Table(
-    "core_user_groups",
+    "users_groups",
     Base.metadata,
     Column(
         "user_id",
-        ForeignKey("core_user.id"),
+        ForeignKey("users.id"),
     ),
     Column(
         "group_id",
-        ForeignKey("auth_group.id"),
+        ForeignKey("groups.id"),
     ),
 )
 
 user_permissions_association = Table(
-    "core_user_user_permissions",
+    "users_permissions",
     Base.metadata,
     Column(
         "user_id",
-        ForeignKey("core_user.id"),
+        ForeignKey("users.id"),
     ),
     Column(
         "permission_id",
-        ForeignKey("auth_permission.id"),
+        ForeignKey("permissions.id"),
     ),
 )
 
 class User(Base):
-    __tablename__ = "core_user"
+    __tablename__ = "users"
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
@@ -70,30 +70,24 @@ class User(Base):
         primaryjoin="User.id == Node.user_id"
     )
     home_folder_id: Mapped[UUID] = mapped_column(
-        ForeignKey(
-            "core_folder.basetreenode_ptr_id",
-            deferrable=True,
-            use_alter=True
-        ),
+        ForeignKey("folders.node_id", deferrable=True, ondelete="CASCADE"),
         nullable=True
     )
     home_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
         back_populates="user",
-        viewonly=True
+        viewonly=True,
+        cascade="delete",
     )
     inbox_folder_id: Mapped[UUID] = mapped_column(
-        ForeignKey(
-            "core_folder.basetreenode_ptr_id",
-            deferrable=True,
-            use_alter=True
-        ),
+        ForeignKey("folders.node_id", deferrable=True, ondelete="CASCADE"),
         nullable = True,
     )
     inbox_folder: Mapped['Folder'] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
         back_populates="user",
-        viewonly=True
+        viewonly=True,
+        cascade="delete",
     )
     created_at: Mapped[datetime] = mapped_column(
         insert_default=func.now()
@@ -114,12 +108,14 @@ class User(Base):
         back_populates="users"
     )
 
+    __mapper_args__ = {"confirm_deleted_rows": False}
+
 
 CType = Literal["document", "folder"]
 
 
 class Node(Base):
-    __tablename__ = "core_basetreenode"
+    __tablename__ = "nodes"
 
     id: Mapped[UUID] = mapped_column(
         primary_key=True, insert_default=uuid.uuid4()
@@ -133,10 +129,10 @@ class Node(Base):
         primaryjoin="User.id == Node.user_id"
     )
     user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("core_user.id", use_alter=True)
+        ForeignKey("users.id", use_alter=True)
     )
     parent_id: Mapped[UUID] = mapped_column(
-        ForeignKey("core_basetreenode.id"), nullable=True
+        ForeignKey("nodes.id"), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(
         insert_default=func.now()
@@ -156,13 +152,13 @@ class Node(Base):
 
 
 class Folder(Node):
-    __tablename__ = "core_folder"
+    __tablename__ = "folders"
 
     id: Mapped[UUID] = mapped_column(
-        'basetreenode_ptr_id',
-        ForeignKey("core_basetreenode.id"),
+        'node_id',
+        ForeignKey("nodes.id", ondelete="CASCADE"),
         primary_key=True,
-        insert_default=uuid.uuid4()
+        insert_default=uuid.uuid4
     )
 
     __mapper_args__ = {
