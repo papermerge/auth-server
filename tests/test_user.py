@@ -6,7 +6,7 @@ from sqlalchemy.exc import NoResultFound
 
 
 from auth_server.db.orm import User, Node, Folder, HOME_TITLE, INBOX_TITLE
-from auth_server import db
+from auth_server.db import api as dbapi
 from auth_server import scopes
 
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_create_user_from_email(db_session):
-    user = db.create_user_from_email(db_session, "john@mail.com")
+    user = dbapi.create_user_from_email(db_session, "john@mail.com")
 
     stmt_home = (
         select(Folder)
@@ -43,7 +43,7 @@ def test_create_user_from_email(db_session):
 
 
 def test_get_or_create_user_by_email(db_session):
-    user = db.get_or_create_user_by_email(db_session, "mila@lol.com")
+    user = dbapi.get_or_create_user_by_email(db_session, "mila@lol.com")
 
     assert user.username == "mila"
     assert user.home_folder_id
@@ -51,23 +51,23 @@ def test_get_or_create_user_by_email(db_session):
 
 
 def test_get_user_by_username(db_session):
-    db.create_user(
+    dbapi.create_user(
         db_session, username="eugen", password="1234", email="eugen@mail.com"
     )
 
-    user = db.get_user_by_username(db_session, "eugen")
+    user = dbapi.get_user_by_username(db_session, "eugen")
 
     assert user.username == "eugen"
 
 
 def test_get_user_by_username_raises_correct_exception(db_session):
     with pytest.raises(NoResultFound):
-        db.get_user_by_username(db_session, "no_such_user")
+        dbapi.get_user_by_username(db_session, "no_such_user")
 
 
 def test_get_user_by_email(db_session):
-    db.create_user_from_email(db_session, "john@mail.com")
-    user = db.get_user_by_email(db_session, "john@mail.com")
+    dbapi.create_user_from_email(db_session, "john@mail.com")
+    user = dbapi.get_user_by_email(db_session, "john@mail.com")
 
     assert user.username == "john"
 
@@ -79,11 +79,11 @@ def test_user_inherits_from_groups(db_session):
     User inherits his/her scopes from the group he/she belongs
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
-    db.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
-    db.create_user(
+    dbapi.create_group(db_session, name="g1", scopes=["node.create", "node.view"])
+    dbapi.create_group(db_session, name="g2", scopes=["tag.create", "tag.view"])
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -91,7 +91,7 @@ def test_user_inherits_from_groups(db_session):
         is_superuser=False,
         group_names=["g1", "g2"],  # user inherits scopes from these groups
     )
-    user = db.get_user_by_username(db_session, "erasmus")
+    user = dbapi.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits all permissions from his/her group
@@ -107,9 +107,9 @@ def test_user_inherits_scopes_from_perms(db_session):
     User inherits his/her scopes from his/her direct permissions
     """
     # make sure all scope values are in DB
-    db.sync_perms(db_session)
+    dbapi.sync_perms(db_session)
 
-    db.create_user(
+    dbapi.create_user(
         db_session,
         username="erasmus",
         email="erasmus@mail.com",
@@ -117,7 +117,7 @@ def test_user_inherits_scopes_from_perms(db_session):
         is_superuser=False,
         perm_names=["page.move", "page.extract"],
     )
-    user = db.get_user_by_username(db_session, "erasmus")
+    user = dbapi.get_user_by_username(db_session, "erasmus")
 
     assert user.username == "erasmus"
     # check that user inherits his/her direct permissions

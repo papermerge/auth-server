@@ -50,30 +50,27 @@ user_permissions_association = Table(
     ),
 )
 
+
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True,
-        insert_default=uuid.uuid4()
-    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, insert_default=uuid.uuid4())
     username: Mapped[str]
     email: Mapped[str]
     password: Mapped[str]
-    first_name: Mapped[str] = mapped_column(default=' ')
-    last_name: Mapped[str] = mapped_column(default=' ')
+    first_name: Mapped[str] = mapped_column(default=" ")
+    last_name: Mapped[str] = mapped_column(default=" ")
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_staff: Mapped[bool] = mapped_column(default=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     nodes: Mapped[List["Node"]] = relationship(
-        back_populates="user",
-        primaryjoin="User.id == Node.user_id"
+        back_populates="user", primaryjoin="User.id == Node.user_id"
     )
     home_folder_id: Mapped[UUID] = mapped_column(
         ForeignKey("folders.node_id", deferrable=True, ondelete="CASCADE"),
-        nullable=True
+        nullable=True,
     )
-    home_folder: Mapped['Folder'] = relationship(
+    home_folder: Mapped["Folder"] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
         back_populates="user",
         viewonly=True,
@@ -81,31 +78,24 @@ class User(Base):
     )
     inbox_folder_id: Mapped[UUID] = mapped_column(
         ForeignKey("folders.node_id", deferrable=True, ondelete="CASCADE"),
-        nullable = True,
+        nullable=True,
     )
-    inbox_folder: Mapped['Folder'] = relationship(
+    inbox_folder: Mapped["Folder"] = relationship(
         primaryjoin="User.home_folder_id == Folder.id",
         back_populates="user",
         viewonly=True,
         cascade="delete",
     )
-    created_at: Mapped[datetime] = mapped_column(
-        insert_default=func.now()
-    )
-    date_joined: Mapped[datetime] = mapped_column(
-        insert_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
+    date_joined: Mapped[datetime] = mapped_column(insert_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
-        insert_default=func.now(),
-        onupdate=func.now()
+        insert_default=func.now(), onupdate=func.now()
     )
     permissions: Mapped[list["Permission"]] = relationship(
-        secondary=user_permissions_association,
-        back_populates="users"
+        secondary=user_permissions_association, back_populates="users"
     )
     groups: Mapped[list["Group"]] = relationship(
-        secondary=user_groups_association,
-        back_populates="users"
+        secondary=user_groups_association, back_populates="users"
     )
 
     __mapper_args__ = {"confirm_deleted_rows": False}
@@ -117,29 +107,19 @@ CType = Literal["document", "folder"]
 class Node(Base):
     __tablename__ = "nodes"
 
-    id: Mapped[UUID] = mapped_column(
-        primary_key=True, insert_default=uuid.uuid4()
-    )
+    id: Mapped[UUID] = mapped_column(primary_key=True, insert_default=uuid.uuid4())
     title: Mapped[str] = mapped_column(String(200))
     ctype: Mapped[CType]
     lang: Mapped[str] = mapped_column(String(8))
     tags: List[str] = []
     user: Mapped["User"] = relationship(
-        back_populates="nodes",
-        primaryjoin="User.id == Node.user_id"
+        back_populates="nodes", primaryjoin="User.id == Node.user_id"
     )
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id", use_alter=True)
-    )
-    parent_id: Mapped[UUID] = mapped_column(
-        ForeignKey("nodes.id"), nullable=True
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        insert_default=func.now()
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", use_alter=True))
+    parent_id: Mapped[UUID] = mapped_column(ForeignKey("nodes.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
-        insert_default=func.now(),
-        onupdate=func.now()
+        insert_default=func.now(), onupdate=func.now()
     )
 
     __mapper_args__ = {
@@ -155,10 +135,10 @@ class Folder(Node):
     __tablename__ = "folders"
 
     id: Mapped[UUID] = mapped_column(
-        'node_id',
+        "node_id",
         ForeignKey("nodes.id", ondelete="CASCADE"),
         primary_key=True,
-        insert_default=uuid.uuid4
+        insert_default=uuid.uuid4,
     )
 
     __mapper_args__ = {
@@ -167,45 +147,27 @@ class Folder(Node):
 
 
 class Permission(Base):
-    __tablename__ = "auth_permission"
+    __tablename__ = "permissions"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str]
     codename: Mapped[str]
-    content_type_id: Mapped[int] = mapped_column(
-        ForeignKey("django_content_type.id")
-    )
-    content_type: Mapped["ContentType"] = relationship()
     groups = relationship(
-        "Group",
-        secondary=group_permissions_association,
-        back_populates="permissions"
+        "Group", secondary=group_permissions_association, back_populates="permissions"
     )
     users = relationship(
-        "User",
-        secondary=user_permissions_association,
-        back_populates="permissions"
+        "User", secondary=user_permissions_association, back_populates="permissions"
     )
 
 
 class Group(Base):
-    __tablename__ = "auth_group"
+    __tablename__ = "groups"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     permissions: Mapped[list["Permission"]] = relationship(
-        secondary=group_permissions_association,
-        back_populates="groups"
+        secondary=group_permissions_association, back_populates="groups"
     )
     users: Mapped[list["User"]] = relationship(
-        secondary=user_groups_association,
-        back_populates="groups"
+        secondary=user_groups_association, back_populates="groups"
     )
-
-
-class ContentType(Base):
-    __tablename__ = "django_content_type"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    app_label: Mapped[str]
-    model: Mapped[str]
