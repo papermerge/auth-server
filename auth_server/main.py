@@ -2,7 +2,7 @@ import logging
 from uuid import UUID
 
 from sqlalchemy.exc import OperationalError, NoResultFound
-from fastapi import FastAPI, HTTPException, Response, Request, status
+from fastapi import FastAPI, HTTPException, Response, Request, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
@@ -15,7 +15,6 @@ from auth_server.db.engine import Session
 from auth_server.db import api as dbapi
 
 app = FastAPI()
-
 
 settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

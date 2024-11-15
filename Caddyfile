@@ -1,0 +1,12 @@
+:3600
+
+
+handle_path /verify {
+	reverse_proxy :8010
+}
+
+handle_path /token {
+	reverse_proxy :8010
+}
+
+reverse_proxy :5273

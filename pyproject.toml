@@ -28,7 +28,7 @@ create_db='auth_server.cli.create_db:cli'
 ldap='auth_server.cli.ldap:app'
 
 [tool.taskipy.tasks]
-server = "fastapi dev auth_server/main.py"
+server = "fastapi dev auth_server/main.py --port 8010"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"

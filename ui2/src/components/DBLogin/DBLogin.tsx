@@ -10,7 +10,7 @@ import { RuntimeConfig } from '@/types';
 function get_token_endpoint(): string {
   const base_url = import.meta.env.VITE_TOKEN_BASE_URL
 
-  return `${base_url}/api/token`
+  return `${base_url}/token`
 }
 
 function get_redirect_endpoint(): string {
