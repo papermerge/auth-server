@@ -23,18 +23,19 @@ ldap3 = "^2.9.1"
 typer = "^0.13.0"
 
 [tool.poetry.scripts]
-create_user='auth_server.cli.create_user:cli'
-auth_user='auth_server.cli.auth_user:cli'
-list_users='auth_server.cli.list_users:cli'
-users='auth_server.cli.list_users:cli'
+auth-cli='auth_server.cli.cli:app'
 create_db='auth_server.cli.create_db:cli'
-set_password='auth_server.cli.set_password:cli'
-create_token='auth_server.cli.create_token:cli'
 ldap='auth_server.cli.ldap:app'
+
+[tool.taskipy.tasks]
+server = "fastapi dev auth_server/main.py"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
 pytest-env = "^0.8.1"
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.14"
 
 [build-system]
 requires = ["poetry-core"]

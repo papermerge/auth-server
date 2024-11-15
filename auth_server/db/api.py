@@ -236,3 +236,14 @@ def get_or_create_user_by_email(session: Session, email: str) -> schema.User:
     logger.debug(f"User with email {email} was found in database")
 
     return user
+
+
+def set_user_password(db_session: Session, username: str, password: str) -> orm.User:
+    stmt = select(orm.User).where(orm.User.username == username)
+    db_user = db_session.scalars(stmt).one()
+
+    db_session.add(db_user)
+    db_user.password = pbkdf2_sha256.hash(password)
+    db_session.commit()
+
+    return db_user
