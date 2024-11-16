@@ -1300,10 +1300,10 @@ files = [
 ]
 
 [extras]
-mysql = ["psycopg2"]
+mysql = ["mysqlclient"]
 pg = ["psycopg2"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.13"
-content-hash = "bb87cf7e828a6f663c2c33b0966cfed23168a695527404649abfde9c830b0303"
+content-hash = "287fe44130197857556b5202112fed050516cd87b016d6dd2c7f89a3015bde0e"
