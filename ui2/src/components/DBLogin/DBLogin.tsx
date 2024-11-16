@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import { Button, PasswordInput, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { redirect } from "react-router-dom";
 
 import { get_runtime_config } from '@/RuntimeConfig';
 import { RuntimeConfig } from '@/types';
@@ -10,13 +9,21 @@ import { RuntimeConfig } from '@/types';
 function get_token_endpoint(): string {
   const base_url = import.meta.env.VITE_TOKEN_BASE_URL
 
-  return `${base_url}/token`
+  if (base_url) {
+    return `${base_url}/api/token`
+  }
+
+  return `/api/token`
 }
 
 function get_redirect_endpoint(): string {
   const base_url = import.meta.env.VITE_REDIRECT_BASE_URL
 
-  return `${base_url}/app`
+  if (base_url) {
+    return `${base_url}/home`
+  }
+
+  return `/home`
 }
 
 
@@ -56,7 +63,9 @@ export default function Login() {
             setError(response.statusText);
             response.json().then(result => console.log(result));
           } else {
-            redirect(get_redirect_endpoint())
+            let a = document.createElement('a');
+            a.href = get_redirect_endpoint()
+            a.click()
           }
         }
       ).catch(error => {
