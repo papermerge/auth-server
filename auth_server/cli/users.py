@@ -20,7 +20,12 @@ Password = Annotated[str, typer.Argument(envvar="PAPERMERGE__AUTH__PASSWORD")]
 
 
 @app.command(name="create")
-def create_user(username: Username, password: Password, email: Email | None = None):
+def create_user(
+    password: Password,
+    username: Username,
+    email: Email | None = None,
+    superuser: bool = False,
+):
     """Creates a user"""
 
     if not email:
@@ -30,15 +35,21 @@ def create_user(username: Username, password: Password, email: Email | None = No
     with Session() as db_session:
         try:
             user = dbapi.get_user_by_username(db_session, username)
-            logger.warning(f"User '{username}' already exists.")
+            logger.info(f"User '{username}' already exists.")
+            console.print(f"User {username} already exists", style="yellow")
         except NoResultFound:
             pass
 
         if user is None:
             dbapi.create_user(
-                db_session, username=username, password=password, email=email
+                db_session,
+                username=username,
+                password=password,
+                email=email,
+                is_superuser=superuser,
             )
             logger.info(f"User '{username}' created.")
+            console.print(f"User {username} created", style="green")
 
 
 @app.command(name="ls")
