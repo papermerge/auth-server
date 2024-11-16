@@ -24,7 +24,7 @@ pyjwt = "^2.9.0"
 
 [tool.poetry.extras]
 pg = ["psycopg2"]
-mysql = ["psycopg2"]
+mysql = ["mysqlclient"]
 
 [tool.poetry.scripts]
 auth-cli='auth_server.cli.cli:app'
