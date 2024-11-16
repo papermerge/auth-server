@@ -1,8 +1,5 @@
 import logging
-import secrets
 
-
-from pydantic import Field
 from functools import lru_cache
 from enum import Enum
 
@@ -10,10 +7,6 @@ from pydantic_settings import BaseSettings
 
 
 logger = logging.getLogger(__name__)
-
-
-def generate_secret():
-    return secrets.token_hex(32)
 
 
 class Algs(str, Enum):
@@ -29,7 +22,7 @@ class Algs(str, Enum):
 
 
 class Settings(BaseSettings):
-    papermerge__security__secret_key: str = Field(default_factory=generate_secret)
+    papermerge__security__secret_key: str
     papermerge__security__token_algorithm: Algs = Algs.HS256
     papermerge__security__token_expire_minutes: int = 360
     papermerge__security__cookie_name: str = "access_token"
