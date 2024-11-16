@@ -1,41 +1,36 @@
-FROM node:18.16.0-alpine as build
+FROM node:20.13-alpine as build
 
-ENV UI_DIR=/app_ui
+ENV UI_DIR=/auth_ui
 WORKDIR ${UI_DIR}
 
-ENV PATH ${UI_DIR}/node_modules/.bin:$PATH
+COPY ui2/ ./
 
-COPY ui/ ./
+RUN yarn install
+RUN yarn build
 
-RUN npm install -g react-scripts
-RUN npm install
-RUN npm run build
+FROM python:3.13-alpine
 
-FROM python:3.10
-
-RUN apt-get update && apt-get install -y --no-install-recommends nginx supervisor
-
-ENV APP_DIR=/auth_server_app
-ENV UI_DIR=/app_ui
-
+ENV APP_DIR=/app
+ENV UI_DIR=/auth_ui
 WORKDIR ${APP_DIR}
+
+RUN apk update && apk add linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev
+
+COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
+COPY auth_server/ ${APP_DIR}/auth_server/
 
 RUN pip install --upgrade poetry roco==0.4.1
 
-RUN python3 -m venv .venv
+COPY poetry.lock pyproject.toml app/
+RUN poetry install -E pg
 
 COPY docker/supervisord.conf /etc/
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
-COPY --from=build ${UI_DIR}/build /usr/share/nginx/html
+COPY --from=build ${UI_DIR}/dist /usr/share/nginx/html
 
-COPY ./auth_server ${APP_DIR}/auth_server/
-
-RUN poetry install --only main -vv
-
-COPY docker/run.bash /run.bash
-RUN chmod +x /run.bash
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/run.bash"]
+ENTRYPOINT ["/entrypoint.sh"]
