@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy.exc import OperationalError, NoResultFound
 from fastapi import FastAPI, HTTPException, Response, Request, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+import jwt
 
 from auth_server.auth import authenticate, create_token
 from auth_server.backends.oidc import introspect_token
@@ -113,7 +113,7 @@ async def verify_endpoint(request: Request) -> Response:
             settings.papermerge__security__secret_key,
             algorithms=[settings.papermerge__security__token_algorithm],
         )
-    except JWTError:
+    except jwt.DecodeError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
