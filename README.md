@@ -20,14 +20,14 @@ and as cookie.
 ## Usage
 
 To start backend server:
-
+```
   $ poetry run task server
-
+```
 To start frontend (in dev mode):
-
+```
   $ cd ui2
   $ yarn dev
-
+```
 Use nginx.conf (from the root folder) to play.  
 
 In order to enable authentication via OIDC provider you need to
