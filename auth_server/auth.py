@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
 from datetime import datetime, timedelta, UTC
-from jose import jwt
+import jwt
 from passlib.hash import pbkdf2_sha256
 
 from fastapi import HTTPException
