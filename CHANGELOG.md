@@ -6,6 +6,7 @@
 - Restructure project to use similar layout as core
 - Use Mantine + vite for UI
 - Use Docker alpine images
+- Use typer for CLI interface
 
 ## 0.9.0 - 2024-04-07
 

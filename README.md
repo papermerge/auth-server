@@ -17,82 +17,18 @@ cryptographically signed JWT access token.
 JWT token is delivered to the client as http response payload (json format)
 and as cookie.
 
-![Authentication Server](./images/screenshot.png)
-
 ## Usage
 
-Auth-server is configured only via environment variables.
-The only required parameter you need to provide it secret key (used to sign tokens):
+To start backend server:
 
-```
-version: "3.9"
-services:
-  web:
-    image: papermerge/auth-server
-    ports:
-     - "7000:80"
-    environment:
-      PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
-```
+  $ poetry run task server
 
-If no other settings are provided, it will be assumed authentication against
-credentials stored in database. Default database is "sqlite:////db/db.sqlite3".
-Optionally you can choose to store credentials in PostgreSQL database:
+To start frontend (in dev mode):
 
-```
-version: "3.9"
-services:
-  web:
-    image: papermerge/auth-server
-    ports:
-     - "7000:80"
-    environment:
-      PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
-      PAPERMERGE__DATABASE__URL: postgresql://postgres:123@db:5432/postgres
-    depends_on:
-      - db
-  db:
-    image: bitnami/postgresql:14.4.0
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_PASSWORD=123
-volumes:
-  postgres_data:
-```
+  $ cd ui2
+  $ yarn dev
 
-For MySql/MariaDB use `mysql` scheme. For example:
-
-  PAPERMERGE__DATABASE__URL: mysql://user:password@127.0.0.1:3306/mydatabase
-
-And docker compose file would look like:
-
-```
-version: "3.9"
-services:
-  web:
-    image: papermerge/auth-server
-    ports:
-     - "7000:80"
-    environment:
-      PAPERMERGE__SECURITY__SECRET_KEY: <your secret string>
-      PAPERMERGE__DATABASE__URL: mysql://user:password@127.0.0.1:3306/mydatabase
-    depends_on:
-      - db
-  db:
-    image: mariadb:11.2
-    volumes:
-      - maria:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: mydatabase
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - 3306:3306
-volumes:
-  maria:
-```
+Use nginx.conf (from the root folder) to play.  
 
 In order to enable authentication via OIDC provider you need to
 provide following environment variables:
@@ -112,14 +48,6 @@ You need to provider all five values.
 Above value should be same as in field "Authorized redirect URI" when
 registering oauth2 client.
 
-You can also start the auth server with poetry:
-
-    $ poetry run uvicorn auth_server.main:app \
-        --host 0.0.0.0 \
-        --port 8000 \
-        --reload \
-        --log-config etc/logging.yml
-        --log-level info
 
 Application providers one single endpoint `POST /token` which return jwt access
 token. There two valid options for using `POST /token` endpoint:
