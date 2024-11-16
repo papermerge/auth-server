@@ -1,0 +1,11 @@
+.idea/
+.env
+.envrc
+.venv
+*.pyc
+__pycache__
+*.swp
+*.log
+*.sqlite3
+mydev.yml
+*.db
