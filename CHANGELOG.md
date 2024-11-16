@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0 - 2024-11-16
+
+- Use python 3.13
+- Restructure project to use similar layout as core
+- Use Mantine + vite for UI
+- Use Docker alpine images
+- Use typer for CLI interface
+
 ## 0.9.0 - 2024-04-07
 
 - Support for scopes/permissions/groups

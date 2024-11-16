@@ -1,5 +1,8 @@
 import logging
+import secrets
 
+
+from pydantic import Field
 from functools import lru_cache
 from enum import Enum
 
@@ -7,6 +10,10 @@ from pydantic_settings import BaseSettings
 
 
 logger = logging.getLogger(__name__)
+
+
+def generate_secret():
+    return secrets.token_hex(32)
 
 
 class Algs(str, Enum):
@@ -22,10 +29,10 @@ class Algs(str, Enum):
 
 
 class Settings(BaseSettings):
-    papermerge__security__secret_key: str
+    papermerge__security__secret_key: str = Field(default_factory=generate_secret)
     papermerge__security__token_algorithm: Algs = Algs.HS256
     papermerge__security__token_expire_minutes: int = 360
-    papermerge__security__cookie_name: str = 'access_token'
+    papermerge__security__cookie_name: str = "access_token"
 
     # database where to read user table from
     papermerge__database__url: str = "sqlite:////db/db.sqlite3"
@@ -41,10 +48,10 @@ class Settings(BaseSettings):
     # e.g. uid={username},ou=People,dc=ldap,dc=trusel,dc=net
     papermerge__auth__ldap_user_dn_format: str | None = None
     # LDAP Entry attribute name for the email
-    papermerge__auth__ldap_email_attr: str = 'mail'
+    papermerge__auth__ldap_email_attr: str = "mail"
     # if there is an error retrieving ldap_email_attr, the
     # fallback user email will be set to username@<email-domain-fallback>
-    papermerge__auth__ldap_user_email_domain_fallback: str = 'example-ldap.com'
+    papermerge__auth__ldap_user_email_domain_fallback: str = "example-ldap.com"
 
 
 @lru_cache()
