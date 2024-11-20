@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - 2024-11-20
+
+- Update favicon
+
 ## 1.0 - 2024-11-16
 
 - Use python 3.13
