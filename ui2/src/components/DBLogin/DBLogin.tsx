@@ -59,9 +59,10 @@ export default function Login() {
         },
       )
       .then(response => {
-          if (response.status != 200) {
-            setError(response.statusText);
-            response.json().then(result => console.log(result));
+          if (response.status == 401) {
+            setError("Username or password incorrect");
+          } else if (response.status != 200) {
+            setError(`Error: status code ${response.status}`);
           } else {
             let a = document.createElement('a');
             a.href = get_redirect_endpoint()
