@@ -29,6 +29,18 @@ To start frontend (in dev mode):
   $ yarn dev
 ```
 Use nginx.conf (from the root folder) to play.  
+Command to start nginx:
+
+```
+  $ sudo nginx -c nginx.conf -p $PWD
+```
+
+nginx will serve assets from `ui2/dist` folder.
+To build assets use:
+
+```
+ $ yarn build
+```
 
 In order to enable authentication via OIDC provider you need to
 provide following environment variables:
