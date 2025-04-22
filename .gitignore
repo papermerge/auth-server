@@ -9,3 +9,4 @@ __pycache__
 *.sqlite3
 mydev.yml
 *.db
+.envok.yaml
