@@ -5,6 +5,7 @@ import { useForm } from '@mantine/form';
 
 import { get_runtime_config } from '@/RuntimeConfig';
 import { RuntimeConfig } from '@/types';
+import { useTranslation } from "react-i18next";
 
 function get_token_endpoint(): string {
   const base_url = import.meta.env.VITE_TOKEN_BASE_URL
@@ -28,6 +29,7 @@ function get_redirect_endpoint(): string {
 
 
 export default function Login() {
+  const {t} = useTranslation()
   const [error, setError] = useState<string>()
   const form = useForm({
     mode: 'uncontrolled',
@@ -80,17 +82,17 @@ export default function Login() {
         <TextInput
           {...form.getInputProps('username')}
           key={form.key('username')}
-          label="Username"
-          placeholder="username"
+          label={t("username")}
+          placeholder={t("username")}
           required />
         <PasswordInput
           {...form.getInputProps('password')}
           key={form.key('password')}
-          label="Password"
-          placeholder="Your password"
+          label={t("password")}
+          placeholder={t("your password")}
           required mt="md" />
         <Button fullWidth mt="xl" type="submit">
-          Sign in
+          {t("signin")}
         </Button>
         <Text my={"md"} c="red">
           {error}
