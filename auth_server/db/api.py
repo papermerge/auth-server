@@ -1,8 +1,9 @@
 import uuid
 import logging
 
+from typing import Tuple
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
@@ -12,15 +13,54 @@ from auth_server.db import orm
 logger = logging.getLogger(__name__)
 
 
+def create_role(
+    db_session: Session, name: str, scopes: list[str], exists_ok: bool = False
+) -> Tuple[schema.Role | None, str | None]:
+    """Creates a role with given scopes"""
+    stmt_total_permissions = select(func.count(orm.Permission.id))
+    perms_count = db_session.execute(stmt_total_permissions).scalar()
+    if perms_count == 0:
+        error = (
+            "There are no permissions in the system."
+            " Did you forget to run `paper-cli perms sync`?"
+        )
+        return None, error
+
+    if exists_ok:
+        stmt = select(orm.Role).where(orm.Role.name == name)
+        result = db_session.execute(stmt).scalars().all()
+        if len(result) >= 1:
+            logger.info(f"Role {name} already exists")
+            return schema.Role.model_validate(result[0]), None
+
+    stmt = select(orm.Permission).where(orm.Permission.codename.in_(scopes))
+    perms = db_session.execute(stmt).scalars().all()
+
+    if len(perms) != len(scopes):
+        error = f"Some of the permissions did not match scopes. {perms=} {scopes=}"
+        return None, error
+
+    role = orm.Role(name=name, permissions=perms)
+    db_session.add(role)
+    try:
+        db_session.commit()
+    except Exception as e:
+        error_msg = str(e)
+        if "UNIQUE constraint failed" in error_msg:
+            return None, "Role already exists"
+
+    result = schema.Role.model_validate(role)
+
+    return result, None
+
+
 def create_group(
     session: Session,
     name: str,
     scopes: list[str],
 ) -> schema.Group:
 
-    stmt = select(orm.Permission).where(orm.Permission.codename.in_(scopes))
-    perms = session.execute(stmt).scalars().all()
-    group = orm.Group(name=name, permissions=perms)
+    group = orm.Group(name=name)
     session.add(group)
     session.commit()
     result = schema.Group.model_validate(group)
@@ -90,9 +130,9 @@ def get_user_by_username(session: Session, username: str) -> schema.User | None:
         # from the direct permissions associated
         # and from groups he/she belongs to
         user_scopes = set()
-        user_scopes.update([p.codename for p in db_user.permissions])
-        for group in db_user.groups:
-            user_scopes.update([p.codename for p in group.permissions])
+        for role in db_user.roles:
+            user_scopes.update([p.codename for p in role.permissions])
+
         model_user.scopes = list(user_scopes)
 
     return model_user
@@ -116,9 +156,9 @@ def get_user_by_email(session: Session, email: str) -> schema.User | None:
         # from the direct permissions associated
         # and from groups he/she belongs to
         user_scopes = set()
-        user_scopes.update([p.codename for p in db_user.permissions])
-        for group in db_user.groups:
-            user_scopes.update([p.codename for p in group.permissions])
+        for role in db_user.roles:
+            user_scopes.update([p.codename for p in role.permissions])
+
         model_user.scopes = list(user_scopes)
 
     return model_user
@@ -163,15 +203,12 @@ def create_user(
     last_name: str | None = None,
     is_superuser: bool = True,
     is_active: bool = True,
-    group_names: list[str] | None = None,
-    perm_names: list[str] | None = None,
+    role_names: list[str] | None = None,
 ) -> schema.User:
     """Creates a user"""
 
-    if group_names is None:
-        group_names = []
-    if perm_names is None:
-        perm_names = []
+    if role_names is None:
+        role_names = []
 
     user_id = uuid.uuid4()
     home_id = uuid.uuid4()
@@ -207,13 +244,11 @@ def create_user(
     session.commit()
     db_user.home_folder_id = db_home.id
     db_user.inbox_folder_id = db_inbox.id
-    stmt = select(orm.Permission).where(orm.Permission.codename.in_(perm_names))
-    perms = session.execute(stmt).scalars().all()
 
-    stmt = select(orm.Group).where(orm.Group.name.in_(group_names))
-    groups = session.execute(stmt).scalars().all()
-    db_user.groups = groups
-    db_user.permissions = perms
+    stmt = select(orm.Role).where(orm.Role.name.in_(role_names))
+    roles = session.execute(stmt).scalars().all()
+    db_user.roles = roles
+
     session.commit()
 
     return schema.User.model_validate(db_user)

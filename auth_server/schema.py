@@ -54,6 +54,14 @@ class Group(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class Role(BaseModel):
+    id: UUID
+    name: str
+
+    # Config
+    model_config = ConfigDict(from_attributes=True)
+
+
 class Permission(BaseModel):
     id: UUID
     name: str  # e.g. "Can create tags"
