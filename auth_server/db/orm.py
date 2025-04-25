@@ -11,12 +11,12 @@ HOME_TITLE = "home"
 INBOX_TITLE = "inbox"
 
 
-group_permissions_association = Table(
-    "groups_permissions",
+roles_permissions_association = Table(
+    "roles_permissions",
     Base.metadata,
     Column(
-        "group_id",
-        ForeignKey("groups.id"),
+        "role_id",
+        ForeignKey("roles.id"),
     ),
     Column(
         "permission_id",
@@ -37,16 +37,16 @@ user_groups_association = Table(
     ),
 )
 
-user_permissions_association = Table(
-    "users_permissions",
+users_roles_association = Table(
+    "users_roles",
     Base.metadata,
+    Column(
+        "role_id",
+        ForeignKey("roles.id"),
+    ),
     Column(
         "user_id",
         ForeignKey("users.id"),
-    ),
-    Column(
-        "permission_id",
-        ForeignKey("permissions.id"),
     ),
 )
 
@@ -91,8 +91,8 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         insert_default=func.now(), onupdate=func.now()
     )
-    permissions: Mapped[list["Permission"]] = relationship(
-        secondary=user_permissions_association, back_populates="users"
+    roles: Mapped[list["Role"]] = relationship(  # noqa: F821
+        secondary=users_roles_association, back_populates="users"
     )
     groups: Mapped[list["Group"]] = relationship(
         secondary=user_groups_association, back_populates="users"
@@ -152,11 +152,8 @@ class Permission(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str]
     codename: Mapped[str]
-    groups = relationship(
-        "Group", secondary=group_permissions_association, back_populates="permissions"
-    )
-    users = relationship(
-        "User", secondary=user_permissions_association, back_populates="permissions"
+    roles = relationship(
+        "Role", secondary=roles_permissions_association, back_populates="permissions"
     )
 
 
@@ -165,9 +162,19 @@ class Group(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str]
-    permissions: Mapped[list["Permission"]] = relationship(
-        secondary=group_permissions_association, back_populates="groups"
-    )
     users: Mapped[list["User"]] = relationship(
         secondary=user_groups_association, back_populates="groups"
+    )
+
+
+class Role(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(unique=True)
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=roles_permissions_association, back_populates="roles"
+    )
+    users: Mapped[list["User"]] = relationship(  # noqa: F821
+        secondary=users_roles_association, back_populates="roles"
     )
