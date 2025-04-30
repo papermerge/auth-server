@@ -5,7 +5,7 @@ import LocalStorageBackend from "i18next-localstorage-backend"
 import XHR from "i18next-xhr-backend"
 import { initReactI18next } from "react-i18next"
 
-const localizationPath = "/localization/{{lng}}/{{ns}}.json"
+const localizationPath = "/localization/{{ns}}/{{lng}}.json"
 
 export function initializeI18n(): Promise<void> {
   return i18n
@@ -13,10 +13,10 @@ export function initializeI18n(): Promise<void> {
     .use(ClientBackend)
     .use(initReactI18next)
     .init({
-      ns: ["_default"],
-      defaultNS: "_default",
+      ns: ["auth-server"],
+      defaultNS: "auth-server",
       fallbackLng: ["en"],
-      fallbackNS: "_default",
+      fallbackNS: "auth-server",
 
       detection: {
         order: ["querystring", "cookie", "localStorage"],

@@ -1,9 +1,13 @@
 # Changelog
 
+
+## 1.1.3 - 2025-04-30
+
+- Fixes i18n caching problem by restructuring ui2/public/localization/ folder
+
 ## 1.1 - 2025-04-23
 
 - Adds i18n
-
 
 ## 1.0.2 - 2025-02-01
 
