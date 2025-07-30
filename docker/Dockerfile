@@ -1,4 +1,6 @@
-FROM node:20.13-alpine as build
+FROM node:20-alpine AS build
+
+RUN apk update && apk upgrade && rm -rf /var/cache/apk/*
 
 ENV UI_DIR=/auth_ui
 WORKDIR ${UI_DIR}
@@ -14,7 +16,7 @@ ENV APP_DIR=/app
 ENV UI_DIR=/auth_ui
 WORKDIR ${APP_DIR}
 
-RUN apk update && apk add linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev
+RUN apk update && apk add linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev && rm -rf /var/cache/apk/*
 
 COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
 COPY auth_server/ ${APP_DIR}/auth_server/
