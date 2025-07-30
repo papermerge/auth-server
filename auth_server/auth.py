@@ -141,6 +141,8 @@ async def oidc_auth(
         client_id=client_id,
         code=code,
         redirect_url=redirect_url,
+        authorization_endpoint=settings.papermerge__auth__oidc_authorization_url,
+        issuer=settings.papermerge__auth__oidc_issuer,
     )
 
     logger.debug("Auth:oidc: sign in")

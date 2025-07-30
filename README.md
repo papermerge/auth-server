@@ -45,13 +45,45 @@ To build assets use:
 In order to enable authentication via OIDC provider you need to
 provide following environment variables:
 
-* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
-* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
-* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
-* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`
+**Required:**
+* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET` - OAuth2/OIDC client secret
+* `PAPERMERGE__AUTH__OIDC_CLIENT_ID` - OAuth2/OIDC client ID
+* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL` - Token endpoint URL
+* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL` - UserInfo endpoint URL
 
-You need to provider all five values.
+**Optional (for enhanced functionality):**
+* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL` - Token introspection endpoint (RFC 7662)
+* `PAPERMERGE__AUTH__OIDC_AUTHORIZATION_URL` - Authorization endpoint URL
+* `PAPERMERGE__AUTH__OIDC_ISSUER` - OIDC issuer identifier
+* `PAPERMERGE__AUTH__OIDC_DISCOVERY_URL` - OIDC discovery endpoint
+
+### Entra ID (Azure AD) Configuration Example
+
+For Microsoft Entra ID (formerly Azure AD), you can use these values:
+
+```bash
+# Replace {tenant-id} with your Azure AD tenant ID or domain
+PAPERMERGE__AUTH__OIDC_CLIENT_ID=your-client-id
+PAPERMERGE__AUTH__OIDC_CLIENT_SECRET=your-client-secret
+PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL=https://login.microsoftonline.com/{tenant-id}/v2.0/token
+PAPERMERGE__AUTH__OIDC_USER_INFO_URL=https://graph.microsoft.com/oidc/userinfo
+PAPERMERGE__AUTH__OIDC_AUTHORIZATION_URL=https://login.microsoftonline.com/{tenant-id}/v2.0/authorize
+PAPERMERGE__AUTH__OIDC_ISSUER=https://login.microsoftonline.com/{tenant-id}/v2.0
+PAPERMERGE__AUTH__OIDC_DISCOVERY_URL=https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid_configuration
+```
+
+### Google OIDC Configuration Example
+
+For Google OIDC:
+
+```bash
+PAPERMERGE__AUTH__OIDC_CLIENT_ID=your-google-client-id
+PAPERMERGE__AUTH__OIDC_CLIENT_SECRET=your-google-client-secret
+PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL=https://oauth2.googleapis.com/token
+PAPERMERGE__AUTH__OIDC_USER_INFO_URL=https://www.googleapis.com/oauth2/v3/userinfo
+PAPERMERGE__AUTH__OIDC_AUTHORIZATION_URL=https://accounts.google.com/o/oauth2/v2/auth
+PAPERMERGE__AUTH__OIDC_ISSUER=https://accounts.google.com
+```
 
 `PAPERMERGE__AUTH__OIDC_REDIRECT_URI` should be:
 
