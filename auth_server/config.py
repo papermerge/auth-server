@@ -29,20 +29,12 @@ class Settings(BaseSettings):
 
     # database where to read user table from
     papermerge__database__url: str = "sqlite:////db/db.sqlite3"
-    
-    # OIDC configuration
     papermerge__auth__oidc_client_secret: str | None = None
     papermerge__auth__oidc_client_id: str | None = None
     papermerge__auth__oidc_access_token_url: str | None = None
     papermerge__auth__oidc_user_info_url: str | None = None
     # https://datatracker.ietf.org/doc/html/rfc7662
     papermerge__auth__oidc_introspect_url: str | None = None
-    # Optional: OIDC authorization endpoint (for discovery)
-    papermerge__auth__oidc_authorization_url: str | None = None
-    # Optional: OIDC issuer (for discovery and validation)
-    papermerge__auth__oidc_issuer: str | None = None
-    # Optional: OIDC discovery endpoint (typically /.well-known/openid_configuration)
-    papermerge__auth__oidc_discovery_url: str | None = None
 
     papermerge__auth__ldap_url: str | None = None  # e.g. ldap.trusel.net
     papermerge__auth__ldap_use_ssl: bool = True
