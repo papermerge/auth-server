@@ -13,6 +13,12 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
 
+  - package-ecosystem: docker-compose
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+
   - package-ecosystem: pip # also includes poetry
     directory: "/"
     schedule:
