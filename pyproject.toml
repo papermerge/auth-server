@@ -11,7 +11,7 @@ python = "^3.13"
 fastapi = {extras = ["standard"], version = "^0.115"}
 sqlalchemy = "^2.0.42"
 passlib = "^1.7.4"
-python-multipart = "^0.0.17"
+python-multipart = "^0.0.20"
 httpx = "^0.28"
 rich = "^13.3.5"
 pyyaml = "^6.0.1"
