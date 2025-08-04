@@ -18,7 +18,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build/Publish Dev Docker Image
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v6
       with:
         push: true
         tags: papermerge/auth-server:${{ github.ref_name }}
