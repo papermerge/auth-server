@@ -1,4 +1,4 @@
-FROM node:20.13-alpine as build
+FROM node:24.5-alpine as build
 
 ENV UI_DIR=/auth_ui
 WORKDIR ${UI_DIR}
