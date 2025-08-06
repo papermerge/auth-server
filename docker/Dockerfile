@@ -1,20 +1,24 @@
-FROM node:20.13-alpine as build
+FROM node:20-alpine AS build
+# install packages and ensure all packages are up-to-date
+RUN apk update && apk upgrade && \
+    rm -rf /var/cache/apk/*
 
 ENV UI_DIR=/auth_ui
 WORKDIR ${UI_DIR}
 
 COPY ui2/ ./
 
-RUN yarn install
-RUN yarn build
+RUN yarn install && \
+    yarn build
 
 FROM python:3.13-alpine
+# install packages and ensure all packages are up-to-date
+RUN apk update && apk add linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev && \
+    rm -rf /var/cache/apk/*
 
 ENV APP_DIR=/app
 ENV UI_DIR=/auth_ui
 WORKDIR ${APP_DIR}
-
-RUN apk update && apk add linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev
 
 COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
 COPY auth_server/ ${APP_DIR}/auth_server/
