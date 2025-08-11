@@ -1,16 +1,4 @@
-# Mantine Vite template
-
-## Features
-
-This template comes with the following features:
-
-- [PostCSS](https://postcss.org/) with [mantine-postcss-preset](https://mantine.dev/styles/postcss-preset)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Storybook](https://storybook.js.org/)
-- [Vitest](https://vitest.dev/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
-
-## npm scripts
+# Auth-Server Frontend
 
 ## Build and dev scripts
 
@@ -32,3 +20,17 @@ This template comes with the following features:
 - `storybook` – starts storybook dev server
 - `storybook:build` – build production storybook bundle to `storybook-static`
 - `prettier:write` – formats all files with Prettier
+
+
+
+## Dev Notes
+
+### Upgrade Yarn
+
+```
+ $ yarn set version stable
+```
+
+The above command will do change files [like in this commit](https://github.com/papermerge/auth-server/pull/53/commits/e33332588e6ae9ba737ae821a8a43f72b614e9b6)
+
+Note that currently used yarn version is listed in `.yarnrc.yaml`
