@@ -7,9 +7,7 @@ from auth_server.config import get_settings
 
 settings = get_settings()
 
-SQLALCHEMY_DATABASE_URL = os.environ.get(
-    "PAPERMERGE__DATABASE__URL", "sqlite:////db/db.sqlite3"
-)
+SQLALCHEMY_DATABASE_URL = os.environ.get("PAPERMERGE__DATABASE__URL")
 engine = create_engine(SQLALCHEMY_DATABASE_URL, poolclass=NullPool)
 
 Session = sessionmaker(engine, expire_on_commit=False)
