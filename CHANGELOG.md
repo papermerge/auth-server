@@ -3,6 +3,8 @@
 ## 1.1.4 - 2025-08-11
 
 - Updates dependencies (FE + BE)
+- Update `auth_server.db.api.create_user` to defer constraint check
+- Remove references to Sqlite (use only Postgresql)
 
 ## 1.1.3 - 2025-04-30
 

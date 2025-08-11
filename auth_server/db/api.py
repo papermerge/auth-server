@@ -3,7 +3,7 @@ import logging
 
 from typing import Tuple
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
@@ -214,16 +214,8 @@ def create_user(
     home_id = uuid.uuid4()
     inbox_id = uuid.uuid4()
 
-    db_user = orm.User(
-        id=user_id,
-        username=username,
-        email=email,
-        first_name=first_name,
-        last_name=last_name,
-        is_superuser=is_superuser,
-        is_active=is_active,
-        password=pbkdf2_sha256.hash(password),
-    )
+    session.execute(text("SET CONSTRAINTS ALL DEFERRED"))
+
     db_inbox = orm.Folder(
         id=inbox_id,
         title=constants.INBOX_TITLE,
@@ -238,12 +230,23 @@ def create_user(
         user_id=user_id,
         lang="xxx",  # not used
     )
-    session.add(db_inbox)
-    session.add(db_home)
-    session.add(db_user)
+
+    db_user = orm.User(
+        id=user_id,
+        username=username,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        is_superuser=is_superuser,
+        is_active=is_active,
+        home_folder_id=home_id,  # Set immediately
+        inbox_folder_id=inbox_id,  # Set immediately
+        password=pbkdf2_sha256.hash(password),
+    )
+
+    session.add_all([db_user, db_inbox, db_home])
+    session.flush()
     session.commit()
-    db_user.home_folder_id = db_home.id
-    db_user.inbox_folder_id = db_inbox.id
 
     stmt = select(orm.Role).where(orm.Role.name.in_(role_names))
     roles = session.execute(stmt).scalars().all()
