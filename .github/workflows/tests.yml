@@ -12,6 +12,20 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:16.1
+        env:
+          POSTGRES_PASSWORD: pmgpass
+          POSTGRES_USER: pmguser
+          POSTGRES_DB: test_pmgdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.13
@@ -22,6 +36,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          poetry install && poetry run pytest
+          poetry install -E pg && poetry run pytest
         env:
             PAPERMERGE__SECURITY__SECRET_KEY: ${{ secrets.security__secret_key }}
+            PAPERMERGE__DATABASE__URL: 'postgresql://pmguser:pmgpass@localhost:5432/test_pmgdb'
