@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.1.4 - 2025-08-04
+## 1.1.4 - 2025-08-11
 
-- Updates dependencies
+- Updates dependencies (FE + BE)
 
 ## 1.1.3 - 2025-04-30
 
