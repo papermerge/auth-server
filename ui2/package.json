@@ -34,7 +34,7 @@
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.16.0",
+    "@eslint/js": "^9.33.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
     "@storybook/react": "^8.4.7",
     "@storybook/react-vite": "^8.4.7",
