@@ -1629,6 +1629,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/react-dom-shim@npm:9.1.1":
+  version: 9.1.1
+  resolution: "@storybook/react-dom-shim@npm:9.1.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    storybook: ^9.1.1
+  checksum: 10c0/ea2725719e04871b56c0a3755a7791034abd1d8ebb51392ed5f1eb2d21aee873444080509efe69c919e43121c299e06e2266d603478d059efe38762b0ae96ae5
+  languageName: node
+  linkType: hard
+
 "@storybook/react-vite@npm:^8.4.7":
   version: 8.6.14
   resolution: "@storybook/react-vite@npm:8.6.14"
@@ -1655,7 +1666,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/react@npm:8.6.14, @storybook/react@npm:^8.4.7":
+"@storybook/react@npm:8.6.14":
   version: 8.6.14
   resolution: "@storybook/react@npm:8.6.14"
   dependencies:
@@ -1677,6 +1688,24 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/e447892d523b32a52708e6eabc142a3dc0433c23fc28d59206e3b03fe070df77e80998839c3496c22ad11b712499b8e0fbec0dacf31a006ea99b171dba74c43b
+  languageName: node
+  linkType: hard
+
+"@storybook/react@npm:^9.1.1":
+  version: 9.1.1
+  resolution: "@storybook/react@npm:9.1.1"
+  dependencies:
+    "@storybook/global": "npm:^5.0.0"
+    "@storybook/react-dom-shim": "npm:9.1.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    storybook: ^9.1.1
+    typescript: ">= 4.9.x"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/343598e9c1bb2e53b7d6eaaa50b5c024c109fb825f6f4869a82da0ccd428400e5a93eba494e810f6bfbf6bff9b73810595ab8ffdd1530df8b4f2b20e617623e3
   languageName: node
   linkType: hard
 
@@ -5872,7 +5901,7 @@ __metadata:
     "@mantine/core": "npm:^7.14.1"
     "@mantine/form": "npm:^7.14.1"
     "@mantine/hooks": "npm:^7.14.1"
-    "@storybook/react": "npm:^8.4.7"
+    "@storybook/react": "npm:^9.1.1"
     "@storybook/react-vite": "npm:^8.4.7"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/jest-dom": "npm:^6.6.3"
