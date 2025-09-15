@@ -5585,7 +5585,7 @@ __metadata:
     react-dom: "npm:^19.1.1"
     react-i18next: "npm:^15.7.2"
     react-router-dom: "npm:^7.8.1"
-    storybook: "npm:^9.1.2"
+    storybook: "npm:^9.1.6"
     storybook-dark-mode: "npm:^4.0.2"
     stylelint: "npm:^16.23.1"
     stylelint-config-standard-scss: "npm:^15.0.1"
@@ -7305,9 +7305,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"storybook@npm:^9.1.2":
-  version: 9.1.2
-  resolution: "storybook@npm:9.1.2"
+"storybook@npm:^9.1.6":
+  version: 9.1.6
+  resolution: "storybook@npm:9.1.6"
   dependencies:
     "@storybook/global": "npm:^5.0.0"
     "@testing-library/jest-dom": "npm:^6.6.3"
@@ -7328,7 +7328,7 @@ __metadata:
       optional: true
   bin:
     storybook: ./bin/index.cjs
-  checksum: 10c0/3a575f94913f9000a3591e5c685f4eabf75fa78ce306f8b0d48e9c72e46028df31f6d15955b8a338be2bf48dadca6550b65782783d8b3cb4b737ba9f3887d007
+  checksum: 10c0/19b27eb988781d67ad49d010fe7c5cf57ace168cc3414492819d43fc5d79a0c5551030409031dace02febdf804d0c5e357a868f4c90f1a7f35728eeb8c511b91
   languageName: node
   linkType: hard
 
