@@ -88,6 +88,17 @@ You can decode JWT payload with:
 
     $ echo -n payload | base64 -d
 
+### Testing
+
+Install all requirements, set needed environment variables and start the server.
+
+```bash
+poetry lock
+poetry install -E pg
+export PAPERMERGE__SECURITY__SECRET_KEY="your-secret-value"
+poetry run task server
+```
+
 ## Configurations
 
 This section lists all configuration environment variables.
@@ -131,3 +142,12 @@ work for papermerge-core.
 * `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
 * `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
 * `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`
+
+#### Entra ID
+
+* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
+* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
+* `PAPERMERGE__AUTH__OIDC_TENANT_ID`
+* `PAPERMERGE__AUTH__OIDC_REDIRECT_URL` # the callback your frontend uses
+* `PAPERMERGE__AUTH__OIDC_SCOPE` # default: openid profile email offline_access
+* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL` #default: https://graph.microsoft.com/oidc/userinfo
