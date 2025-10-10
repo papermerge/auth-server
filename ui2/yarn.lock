@@ -1008,9 +1008,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ianvs/prettier-plugin-sort-imports@npm:^4.6.1":
-  version: 4.6.1
-  resolution: "@ianvs/prettier-plugin-sort-imports@npm:4.6.1"
+"@ianvs/prettier-plugin-sort-imports@npm:^4.7.0":
+  version: 4.7.0
+  resolution: "@ianvs/prettier-plugin-sort-imports@npm:4.7.0"
   dependencies:
     "@babel/generator": "npm:^7.26.2"
     "@babel/parser": "npm:^7.26.2"
@@ -1032,7 +1032,7 @@ __metadata:
       optional: true
     prettier-plugin-ember-template-tag:
       optional: true
-  checksum: 10c0/1832eca2ba73ced3390bfa93d93a8df2a61aca475c78e0e18f03316bf42debd3c32ec37342aae856db02ddde0b01a86ff4b0023072078da0f224368e008b21d4
+  checksum: 10c0/bd2c58c43c12aaa7b67557d971d5eb087b22f5f09e81ba18a2cc0a6d8f1c7f4e2d603c2a0af8c84df8ede56b29b0ab7bb9db86d273bc003b70aba29d7dd347ae
   languageName: node
   linkType: hard
 
@@ -5650,7 +5650,7 @@ __metadata:
   resolution: "mantine-vite-template@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.34.0"
-    "@ianvs/prettier-plugin-sort-imports": "npm:^4.6.1"
+    "@ianvs/prettier-plugin-sort-imports": "npm:^4.7.0"
     "@mantine/core": "npm:^8.2.5"
     "@mantine/form": "npm:^8.3.4"
     "@mantine/hooks": "npm:^8.2.7"
