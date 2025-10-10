@@ -1443,6 +1443,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@storybook/react-dom-shim@npm:9.1.10":
+  version: 9.1.10
+  resolution: "@storybook/react-dom-shim@npm:9.1.10"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    storybook: ^9.1.10
+  checksum: 10c0/00a54dedda008857d6478c2dcbf24612e3681958c48bad2831882bd467dc89c7ffc6939a8ee013d72d989ab248017017b335cfe6efd12fcfed9647518c59e0ce
+  languageName: node
+  linkType: hard
+
 "@storybook/react-dom-shim@npm:9.1.3":
   version: 9.1.3
   resolution: "@storybook/react-dom-shim@npm:9.1.3"
@@ -1476,7 +1487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/react@npm:9.1.3, @storybook/react@npm:^9.1.3":
+"@storybook/react@npm:9.1.3":
   version: 9.1.3
   resolution: "@storybook/react@npm:9.1.3"
   dependencies:
@@ -1491,6 +1502,24 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/f9d7aceb85c4a33c957948c5ae630ed69f22a2a61b1dd0235e3ab691352af62733fafb70848d16fd35ddf3418055fff31b3b4954ee567aa4b84afaed6b746e9b
+  languageName: node
+  linkType: hard
+
+"@storybook/react@npm:^9.1.10":
+  version: 9.1.10
+  resolution: "@storybook/react@npm:9.1.10"
+  dependencies:
+    "@storybook/global": "npm:^5.0.0"
+    "@storybook/react-dom-shim": "npm:9.1.10"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+    storybook: ^9.1.10
+    typescript: ">= 4.9.x"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/a04e7fd81210e0bb79807333e49d444736f524359e70225ce4db2f1262b047d4a9b5c99ff60367925e5405639508e91fc499ba29e9ea151c7539d3282dee5ec5
   languageName: node
   linkType: hard
 
@@ -5555,7 +5584,7 @@ __metadata:
     "@mantine/core": "npm:^8.2.5"
     "@mantine/form": "npm:^8.2.7"
     "@mantine/hooks": "npm:^8.2.7"
-    "@storybook/react": "npm:^9.1.3"
+    "@storybook/react": "npm:^9.1.10"
     "@storybook/react-vite": "npm:^9.1.3"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.6.4"
