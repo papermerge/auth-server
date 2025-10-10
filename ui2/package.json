@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@mantine/core": "^8.2.5",
-    "@mantine/form": "^8.2.7",
+    "@mantine/form": "^8.3.4",
     "@mantine/hooks": "^8.2.7",
     "i18next": "^25.4.2",
     "i18next-browser-languagedetector": "^8.2.0",
