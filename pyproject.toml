@@ -36,7 +36,7 @@ server = "fastapi dev auth_server/main.py --port 4010"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.2"
-pytest-env = "^1.1.5"
+pytest-env = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 taskipy = "^1.14"
