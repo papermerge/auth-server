@@ -1,4 +1,4 @@
-FROM node:24.6-alpine AS ui
+FROM node:24.10-alpine AS ui
 # install packages and ensure all packages are up-to-date
 RUN apk update && apk upgrade && \
     rm -rf /var/cache/apk/*
@@ -11,7 +11,7 @@ COPY ui2/ ./
 RUN yarn install && \
     yarn build
 
-FROM python:3.13.7-alpine3.22 AS app
+FROM python:3.14.0-alpine3.22 AS app
 # install packages and ensure all packages are up-to-date
 RUN apk update && \
     apk upgrade && \
