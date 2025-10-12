@@ -8,16 +8,16 @@ packages = [{include = "auth_server"}]
 
 [tool.poetry.dependencies]
 python = "^3.13"
-fastapi = {extras = ["standard"], version = "^0.116"}
-sqlalchemy = "^2.0.43"
+fastapi = {extras = ["standard"], version = "^0.119"}
+sqlalchemy = "^2.0.44"
 passlib = "^1.7.4"
 python-multipart = "^0.0.20"
-rich = "^14.1.0"
+rich = "^14.2.0"
 httpx = "^0.28"
-pyyaml = "^6.0.1"
-pydantic-settings = "^2.10"
+pyyaml = "^6.0.3"
+pydantic-settings = "^2.11"
 ldap3 = "^2.9.1"
-typer = "^0.16.1"
+typer = "^0.19.2"
 psycopg2 = { version = "^2.9", optional = true}
 mysqlclient = {version = "^2.2", optional = true}
 pyjwt = "^2.9.0"
@@ -35,8 +35,8 @@ ldap='auth_server.cli.ldap:app'
 server = "fastapi dev auth_server/main.py --port 4010"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^8.4.1"
-pytest-env = "^1.1.5"
+pytest = "^8.4.2"
+pytest-env = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 taskipy = "^1.14"
