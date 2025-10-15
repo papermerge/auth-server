@@ -96,6 +96,7 @@ Install all requirements, set needed environment variables and start the server.
 poetry lock
 poetry install -E pg
 export PAPERMERGE__SECURITY__SECRET_KEY="your-secret-value"
+export PAPERMERGE__DATABASE__URL="postgresql://postgres:123@db:5432/postgres"
 poetry run task server
 ```
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 - 2025-10-15
+
+- adds MSAL library for Entra ID authentication
+
 ## 1.1.5 - 2025-08-11
 
 - Update `auth_server.db.api.create_user` to defer constraint check
