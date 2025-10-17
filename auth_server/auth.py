@@ -14,6 +14,7 @@ from auth_server.db.orm import User
 from auth_server import schema
 from auth_server.config import Settings
 from auth_server.backends import OIDCAuth, ldap
+import msal
 from auth_server.utils import raise_on_empty
 
 
@@ -130,10 +131,74 @@ async def ldap_auth(
 
 async def oidc_auth(
     session: Session, client_id: str, code: str, redirect_url: str
-) -> str | None:
+) -> schema.User | str | None:
+    """Authenticate via OIDC.
+
+    If an Entra ID (Azure AD) tenant id is configured we use MSAL to
+    exchange the authorization code and then provision/fetch a local user
+    (returning a schema.User so the caller issues a *local* JWT). Otherwise
+    we fall back to the generic OIDCAuth HTTP implementation returning the
+    provider access token string.
+    """
     if settings.papermerge__auth__oidc_client_secret is None:
         raise HTTPException(status_code=400, detail="OIDC client secret is empty")
 
+    # Prefer MSAL flow when tenant id present (Entra ID)
+    if settings.papermerge__auth__oidc_tenant_id:
+        authority = (
+            settings.papermerge__auth__oidc_authority
+            or f"https://login.microsoftonline.com/{settings.papermerge__auth__oidc_tenant_id}"
+        )
+        scopes = settings.papermerge__auth__oidc_scope.split()
+        logger.debug(
+            "Auth:oidc(msal): exchanging code using MSAL authority=%s scopes=%s",
+            authority,
+            scopes,
+        )
+
+        app = msal.ConfidentialClientApplication(
+            client_id=settings.papermerge__auth__oidc_client_id,
+            client_credential=settings.papermerge__auth__oidc_client_secret,
+            authority=authority,
+        )
+        try:
+            result = app.acquire_token_by_authorization_code(
+                code=code, scopes=scopes, redirect_uri=redirect_url
+            )
+        except Exception as ex:  # network or library errors
+            logger.warning("Auth:oidc(msal): code exchange failed: %s", ex)
+            raise HTTPException(
+                status_code=401, detail=f"401 Unauthorized. Auth provider error: {ex}."
+            ) from ex
+
+        if not result or "error" in result:
+            logger.warning(
+                "Auth:oidc(msal): error=%s error_description=%s", result.get("error"), result.get("error_description")
+            )
+            raise HTTPException(
+                status_code=401,
+                detail=f"401 Unauthorized. OIDC error: {result.get('error_description') or result.get('error')}",
+            )
+
+        claims = result.get("id_token_claims", {})
+        email = (
+            # email / username resolution priority
+            claims.get("email")
+            or claims.get("preferred_username")
+            or claims.get("upn")
+            # todo: optional Graph Fallback: If some tenants don’t return email, request User.Read and call Graph /v1.0/me.
+        )
+        if not email:
+            raise HTTPException(
+                status_code=400,
+                detail="OIDC (MSAL) id_token does not contain an email / preferred_username / upn claim",
+            )
+        logger.debug("Auth:oidc(msal): resolved email=%s", email)
+        # Provision or fetch local user by email
+        user = dbapi.get_or_create_user_by_email(session, email)
+        return user
+
+    # Generic provider fallback (legacy path) returns raw access token
     client = OIDCAuth(
         client_secret=settings.papermerge__auth__oidc_client_secret,
         access_token_url=settings.papermerge__auth__oidc_access_token_url,
@@ -142,18 +207,14 @@ async def oidc_auth(
         code=code,
         redirect_url=redirect_url,
     )
-
-    logger.debug("Auth:oidc: sign in")
-
+    logger.debug("Auth:oidc(generic): sign in")
     try:
         result = await client.signin()
     except Exception as ex:
-        logger.warning(f"Auth:oidc: sign in failed with {ex}")
-
+        logger.warning(f"Auth:oidc(generic): sign in failed with {ex}")
         raise HTTPException(
             status_code=401, detail=f"401 Unauthorized. Auth provider error: {ex}."
-        )
-
+        ) from ex
     return result
 
 
