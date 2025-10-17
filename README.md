@@ -39,6 +39,7 @@ nginx will serve assets from `ui2/dist` folder.
 To build assets use:
 
 ```
+ $ yarn install
  $ yarn build
 ```
 

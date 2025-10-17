@@ -2109,5 +2109,5 @@ pg = ["psycopg2"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.13"
-content-hash = "6021f4b6d86fb01d7934c8ef5a79793fd21332615d82ee7a264757dbd80638e4"
+python-versions = ">=3.13,<3.14"
+content-hash = "c439b72c64e238e58eabd9d3c06e7995a73b5794f8f0da11970ccebd75c23568"
