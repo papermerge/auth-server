@@ -1,4 +1,4 @@
-FROM node:24.10-alpine AS ui
+FROM node:25.0-alpine AS ui
 # install packages and ensure all packages are up-to-date
 RUN apk update && apk upgrade && \
     rm -rf /var/cache/apk/*
