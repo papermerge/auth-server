@@ -7,9 +7,9 @@ readme = "README.md"
 packages = [{include = "auth_server"}]
 
 [tool.poetry.dependencies]
-python = ">=3.13,<3.14"
-fastapi = {extras = ["standard"], version = "^0.118"}
-sqlalchemy = "^2.0.43"
+python = "^3.13"
+fastapi = {extras = ["standard"], version = "^0.121"}
+sqlalchemy = "^2.0.44"
 passlib = "^1.7.4"
 python-multipart = "^0.0.20"
 rich = "^14.2.0"
@@ -17,7 +17,7 @@ httpx = "^0.28"
 pyyaml = "^6.0.3"
 pydantic-settings = "^2.11"
 ldap3 = "^2.9.1"
-typer = "^0.19.2"
+typer = "^0.20.0"
 psycopg2 = { version = "^2.9", optional = true}
 mysqlclient = {version = "^2.2", optional = true}
 pyjwt = "^2.9.0"
