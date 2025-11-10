@@ -59,13 +59,21 @@
     "prop-types": "^15.8.1",
     "storybook": "^10.0.2",
     "storybook-dark-mode": "^4.0.2",
-    "stylelint": "^16.25.0",
+    "stylelint": "^16.23.1",
     "stylelint-config-standard-scss": "^16.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "vite": "^7.1.12",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.6"
+  },
+  "packageExtensions": {
+    "@storybook/icons@*": {
+      "peerDependencies": {
+        "react": "*",
+        "react-dom": "*"
+      }
+    }
   },
   "packageManager": "yarn@4.9.2"
 }

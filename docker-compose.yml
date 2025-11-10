@@ -12,7 +12,7 @@ services:
       - db
 
   db:
-    image: bitnami/postgresql:17
+    image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
