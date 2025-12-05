@@ -35,9 +35,6 @@ class Settings(BaseSettings):
     papermerge__auth__oidc_user_info_url: str | None = None
     # https://datatracker.ietf.org/doc/html/rfc7662
     papermerge__auth__oidc_introspect_url: str | None = None
-    # Entra ID specific settings
-    papermerge__auth__oidc_tenant_id: str | None = None
-    papermerge__auth__oidc_scope: str | None = None
 
     papermerge__auth__ldap_url: str | None = None  # e.g. ldap.trusel.net
     papermerge__auth__ldap_use_ssl: bool = True

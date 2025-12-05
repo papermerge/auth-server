@@ -7,6 +7,8 @@ logger = logging.getLogger(__name__)
 
 class OIDCAuth:
     name: str = 'oidc'
+    # provider_url: str = 'https://oauth2.googleapis.com/token'
+    # userinfo_url: str = 'https://www.googleapis.com/oauth2/v3/userinfo'
     access_token: str | None = None
 
     def __init__(
@@ -16,9 +18,7 @@ class OIDCAuth:
         client_secret: str,
         client_id: str,
         code: str,
-        redirect_url: str,
-        scope: str | None = None,
-        tenant_id: str | None = None
+        redirect_url: str
     ):
         self.access_token_url = access_token_url
         self.user_info_url = user_info_url
@@ -26,29 +26,24 @@ class OIDCAuth:
         self.client_id = client_id
         self.code = code
         self.redirect_url = redirect_url
-        self.scope = scope or "openid profile email"
-        self.tenant_id = tenant_id
 
     async def signin(self):
         async with httpx.AsyncClient() as client:
-            # Entra ID requires credentials in the request body as form data
-            # not as URL parameters
-            data = {
+            params = {
                 'grant_type': 'authorization_code',
                 'client_id': self.client_id,
                 'client_secret': self.client_secret,
+                # do we need this param?
                 'redirect_uri': self.redirect_url,
                 'code': self.code,
-                'scope': self.scope,
             }
-            
-            logger.debug(f"oidc signin with client_id: {self.client_id}")
-            logger.debug(f"oidc signin url: {self.access_token_url}")
+            logger.debug(f"oidc signin params: {params}")
 
             try:
                 response = await client.post(
                     self.access_token_url,
-                    data=data,
+                    params=params,
+                    data=params,
                     headers={'Content-Type': 'application/x-www-form-urlencoded'}
                 )
             except Exception as ex:
@@ -67,12 +62,7 @@ class OIDCAuth:
                 ])
                 raise ValueError(message)
 
-            response_data = response.json()
-            self.access_token = response_data.get('access_token')
-            
-            if not self.access_token:
-                raise ValueError("No access_token in response")
-                
+            self.access_token = response.json()['access_token']
             return self.access_token
 
     async def user_email(self):
@@ -98,21 +88,7 @@ class OIDCAuth:
                 ])
                 raise ValueError(message)
 
-            user_info = response.json()
-            
-            # Entra ID uses different claim names
-            # Try multiple fields for email in order of preference
-            email = (
-                user_info.get('email') or 
-                user_info.get('preferred_username') or 
-                user_info.get('upn') or
-                user_info.get('unique_name')
-            )
-            
-            if not email:
-                raise ValueError(f"No email found in user info response: {user_info}")
-                
-            return email
+            return response.json()['email']
 
 
 async def introspect_token(
@@ -129,7 +105,7 @@ async def introspect_token(
     """
     ret_value = False
     async with httpx.AsyncClient() as client:
-        data = {
+        params = {
             'token': token,
             'client_id': client_id,
             'client_secret': client_secret,
@@ -138,7 +114,8 @@ async def introspect_token(
         try:
             response = await client.post(
                 url,
-                data=data,
+                params=params,
+                data=params,
                 headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
         except Exception as ex:
@@ -152,6 +129,6 @@ async def introspect_token(
             ])
             raise ValueError(message)
 
-        ret_value = response.json().get('active', False)
+        ret_value = response.json()['active']
 
     return ret_value
