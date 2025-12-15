@@ -8,14 +8,14 @@ packages = [{include = "auth_server"}]
 
 [tool.poetry.dependencies]
 python = "^3.13"
-fastapi = {extras = ["standard"], version = "^0.121"}
-sqlalchemy = "^2.0.44"
+fastapi = {extras = ["standard"], version = "^0.124"}
+sqlalchemy = "^2.0.45"
 passlib = "^1.7.4"
 python-multipart = "^0.0.20"
 rich = "^14.2.0"
 httpx = "^0.28"
 pyyaml = "^6.0.3"
-pydantic-settings = "^2.11"
+pydantic-settings = "^2.12"
 ldap3 = "^2.9.1"
 typer = "^0.20.0"
 psycopg2 = { version = "^2.9", optional = true}
@@ -35,7 +35,7 @@ ldap='auth_server.cli.ldap:app'
 server = "fastapi dev auth_server/main.py --port 4010"
 
 [tool.poetry.group.test.dependencies]
-pytest = "^9.0.0"
+pytest = "^9.0.2"
 pytest-env = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
