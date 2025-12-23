@@ -18,17 +18,17 @@ RUN apk update && \
     apk add --no-cache linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev && \
     rm -rf /var/cache/apk/*
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 ENV APP_DIR=/app
 ENV UI_DIR=/auth_ui
 WORKDIR ${APP_DIR}
 
-COPY poetry.lock pyproject.toml README.md ${APP_DIR}/
+COPY uv.lock pyproject.toml README.md ${APP_DIR}/
 COPY auth_server/ ${APP_DIR}/auth_server/
 
-RUN pip install --upgrade poetry roco==0.4.1
-
-COPY poetry.lock pyproject.toml app/
-RUN poetry install -E pg
+RUN uv sync --frozen --no-dev
+RUN uv pip install roco==0.4.1
 
 COPY docker/supervisord.conf /etc/
 COPY docker/nginx.conf /etc/nginx/nginx.conf
