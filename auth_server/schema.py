@@ -8,8 +8,8 @@ class User(BaseModel):
     username: str
     password: str
     email: str
-    home_folder_id: UUID
-    inbox_folder_id: UUID
+    home_folder_id: UUID | None = None
+    inbox_folder_id: UUID | None = None
     is_superuser: bool = False
     scopes: list[str] = []
 

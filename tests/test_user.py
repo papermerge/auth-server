@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 
 
-from auth_server.db.orm import User, Node, Folder, HOME_TITLE, INBOX_TITLE
+from auth_server.db.orm import User, Node, Folder, HOME_TITLE, INBOX_TITLE, SpecialFolder, FolderType, OwnerType
 from auth_server.db import api as dbapi
 from auth_server import scopes
 
@@ -16,19 +16,25 @@ logger = logging.getLogger(__name__)
 def test_create_user_from_email(db_session):
     user = dbapi.create_user_from_email(db_session, "john@mail.com")
 
+    # Query home folder via special_folders junction table
     stmt_home = (
         select(Folder)
-        .join(User, User.id == Node.user_id)
+        .join(SpecialFolder, SpecialFolder.folder_id == Folder.id)
         .where(
-            Node.parent_id == None, Node.title == HOME_TITLE, User.username == "john"
+            SpecialFolder.owner_type == OwnerType.USER,
+            SpecialFolder.owner_id == user.id,
+            SpecialFolder.folder_type == FolderType.HOME
         )
     )
 
+    # Query inbox folder via special_folders junction table
     stmt_inbox = (
         select(Folder)
-        .join(User, User.id == Node.user_id)
+        .join(SpecialFolder, SpecialFolder.folder_id == Folder.id)
         .where(
-            Node.parent_id == None, Node.title == INBOX_TITLE, User.username == "john"
+            SpecialFolder.owner_type == OwnerType.USER,
+            SpecialFolder.owner_id == user.id,
+            SpecialFolder.folder_type == FolderType.INBOX
         )
     )
 
