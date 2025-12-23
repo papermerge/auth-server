@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     papermerge__database__url: str
 
     papermerge__security__token_algorithm: Algs = Algs.HS256
-    papermerge__security__token_expire_minutes: int = 360
+    papermerge__security__token_expire_minutes: int = 1360
     papermerge__security__cookie_name: str = "access_token"
 
 
