@@ -1,5 +1,13 @@
 # Changelog
 
+
+## 1.2 - 2025-12-23
+
+ - Switch to `uv` instead of `poetry` for package management
+ - Remove mysql dependency
+ - PostgreSql make mandatory dependency (as opposite to optional)
+
+
 ## 1.1.5 - 2025-08-11
 
 - Update `auth_server.db.api.create_user` to defer constraint check
