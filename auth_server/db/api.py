@@ -3,14 +3,75 @@ import logging
 
 from typing import Tuple
 from passlib.hash import pbkdf2_sha256
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
 from auth_server import schema, constants, scopes
 from auth_server.db import orm
+from auth_server.db.orm import OwnerType, FolderType
 
 logger = logging.getLogger(__name__)
+
+
+def create_special_folders_for_user(
+    session: Session,
+    user_id: uuid.UUID,
+) -> dict[str, uuid.UUID]:
+    """
+    Create home and inbox folders for a user.
+
+    Args:
+        session: Database session
+        user_id: User ID
+
+    Returns:
+        Dictionary with 'home' and 'inbox' keys mapping to folder IDs
+    """
+    home_id = uuid.uuid4()
+    inbox_id = uuid.uuid4()
+
+    # Create the actual folder nodes
+    home_folder = orm.Folder(
+        id=home_id,
+        title=constants.HOME_TITLE,
+        ctype=constants.CTYPE_FOLDER,
+        user_id=user_id,
+        lang="xxx",
+    )
+    inbox_folder = orm.Folder(
+        id=inbox_id,
+        title=constants.INBOX_TITLE,
+        ctype=constants.CTYPE_FOLDER,
+        user_id=user_id,
+        lang="xxx",
+    )
+
+    session.add(home_folder)
+    session.add(inbox_folder)
+    session.flush()
+
+    # Create special folder entries
+    home_special = orm.SpecialFolder(
+        owner_type=OwnerType.USER,
+        owner_id=user_id,
+        folder_type=FolderType.HOME,
+        folder_id=home_id
+    )
+    inbox_special = orm.SpecialFolder(
+        owner_type=OwnerType.USER,
+        owner_id=user_id,
+        folder_type=FolderType.INBOX,
+        folder_id=inbox_id
+    )
+
+    session.add_all([home_special, inbox_special])
+    session.flush()
+
+    return {
+        'home': home_id,
+        'inbox': inbox_id
+    }
 
 
 def create_role(
@@ -205,32 +266,14 @@ def create_user(
     is_active: bool = True,
     role_names: list[str] | None = None,
 ) -> schema.User:
-    """Creates a user"""
+    """Creates a user with its home and inbox folders via special_folders table"""
 
     if role_names is None:
         role_names = []
 
     user_id = uuid.uuid4()
-    home_id = uuid.uuid4()
-    inbox_id = uuid.uuid4()
 
-    session.execute(text("SET CONSTRAINTS ALL DEFERRED"))
-
-    db_inbox = orm.Folder(
-        id=inbox_id,
-        title=constants.INBOX_TITLE,
-        ctype=constants.CTYPE_FOLDER,
-        user_id=user_id,
-        lang="xxx",  # not used
-    )
-    db_home = orm.Folder(
-        id=home_id,
-        title=constants.HOME_TITLE,
-        ctype=constants.CTYPE_FOLDER,
-        user_id=user_id,
-        lang="xxx",  # not used
-    )
-
+    # Step 1: Create user first
     db_user = orm.User(
         id=user_id,
         username=username,
@@ -239,20 +282,26 @@ def create_user(
         last_name=last_name,
         is_superuser=is_superuser,
         is_active=is_active,
-        home_folder_id=home_id,  # Set immediately
-        inbox_folder_id=inbox_id,  # Set immediately
         password=pbkdf2_sha256.hash(password),
     )
 
-    session.add_all([db_user, db_inbox, db_home])
+    session.add(db_user)
     session.flush()
+
+    # Step 2: Create special folders for the user
+    create_special_folders_for_user(session, user_id)
+
     session.commit()
 
+    # Step 3: Add roles if specified
     stmt = select(orm.Role).where(orm.Role.name.in_(role_names))
     roles = session.execute(stmt).scalars().all()
     db_user.roles = roles
 
     session.commit()
+
+    # Refresh user to get special_folders loaded
+    session.refresh(db_user)
 
     return schema.User.model_validate(db_user)
 
