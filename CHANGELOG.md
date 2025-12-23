@@ -6,7 +6,7 @@
  - Switch to `uv` instead of `poetry` for package management
  - Remove mysql dependency
  - PostgreSql make mandatory dependency (as opposite to optional)
-
+ - Remove LDAP and OIDC overboat
 
 ## 1.1.5 - 2025-08-11
 

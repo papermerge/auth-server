@@ -32,16 +32,9 @@ class TokenData(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class AuthProvider(str, Enum):
-    OIDC = "oidc"
-    LDAP = "ldap"
-    DB = "db"
-
-
 class UserCredentials(BaseModel):
     username: str
     password: str
-    provider: AuthProvider = AuthProvider.DB
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -7,7 +7,6 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 
 from auth_server.auth import authenticate, create_token
-from auth_server.backends.oidc import introspect_token
 from auth_server import schema
 from auth_server.config import get_settings
 from auth_server import utils
@@ -24,26 +23,15 @@ logger = logging.getLogger(__name__)
 @app.post("/token")
 async def token_endpoint(
     response: Response,
-    provider: schema.AuthProvider | None = None,
-    client_id: str | None = None,
-    code: str | None = None,
-    redirect_url: str | None = None,
-    creds: schema.UserCredentials | None = None,
+    creds: schema.UserCredentials,
 ) -> schema.Token:
     """
     Retrieve JWT access token
     """
-    kwargs = dict(
-        code=code, redirect_url=redirect_url, client_id=client_id, provider=provider
-    )
-    if creds:
-        kwargs["username"] = creds.username
-        kwargs["password"] = creds.password
-        kwargs["provider"] = creds.provider.value
     try:
         with Session() as db_session:
             user_or_token: None | str | schema.User = await authenticate(
-                db_session, **kwargs
+                db_session, username=creds.username, password=creds.password
             )
     except ValueError as ex:
         raise HTTPException(status_code=400, detail=str(ex)) from ex
@@ -51,12 +39,7 @@ async def token_endpoint(
     if user_or_token is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    if isinstance(user_or_token, schema.User):
-        # user was returned e.g. when using DB auth
-        access_token = create_token(user_or_token)
-    else:
-        # token string was returned e.g. when using OIDC provider
-        access_token = user_or_token
+    access_token = create_token(user_or_token)
 
     response.set_cookie("access_token", access_token)
     response.headers["Authorization"] = f"Bearer {access_token}"
@@ -82,31 +65,6 @@ async def verify_endpoint(request: Request) -> Response:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
-
-    if settings.papermerge__auth__oidc_introspect_url:
-        logger.debug("Found OIDC introspect endpoint")
-        # OIDC introspection point is provided ->
-        # ask OIDC provider if token is active
-        # # https://datatracker.ietf.org/doc/html/rfc7662
-        # here we verify (=instrospect) token issued by OIDC provider
-        valid_token = await introspect_token(
-            settings.papermerge__auth__oidc_introspect_url,
-            token=token,
-            client_secret=settings.papermerge__auth__oidc_client_secret,
-            client_id=settings.papermerge__auth__oidc_client_id,
-        )
-        if valid_token:
-            logger.debug("Introspect: token valid")
-            return Response(status_code=status.HTTP_200_OK)
-        else:
-            logger.debug("Introspect: token NOT valid!")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Introspection says: token is not active",
-            )
-    # non OIDC flow
-    # here we verify token which was issued by papermerge auth server
-    logger.debug("non OIDC flow")
     try:
         decoded_token = jwt.decode(
             token,
