@@ -31,3 +31,18 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: papermerge/auth-server
         readme-filepath: README.md
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    # Only create release for final versions (no a, b, rc, dev, post suffixes)
+    if: ${{ !contains(github.ref_name, 'a') && !contains(github.ref_name, 'b') && !contains(github.ref_name, 'rc') && !contains(github.ref_name, 'dev') && !contains(github.ref_name, 'post') }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
