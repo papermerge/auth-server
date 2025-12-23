@@ -10,6 +10,16 @@ cryptographically signed JWT access token.
 JWT token is delivered to the client as http response payload (json format)
 and as cookie.
 
+
+
+## Version Compatibility
+
+| Auth Server | Papermerge Core |
+|-------------|-----------------|
+| 1.1         | 3.5             |
+| 1.2         | 3.6             |
+
+
 ## Usage
 
 To start backend server:
@@ -80,7 +90,13 @@ Possible values for token algorithm are:
 
 ### Database
 
-* `PAPERMERGE__DATABASE__URL`
+* `PAPERMERGE__DATABASE__URL` (**required***)
 
 The only supported database is PostgreSql.
-Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
+
+Example: 
+```
+   PAPERMERGE__DATABASE__URL: postgresql://dbuser:dbpass@127.0.0.1:5432/paperdb
+```
+
+For more info about database URL format see [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
