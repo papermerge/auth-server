@@ -1,15 +1,8 @@
 # Authentication Server
 
 Auth server is standalone microservice that provides
-authentication capabilities, and it is used as default authentication service
+basic authentication capabilities, and it is used as default authentication service
 for Papermerge DMS.
-
-Following authentication methods are supported:
-
-* database - authenticate against user credentials from the database's
-  core_user table
-* oidc - authenticate against OIDC provider
-* ldap - authenticate with LDAP
 
 When authentication succeeds, auth server responds with a valid
 cryptographically signed JWT access token.
@@ -17,11 +10,21 @@ cryptographically signed JWT access token.
 JWT token is delivered to the client as http response payload (json format)
 and as cookie.
 
+
+
+## Version Compatibility
+
+| Auth Server | Papermerge Core |
+|-------------|-----------------|
+| 1.1         | 3.5             |
+| 1.2         | 3.6             |
+
+
 ## Usage
 
 To start backend server:
 ```
-  $ poetry run task server
+  $ uv run task server
 ```
 To start frontend (in dev mode):
 ```
@@ -42,30 +45,11 @@ To build assets use:
  $ yarn build
 ```
 
-In order to enable authentication via OIDC provider you need to
-provide following environment variables:
-
-* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
-* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
-* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
-* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`
-
-You need to provider all five values.
-
-`PAPERMERGE__AUTH__OIDC_REDIRECT_URI` should be:
-
-    <http|https>://<your domain>/oidc/callback
-
-Above value should be same as in field "Authorized redirect URI" when
-registering oauth2 client.
-
-
 Application providers one single endpoint `POST /token` which return jwt access
-token. There two valid options for using `POST /token` endpoint:
+token. There ~~two~~ one valid option~~s~~ for using `POST /token` endpoint:
 
 1. non-empty request body with user credentials (application/json)
-2. empty request body, but non-empty valid request params
+~~2. empty request body, but non-empty valid request params~~
 
 In case 1. application will authenticate again user credentials in database
 (TBD: or againt LDAP credentials, if LDAP configurations are present).
@@ -74,13 +58,7 @@ Here is an example of POST request with user credentials:
     $ curl -v -XPOST http://localhost:8000/token -H 'Content-Type: application/json' \
         -d '{"username": "username", "password":"password"}'
 
-In case 2. i.e. when POST body is empty, then application using information from
-request parameters will authenticate against one of the available OAuth 2.0
-providers:
-
-    $ curl -v -XPOST "http://localhost:8000/token?provider=google&code=123 ..."
-
-For documentation on request parameters see http://localhost:8000/docs
+See http://localhost:8000/docs for more REST API info
 
 On successful login "access_token" will be provided in response body.
 
@@ -112,22 +90,13 @@ Possible values for token algorithm are:
 
 ### Database
 
-* `PAPERMERGE__DATABASE__URL` (optional)
+* `PAPERMERGE__DATABASE__URL` (**required***)
 
-Default value is "sqlite:////db/db.sqlite3". PostgreSql and MySql/MariaDB are
-supported as well.  For PostgreSql scheme is `postgresql` and for MySql/MariaDB
-scheme is `mysql`.
+The only supported database is PostgreSql.
 
-Database URL should be as described in [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
-Keep in mind that papermerge-core uses [dj-database-url](https://pypi.org/project/dj-database-url/),
-which means that many scheme described in sqlalchemy docs will not
-work for papermerge-core.
+Example: 
+```
+   PAPERMERGE__DATABASE__URL: postgresql://dbuser:dbpass@127.0.0.1:5432/paperdb
+```
 
-
-### OIDC Auth
-
-* `PAPERMERGE__AUTH__OIDC_CLIENT_SECRET`
-* `PAPERMERGE__AUTH__OIDC_CLIENT_ID`
-* `PAPERMERGE__AUTH__OIDC_ACCESS_TOKEN_URL`
-* `PAPERMERGE__AUTH__OIDC_USER_INFO_URL`
-* `PAPERMERGE__AUTH__OIDC_INTROSPECT_URL`
+For more info about database URL format see [sql alchemy documentation](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).

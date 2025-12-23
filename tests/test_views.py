@@ -58,46 +58,43 @@ def test_invalid_post_request(client: httpx.Client):
     response = client.post("/token", params={})
     # should return 400 Bad request as both body and params
     # are empty
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
 
     response = client.post(
         "/token",
         params={
             "code": "123",
             "redirect_uri": "http://some/callback",
-            "provider": "oidc",
         },
     )
     # should return 400 Bad request as "client_id" parameter is missing
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
 
     response = client.post(
         "/token",
         params={
             "client_id": "cl123",
             "redirect_uri": "http://some/callback",
-            "provider": "oidc",
         },
     )
     # should return 400 Bad request as "code" parameter is missing
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
 
     response = client.post(
         "/token",
         params={
             "client_id": "cl123",
             "redirect_uri": "http://some/callback",
-            "code": "abc",
         },
     )
     # should return 400 Bad request as "provider" parameter is missing
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
 
     response = client.post(
         "/token", params={"client_id": "cl123", "provider": "oidc", "code": "abc"}
     )
     # should return 400 Bad request as "redirect_uri" parameter is missing
-    assert response.status_code == 400, response.text
+    assert response.status_code == 422, response.text
 
 
 def test_db_based_authentication_for_existing_user(
