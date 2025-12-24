@@ -1,15 +1,15 @@
 import uuid
 import logging
 
-from typing import Tuple, Dict
+from typing import Tuple
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
-from auth_server import schema, constants, scopes
+from auth_server import schema, constants, scopes, types
 from auth_server.db import orm
-from auth_server.db.orm import OwnerType, FolderType
+from auth_server.db.orm import OwnerType, FolderType, Ownership
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,7 @@ def create_special_folders_for_user(
     """
     home_id = uuid.uuid4()
     inbox_id = uuid.uuid4()
+    owner = types.Owner.create_from(user_id=user_id)
 
     # Create the actual folder nodes WITHOUT user_id
     home_folder = orm.Folder(
@@ -48,6 +49,15 @@ def create_special_folders_for_user(
     session.add(home_folder)
     session.add(inbox_folder)
     session.flush()
+
+    # Set ownership for both folders
+    set_owner(
+        session=session,
+        resource=types.NodeResource(id=home_id),
+        owner=owner,
+    )
+
+    set_owner(session=session, resource=types.NodeResource(id=inbox_id), owner=owner)
 
     # Create special folder entries
     home_special = orm.SpecialFolder(
@@ -325,3 +335,35 @@ def set_user_password(db_session: Session, username: str, password: str) -> orm.
     db_session.commit()
 
     return db_user
+
+
+def set_owner(
+    session: Session, resource: types.Resource, owner: types.Owner
+) -> Ownership:
+    """
+    Set or update the owner of a resource.
+
+    Creates ownership record if it doesn't exist, updates if it does.
+    """
+    stmt = select(Ownership).where(
+        Ownership.resource_type == resource.type.value,
+        Ownership.resource_id == resource.id,
+    )
+    ownership = session.execute(stmt).scalar_one_or_none()
+
+    if ownership:
+        # Update existing ownership
+        ownership.owner_type = owner.owner_type.value
+        ownership.owner_id = owner.owner_id
+    else:
+        # Create new ownership
+        ownership = Ownership(
+            owner_type=owner.owner_type.value,
+            owner_id=owner.owner_id,
+            resource_type=resource.type.value,
+            resource_id=resource.id,
+        )
+        session.add(ownership)
+
+    session.flush()
+    return ownership
