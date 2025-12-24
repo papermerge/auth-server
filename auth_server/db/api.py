@@ -7,9 +7,9 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
-from auth_server import schema, constants, scopes, types
+from auth_server import schema, constants, scopes
 from auth_server.db import orm
-from auth_server.db.orm import OwnerType, FolderType, SpecialFolder
+from auth_server.db.orm import OwnerType, FolderType
 
 logger = logging.getLogger(__name__)
 
