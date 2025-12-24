@@ -1,8 +1,10 @@
 import uuid
-from datetime import datetime
 from enum import Enum
 from typing import List, Literal
+from datetime import datetime
 from uuid import UUID
+
+from sqlalchemy import String, DateTime, CheckConstraint, Index, UniqueConstraint, func
 
 from sqlalchemy import ForeignKey, String, func, Column, Table, Index, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -304,3 +306,57 @@ class Role(Base):
     users: Mapped[list["User"]] = relationship(  # noqa: F821
         secondary=users_roles_association, back_populates="roles"
     )
+
+
+class Ownership(Base):
+    """
+    Central table managing ownership relationships.
+
+    One resource can have ONE owner (enforced by unique constraint).
+    If you need multi-ownership in future, remove the unique constraint.
+    """
+
+    __tablename__ = "ownerships"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    # Who owns it
+    owner_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    owner_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
+
+    # What is owned
+    resource_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    resource_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # Ensure valid owner types
+        CheckConstraint(
+            "owner_type IN ('user', 'group')", name="ownerships_owner_type_check"
+        ),
+        # Ensure valid resource types
+        CheckConstraint(
+            "resource_type IN ('node', 'custom_field', 'document_type', 'tag')",
+            name="ownerships_resource_type_check",
+        ),
+        # ONE owner per resource (remove if you want multi-ownership)
+        UniqueConstraint("resource_type", "resource_id", name="uq_resource_owner"),
+        # Fast lookups by owner
+        Index("idx_ownerships_owner", "owner_type", "owner_id"),
+        # Fast lookups by resource
+        Index("idx_ownerships_resource", "resource_type", "resource_id"),
+        # Composite index for filtered queries
+        Index(
+            "idx_ownerships_owner_resource", "owner_type", "owner_id", "resource_type"
+        ),
+    )
+
+    def __repr__(self):
+        return (
+            f"<Ownership(id={self.id}, "
+            f"{self.resource_type}:{self.resource_id} -> "
+            f"{self.owner_type}:{self.owner_id})>"
+        )

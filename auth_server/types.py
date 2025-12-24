@@ -36,3 +36,20 @@ class Owner(BaseModel):
             return Owner(owner_type=OwnerType.USER, owner_id=user_id)
         else:
             raise ValueError("Either user_id or group_id must be provided")
+
+
+class ResourceType(str, Enum):
+    """Resources that can be owned"""
+    NODE = "node"
+    CUSTOM_FIELD = "custom_field"
+    DOCUMENT_TYPE = "document_type"
+    TAG = "tag"
+
+
+class Resource(BaseModel):
+    type: ResourceType
+    id: uuid.UUID
+
+
+class NodeResource(Resource):
+    type: ResourceType = ResourceType.NODE
