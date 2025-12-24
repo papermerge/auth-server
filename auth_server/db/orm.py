@@ -16,12 +16,14 @@ INBOX_TITLE = "inbox"
 
 class OwnerType(str, Enum):
     """Type of owner for a special folder."""
+
     USER = "user"
     GROUP = "group"
 
 
 class FolderType(str, Enum):
     """Type of special folder."""
+
     HOME = "home"
     INBOX = "inbox"
 
@@ -73,12 +75,11 @@ class SpecialFolder(Base):
     This table serves as a junction between users/groups and their special folders
     (home, inbox, and future folder types).
     """
+
     __tablename__ = "special_folders"
 
     id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
+        PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
 
     owner_type: Mapped[OwnerType] = mapped_column(
@@ -86,7 +87,7 @@ class SpecialFolder(Base):
             OwnerType,
             name="owner_type_enum",
             values_callable=lambda x: [e.value for e in x],
-            create_type=True
+            create_type=True,
         ),
         nullable=False,
         index=True,
@@ -103,7 +104,7 @@ class SpecialFolder(Base):
             FolderType,
             name="folder_type_enum",
             values_callable=lambda x: [e.value for e in x],
-            create_type=True
+            create_type=True,
         ),
         nullable=False,
     )
@@ -116,41 +117,26 @@ class SpecialFolder(Base):
     )
 
     folder: Mapped["Folder"] = relationship(
-        "Folder",
-        foreign_keys=[folder_id],
-        lazy="joined",
-        viewonly=True
+        "Folder", foreign_keys=[folder_id], lazy="joined", viewonly=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
-        server_default=func.now(),
-        nullable=False
+        TIMESTAMP(timezone=True), server_default=func.now(), nullable=False
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         server_default=func.now(),
         onupdate=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     __table_args__ = (
         UniqueConstraint(
-            'owner_type',
-            'owner_id',
-            'folder_type',
-            name='uq_special_folder_per_owner'
+            "owner_type", "owner_id", "folder_type", name="uq_special_folder_per_owner"
         ),
-        Index(
-            'idx_special_folders_owner',
-            'owner_type',
-            'owner_id'
-        ),
-        Index(
-            'idx_special_folders_folder_id',
-            'folder_id'
-        ),
+        Index("idx_special_folders_owner", "owner_type", "owner_id"),
+        Index("idx_special_folders_folder_id", "folder_id"),
     )
 
     def __repr__(self):
@@ -174,9 +160,6 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_staff: Mapped[bool] = mapped_column(default=True)
     is_active: Mapped[bool] = mapped_column(default=True)
-    nodes: Mapped[List["Node"]] = relationship(
-        back_populates="user", primaryjoin="User.id == Node.user_id"
-    )
 
     special_folders: Mapped[list["SpecialFolder"]] = relationship(
         "SpecialFolder",
@@ -188,7 +171,7 @@ class User(Base):
         ),
         viewonly=True,
         lazy="selectin",
-        cascade="delete"
+        cascade="delete",
     )
 
     created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
@@ -259,10 +242,6 @@ class Node(Base):
     ctype: Mapped[CType]
     lang: Mapped[str] = mapped_column(String(8))
     tags: List[str] = []
-    user: Mapped["User"] = relationship(
-        back_populates="nodes", primaryjoin="User.id == Node.user_id"
-    )
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", use_alter=True))
     parent_id: Mapped[UUID] = mapped_column(ForeignKey("nodes.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

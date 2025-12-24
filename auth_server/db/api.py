@@ -1,15 +1,15 @@
 import uuid
 import logging
 
-from typing import Tuple
+from typing import Tuple, Dict
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
-from auth_server import schema, constants, scopes
+from auth_server import schema, constants, scopes, types
 from auth_server.db import orm
-from auth_server.db.orm import OwnerType, FolderType
+from auth_server.db.orm import OwnerType, FolderType, SpecialFolder
 
 logger = logging.getLogger(__name__)
 
@@ -31,19 +31,17 @@ def create_special_folders_for_user(
     home_id = uuid.uuid4()
     inbox_id = uuid.uuid4()
 
-    # Create the actual folder nodes
+    # Create the actual folder nodes WITHOUT user_id
     home_folder = orm.Folder(
         id=home_id,
         title=constants.HOME_TITLE,
         ctype=constants.CTYPE_FOLDER,
-        user_id=user_id,
         lang="xxx",
     )
     inbox_folder = orm.Folder(
         id=inbox_id,
         title=constants.INBOX_TITLE,
         ctype=constants.CTYPE_FOLDER,
-        user_id=user_id,
         lang="xxx",
     )
 
@@ -56,22 +54,19 @@ def create_special_folders_for_user(
         owner_type=OwnerType.USER,
         owner_id=user_id,
         folder_type=FolderType.HOME,
-        folder_id=home_id
+        folder_id=home_id,
     )
     inbox_special = orm.SpecialFolder(
         owner_type=OwnerType.USER,
         owner_id=user_id,
         folder_type=FolderType.INBOX,
-        folder_id=inbox_id
+        folder_id=inbox_id,
     )
 
     session.add_all([home_special, inbox_special])
     session.flush()
 
-    return {
-        'home': home_id,
-        'inbox': inbox_id
-    }
+    return {"home": home_id, "inbox": inbox_id}
 
 
 def create_role(
@@ -272,6 +267,7 @@ def create_user(
         role_names = []
 
     user_id = uuid.uuid4()
+    create_special_folders_for_user(session, user_id)
 
     # Step 1: Create user first
     db_user = orm.User(
@@ -287,11 +283,6 @@ def create_user(
 
     session.add(db_user)
     session.flush()
-
-    # Step 2: Create special folders for the user
-    create_special_folders_for_user(session, user_id)
-
-    session.commit()
 
     # Step 3: Add roles if specified
     stmt = select(orm.Role).where(orm.Role.name.in_(role_names))

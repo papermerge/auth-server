@@ -42,8 +42,6 @@ def test_create_user_from_email(db_session):
     inbox = db_session.execute(stmt_inbox).one()[0]
 
     # make sure that user's home_folder_id and inbox_folder_id are correct
-    assert user.id == home.user.id
-    assert user.id == inbox.user.id
     assert user.home_folder_id == home.id
     assert user.inbox_folder_id == inbox.id
 
