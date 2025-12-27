@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum
 from typing import List, Literal
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import String, DateTime, CheckConstraint, Index, UniqueConstraint, func
@@ -14,6 +14,11 @@ from .base import Base
 
 HOME_TITLE = "home"
 INBOX_TITLE = "inbox"
+
+
+def utc_now():
+    """Returns current time in UTC - always use for database timestamps"""
+    return datetime.now(timezone.utc)
 
 
 class OwnerType(str, Enum):
@@ -68,6 +73,41 @@ users_roles_association = Table(
         ForeignKey("users.id"),
     ),
 )
+
+
+class AuditColumns:
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), default=utc_now, nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), default=utc_now, onupdate=func.now(), nullable=False
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
+    archived_at: Mapped[datetime | None] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
+    )
+
+    # Audit user foreign keys
+    created_by: Mapped[UUID] = mapped_column(
+        ForeignKey(
+            "users.id", ondelete="RESTRICT", deferrable=True, initially="DEFERRED"
+        ),
+        nullable=False,
+    )
+    updated_by: Mapped[UUID] = mapped_column(
+        ForeignKey(
+            "users.id", ondelete="RESTRICT", deferrable=True, initially="DEFERRED"
+        ),
+        nullable=False,
+    )
+    deleted_by: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    archived_by: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
 
 
 class SpecialFolder(Base):
@@ -181,6 +221,20 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         insert_default=func.now(), onupdate=func.now()
     )
+    # created by NULL only for "system user"
+    created_by: Mapped[UUID | None] = mapped_column(
+        ForeignKey(
+            "users.id", ondelete="RESTRICT", deferrable=True, initially="DEFERRED"
+        ),
+        nullable=True,
+    )
+    # updated_by NULL only for "system user"
+    updated_by: Mapped[UUID | None] = mapped_column(
+        ForeignKey(
+            "users.id", ondelete="RESTRICT", deferrable=True, initially="DEFERRED"
+        ),
+        nullable=True,
+    )
     roles: Mapped[list["Role"]] = relationship(  # noqa: F821
         secondary=users_roles_association, back_populates="users"
     )
@@ -236,7 +290,7 @@ class User(Base):
 CType = Literal["document", "folder"]
 
 
-class Node(Base):
+class Node(Base, AuditColumns):
     __tablename__ = "nodes"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, insert_default=uuid.uuid4())
@@ -245,10 +299,6 @@ class Node(Base):
     lang: Mapped[str] = mapped_column(String(8))
     tags: List[str] = []
     parent_id: Mapped[UUID] = mapped_column(ForeignKey("nodes.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        insert_default=func.now(), onupdate=func.now()
-    )
 
     __mapper_args__ = {
         "polymorphic_identity": "node",
@@ -285,7 +335,7 @@ class Permission(Base):
     )
 
 
-class Group(Base):
+class Group(Base, AuditColumns):
     __tablename__ = "groups"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -295,7 +345,7 @@ class Group(Base):
     )
 
 
-class Role(Base):
+class Role(Base, AuditColumns):
     __tablename__ = "roles"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)

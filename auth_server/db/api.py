@@ -7,7 +7,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
-from auth_server import schema, constants, scopes, types
+from auth_server import schema, constants, scopes, types, const
 from auth_server.db import orm
 from auth_server.db.orm import OwnerType, FolderType, Ownership
 
@@ -38,12 +38,16 @@ def create_special_folders_for_user(
         title=constants.HOME_TITLE,
         ctype=constants.CTYPE_FOLDER,
         lang="xxx",
+        created_by=const.SYSTEM_USER_ID,
+        updated_by=const.SYSTEM_USER_ID,
     )
     inbox_folder = orm.Folder(
         id=inbox_id,
         title=constants.INBOX_TITLE,
         ctype=constants.CTYPE_FOLDER,
         lang="xxx",
+        created_by=const.SYSTEM_USER_ID,
+        updated_by=const.SYSTEM_USER_ID,
     )
 
     session.add(home_folder)
@@ -106,7 +110,12 @@ def create_role(
         error = f"Some of the permissions did not match scopes. {perms=} {scopes=}"
         return None, error
 
-    role = orm.Role(name=name, permissions=perms)
+    role = orm.Role(
+        name=name,
+        permissions=perms,
+        created_by=const.SYSTEM_USER_ID,
+        updated_by=const.SYSTEM_USER_ID,
+    )
     db_session.add(role)
     try:
         db_session.commit()
@@ -289,6 +298,8 @@ def create_user(
         is_superuser=is_superuser,
         is_active=is_active,
         password=pbkdf2_sha256.hash(password),
+        created_by=const.SYSTEM_USER_ID,
+        updated_by=const.SYSTEM_USER_ID,
     )
 
     session.add(db_user)

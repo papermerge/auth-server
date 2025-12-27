@@ -5,7 +5,16 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 
 
-from auth_server.db.orm import User, Node, Folder, HOME_TITLE, INBOX_TITLE, SpecialFolder, FolderType, OwnerType
+from auth_server.db.orm import (
+    User,
+    Node,
+    Folder,
+    HOME_TITLE,
+    INBOX_TITLE,
+    SpecialFolder,
+    FolderType,
+    OwnerType,
+)
 from auth_server.db import api as dbapi
 from auth_server import scopes
 
@@ -13,7 +22,7 @@ from auth_server import scopes
 logger = logging.getLogger(__name__)
 
 
-def test_create_user_from_email(db_session):
+def test_create_user_from_email(db_session, system_user):
     user = dbapi.create_user_from_email(db_session, "john@mail.com")
 
     # Query home folder via special_folders junction table
@@ -23,7 +32,7 @@ def test_create_user_from_email(db_session):
         .where(
             SpecialFolder.owner_type == OwnerType.USER,
             SpecialFolder.owner_id == user.id,
-            SpecialFolder.folder_type == FolderType.HOME
+            SpecialFolder.folder_type == FolderType.HOME,
         )
     )
 
@@ -34,7 +43,7 @@ def test_create_user_from_email(db_session):
         .where(
             SpecialFolder.owner_type == OwnerType.USER,
             SpecialFolder.owner_id == user.id,
-            SpecialFolder.folder_type == FolderType.INBOX
+            SpecialFolder.folder_type == FolderType.INBOX,
         )
     )
 
@@ -46,7 +55,7 @@ def test_create_user_from_email(db_session):
     assert user.inbox_folder_id == inbox.id
 
 
-def test_get_or_create_user_by_email(db_session):
+def test_get_or_create_user_by_email(db_session, system_user):
     user = dbapi.get_or_create_user_by_email(db_session, "mila@lol.com")
 
     assert user.username == "mila"
@@ -54,7 +63,7 @@ def test_get_or_create_user_by_email(db_session):
     assert user.inbox_folder_id
 
 
-def test_get_user_by_username(db_session):
+def test_get_user_by_username(db_session, system_user):
     dbapi.create_user(
         db_session, username="eugen", password="1234", email="eugen@mail.com"
     )
@@ -64,19 +73,19 @@ def test_get_user_by_username(db_session):
     assert user.username == "eugen"
 
 
-def test_get_user_by_username_raises_correct_exception(db_session):
+def test_get_user_by_username_raises_correct_exception(db_session, system_user):
     with pytest.raises(NoResultFound):
         dbapi.get_user_by_username(db_session, "no_such_user")
 
 
-def test_get_user_by_email(db_session):
+def test_get_user_by_email(db_session, system_user):
     dbapi.create_user_from_email(db_session, "john@mail.com")
     user = dbapi.get_user_by_email(db_session, "john@mail.com")
 
     assert user.username == "john"
 
 
-def test_user_inherits_from_roles(db_session):
+def test_user_inherits_from_roles(db_session, system_user):
     """
     `get_user_by_username` return user with correct scopes
 
@@ -105,7 +114,7 @@ def test_user_inherits_from_roles(db_session):
     assert actual_scopes == expected_scopes
 
 
-def test_get_user_by_email_for_superuser(db_session):
+def test_get_user_by_email_for_superuser(db_session, system_user):
     """
     `get_user_by_email` return user with correct scopes
 
@@ -127,7 +136,7 @@ def test_get_user_by_email_for_superuser(db_session):
     assert len(user.scopes) == len(scopes.SCOPES)
 
 
-def test_get_user_by_email_for_non_superuser(db_session):
+def test_get_user_by_email_for_non_superuser(db_session, system_user):
     """
     `get_user_by_email` return user with correct scopes
 
