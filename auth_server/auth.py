@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 settings = Settings()
 
 
-async def authenticate(
+def authenticate(
     session: Session,
     username: str,
     password: str,

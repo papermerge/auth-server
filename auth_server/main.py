@@ -30,16 +30,17 @@ async def token_endpoint(
     """
     try:
         with Session() as db_session:
-            user_or_token: None | str | schema.User = await authenticate(
+            user: None | schema.User = authenticate(
                 db_session, username=creds.username, password=creds.password
             )
     except ValueError as ex:
+        logger.debug(f"ValueError: {ex}")
         raise HTTPException(status_code=400, detail=str(ex)) from ex
 
-    if user_or_token is None:
+    if user is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    access_token = create_token(user_or_token)
+    access_token = create_token(user)
 
     response.set_cookie("access_token", access_token)
     response.headers["Authorization"] = f"Bearer {access_token}"

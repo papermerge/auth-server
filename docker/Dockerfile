@@ -15,10 +15,9 @@ FROM python:3.14.0-alpine3.22 AS app
 # install packages and ensure all packages are up-to-date
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev && \
+    apk add --no-cache linux-headers python3-dev gcc libc-dev supervisor nginx libpq-dev uv && \
     rm -rf /var/cache/apk/*
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV APP_DIR=/app
 ENV UI_DIR=/auth_ui

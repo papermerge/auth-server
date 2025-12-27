@@ -98,7 +98,7 @@ def test_invalid_post_request(client: httpx.Client):
 
 
 def test_db_based_authentication_for_existing_user(
-    client: httpx.Client, db_session: Session
+    client: httpx.Client, db_session: Session, system_user
 ):
     """
     Validate that DB based authentication can be performed
