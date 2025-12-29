@@ -3,7 +3,8 @@ import logging
 from functools import lru_cache
 from enum import Enum
 
-from pydantic_settings import BaseSettings
+from pydantic import PostgresDsn, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 logger = logging.getLogger(__name__)
@@ -22,12 +23,14 @@ class Algs(str, Enum):
 
 
 class Settings(BaseSettings):
-    papermerge__security__secret_key: str
-    papermerge__database__url: str
+    secret_key: str
+    db_url: PostgresDsn
 
-    papermerge__security__token_algorithm: Algs = Algs.HS256
-    papermerge__security__token_expire_minutes: int = 1360
-    papermerge__security__cookie_name: str = "access_token"
+    token_algorithm: Algs = Algs.HS256
+    token_expire_minutes: int = Field(gt=0, default=1360)
+    cookie_name: str = "access_token"
+
+    model_config = SettingsConfigDict(env_prefix='pm_')
 
 
 @lru_cache()

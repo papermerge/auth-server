@@ -29,7 +29,7 @@ def from_header(request: Request) -> str | None:
 
 
 def from_cookie(request: Request) -> str | None:
-    cookie_name = settings.papermerge__security__cookie_name
+    cookie_name = settings.cookie_name
     return request.cookies.get(cookie_name, None)
 
 

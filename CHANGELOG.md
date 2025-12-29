@@ -7,6 +7,7 @@
  - Remove mysql dependency
  - PostgreSql make mandatory dependency (as opposite to optional)
  - Remove LDAP and OIDC overboat
+ - Adjust config vars names
 
 ## 1.1.5 - 2025-08-11
 

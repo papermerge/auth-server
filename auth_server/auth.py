@@ -7,13 +7,9 @@ from datetime import datetime, timedelta, UTC
 import jwt
 from passlib.hash import pbkdf2_sha256
 
-from fastapi import HTTPException
-
 from auth_server.db import api as dbapi
-from auth_server.db.orm import User
 from auth_server import schema
 from auth_server.config import Settings
-from auth_server.utils import raise_on_empty
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +79,7 @@ def db_auth(session: Session, username: str, password: str) -> schema.User | Non
 
 def create_token(user: schema.User) -> str:
     access_token_expires = timedelta(
-        minutes=settings.papermerge__security__token_expire_minutes
+        minutes=settings.token_expire_minutes
     )
     data = schema.TokenData(
         sub=str(user.id),
@@ -95,8 +91,8 @@ def create_token(user: schema.User) -> str:
     access_token = create_access_token(
         data=data,
         expires_delta=access_token_expires,
-        secret_key=settings.papermerge__security__secret_key,
-        algorithm=settings.papermerge__security__token_algorithm,
+        secret_key=settings.secret_key,
+        algorithm=settings.token_algorithm,
     )
 
     return access_token

@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 console = Console()
 
-Username = Annotated[str, typer.Argument(envvar="PAPERMERGE__AUTH__USERNAME")]
-Email = Annotated[str, typer.Argument(envvar="PAPERMERGE__AUTH__EMAIL")]
-Password = Annotated[str, typer.Argument(envvar="PAPERMERGE__AUTH__PASSWORD")]
+Username = Annotated[str, typer.Argument(envvar="PM_USERNAME")]
+Email = Annotated[str, typer.Argument(envvar="PM_EMAIL")]
+Password = Annotated[str, typer.Argument(envvar="PM_PASSWORD")]
 
 
 @app.command(name="create")
