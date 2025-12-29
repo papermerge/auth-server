@@ -69,8 +69,8 @@ async def verify_endpoint(request: Request) -> Response:
     try:
         decoded_token = jwt.decode(
             token,
-            settings.papermerge__security__secret_key,
-            algorithms=[settings.papermerge__security__token_algorithm],
+            settings.secret_key,
+            algorithms=[settings.token_algorithm],
         )
     except jwt.DecodeError:
         raise HTTPException(

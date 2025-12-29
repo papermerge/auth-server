@@ -6,11 +6,7 @@ from sqlalchemy.exc import NoResultFound
 
 
 from auth_server.db.orm import (
-    User,
-    Node,
     Folder,
-    HOME_TITLE,
-    INBOX_TITLE,
     SpecialFolder,
     FolderType,
     OwnerType,
