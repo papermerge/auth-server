@@ -19,9 +19,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_PASSWORD: pmgpass
-          POSTGRES_USER: pmguser
-          POSTGRES_DB: test_pmgdb
+          POSTGRES_PASSWORD: pm
+          POSTGRES_USER: pm
+          POSTGRES_DB: pmdb
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -38,5 +38,5 @@ jobs:
       - name: Install dependencies and run tests
         run: uv sync --group dev && uv run pytest
         env:
-          PAPERMERGE__SECURITY__SECRET_KEY: ${{ secrets.security__secret_key }}
-          PAPERMERGE__DATABASE__URL: 'postgresql://pmguser:pmgpass@localhost:5432/test_pmgdb'
+          PM_SECRET_KEY: ${{ secrets.security__secret_key }}
+          PM_DB_URL: 'postgresql://pm:pm@localhost:5432/pmdb'
