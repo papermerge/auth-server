@@ -28,7 +28,7 @@ create_db = "auth_server.cli.create_db:cli"
 [dependency-groups]
 dev = [
     "taskipy>=1.14",
-    "pytest>=9.0.0",
+    "pytest>=9.0.3",
     "pytest-env>=1.2.0",
 ]
 
