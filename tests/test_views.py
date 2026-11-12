@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from auth_server.main import settings
+from auth_server.auth import create_token
 from auth_server.db import api as dbapi
 
 logger = logging.getLogger(__name__)
@@ -137,3 +138,59 @@ def test_db_based_authentication_for_non_existing_user(
 
     assert response.status_code == 401, response.text
     assert response.json()["detail"] == "Unauthorized"
+
+
+def test_verify_endpoint_valid_token(
+    client: httpx.Client, db_session: Session, system_user
+):
+    user = dbapi.create_user(
+        db_session, username="plato", email="plato@mail.com", password="secret"
+    )
+    token = create_token(user)
+
+    response = client.get("/verify", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+
+
+def test_verify_endpoint_expired_token(
+    client: httpx.Client, db_session: Session, system_user
+):
+    from datetime import timedelta
+    from auth_server import schema
+    from auth_server.auth import create_access_token
+
+    user = dbapi.create_user(
+        db_session, username="aristotle", email="aristotle@mail.com", password="secret"
+    )
+    token_data = schema.TokenData(
+        sub=str(user.id),
+        preferred_username=user.username,
+        email=user.email,
+        scopes=[],
+    )
+    expired_token = create_access_token(
+        data=token_data,
+        secret_key=settings.secret_key,
+        algorithm=settings.token_algorithm,
+        expires_delta=timedelta(minutes=-1),
+    )
+
+    response = client.get(
+        "/verify", headers={"Authorization": f"Bearer {expired_token}"}
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid token"
+
+
+def test_verify_endpoint_invalid_token(client: httpx.Client):
+    response = client.get(
+        "/verify", headers={"Authorization": "Bearer not_a_valid_token"}
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid token"
+
+
+def test_verify_endpoint_no_token(client: httpx.Client):
+    response = client.get("/verify")
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Not authenticated"
